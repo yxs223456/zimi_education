@@ -1,0 +1,132 @@
+[v-cloak] {
+  display: none;
+}
+.vip-head,.vip-middle,.vip-bottom{
+	background: #fff;
+	margin: 0.71rem;
+	padding: 0.71rem 1.07rem;
+	position: relative;
+}
+.credit-id.active{
+	color: #c98b49;
+}
+.dead-line{
+	color: #999;
+}
+.credit-id{
+	color: #000;
+}
+.vip-explain > span{
+	color: #c98b49;
+}
+.vip-explain{
+	color: #666;
+}
+.vip-price{
+	color: #c98b49;
+	padding: 0.71rem 0;
+}
+.purchase-btn,.join-btn{
+	position: absolute;
+	bottom: 1rem;
+	right: 1rem;
+	width: 7.14rem;
+	height: 2.5rem;
+	border: 1px solid #c98b49;
+	border-radius: 2px;
+}
+.purchase-btn > p,.join-btn > p{
+	font-size: 1.07rem;
+	line-height: 2.5rem;
+	text-align: center;
+	color: #c98b49;
+}
+.no-vip-head{
+	color: #576b95;
+	background: #fff;
+	margin: 0.71rem;
+	padding: 0.71rem 1.07rem;
+	position: relative;
+}
+.vip-deadline{
+	color: #999;
+}
+/***********新版**********/
+
+html,body{
+	background: #faf8f7;
+}
+*{
+	margin: 0;
+	padding: 0;
+	font-family: Microsoft YaHei,Arial,sans-serif;
+}
+@media screen and (max-width: 414px){
+	html,body{
+		font-size: 16px;
+	}
+}
+@media screen and (max-width: 375px){
+	html,body{
+		font-size: 14px;
+	}
+}
+@media screen and (max-width: 320px){
+	html,body{
+		font-size: 12px;
+	}
+}
+.be-a-vip{
+	margin:0.71rem;
+
+}
+.your-identity{
+	padding: 1rem 0 1rem 1.1rem;
+	margin-bottom: 0.71rem;
+	background: #fff;
+	vertical-align: middle;
+	line-height: 1rem;
+}
+.your-identity>span{
+	color: #8f9bb5;
+}
+.dead-line{
+	margin-top: 0.4rem;
+}
+.vip-explaination{
+	padding: 1rem 1rem 1rem 1.1rem;
+}
+.vip-explain {
+	margin-bottom: 1.64rem;
+}
+.become-vip{
+	padding-right: 1.93rem;
+	margin-bottom: 1.71rem;
+	font-size: 1rem;
+	color: rgb(128,128,128);
+}
+.become-vip>span{
+	color: #c98b49;
+}
+.vip-welfare{
+	color: #c98b49;
+}
+.welfare-number{
+	color: rgb(128,128,128);
+	padding-right: 1.21rem;
+	line-height: 1.5rem;
+}
+.vip-explaination{
+	background: #fff;
+}
+.vip-btn{
+	width: 87%;
+	height: 2.5rem;
+	font-size: 1rem;
+	color: #FFFFFF;
+	border-width: 0px;
+	background-color: rgb(176,31,36);
+	margin-left: 3.6%;
+	position: fixed;
+	bottom: 1rem;
+}

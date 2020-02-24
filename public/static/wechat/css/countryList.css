@@ -1,0 +1,59 @@
+.country-title{
+	background: #fff;
+	position: fixed;
+	z-index: 100;
+	top: 0;
+	width: 100%;
+}
+.country-title > p{
+	padding: 1rem 0.71rem;
+	font-size: 1.17rem;
+}
+.cancel-btn{
+	position: absolute;
+	right: 0.71rem;
+	top: 0.55rem;
+	width: 6.43rem;
+	height: 2.5rem;
+	border: 1px solid #e2c29f;
+}
+.cancel-btn > p{
+	line-height: 2.5rem;
+	color: #e2c29f;
+	font-size: 1.07rem;
+	text-align: center;
+}
+.country-rank-first{
+	margin-top: 3.8rem;
+	padding: 0.35rem 0.71rem;
+	color: #666;
+}
+.country-rank{
+	padding: 0.35rem 0.71rem;
+	color: #666;
+}
+.hot-country > p{
+	position: relative;
+	background: #fff;
+	padding: 0.71rem;
+	border-top: 1px solid #d1d1d1;
+}
+.hot-country > p > span{
+	position: absolute;
+	right: 0.71rem;
+	top: 0.71rem;
+}
+body:last-child{
+	margin-bottom: 70px;
+}
+.rank-country > p{
+	position: relative;
+	background: #fff;
+	padding: 0.71rem;
+	border-bottom: 1px solid #d1d1d1;
+}
+.rank-country > p > span{
+	position: absolute;
+	right: 0.71rem;
+	top: 0.71rem;
+}

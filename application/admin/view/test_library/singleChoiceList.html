@@ -1,0 +1,131 @@
+{include file="public/header" /}
+<style type="text/css">
+    /*强制table不换行*/
+    table td{word-break: keep-all;white-space:nowrap;}
+    table th{word-break: keep-all;white-space:nowrap;}
+    .tableWordVreakNone{
+        white-space: normal !important;word-break: normal !important;
+    }
+</style>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>单选列表</h5>
+        </div>
+        <div class="ibox-content">
+            <!--搜索框开始-->
+            <div class="row">
+                <div class="col-sm-12">
+                    <div  class="col-sm-2" style="width: 100px">
+                        <div class="input-group" >
+                            <a href="{:url('addSingleChoiceList')}"><button class="btn btn-outline btn-primary" type="button">添加单选题</button></a>
+                        </div>
+                    </div>
+                    <div class="col-sm-10">
+                        <form method="post" action="{:url('singleChoiceList')}" id="searchForm" class="form-inline">
+                            <label for="">题目</label>
+                            <input type="text" name="question" value="{$question|default=''}" class="form-control">
+
+                            <button class="btn btn-success btn-sm" type="submit" style="margin-bottom:0;margin-left:4px"><i class="fa fa-filter"></i> 筛选</button>
+                            <a class="btn btn-primary btn-sm"  style="margin-bottom:0" href="{:url('singleChoiceList')}"><i class="fa fa-filter"></i> 重置</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!--搜索框结束-->
+            <div class="hr-line-dashed"></div>
+
+            <div class="example-wrap">
+                <div class="example">
+                    <div style="overflow-x:scroll;width:100%;">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr class="long-tr">
+                                <th>ID</th>
+                                <th>问题</th>
+                                <th>备选答案</th>
+                                <th>答案</th>
+                                <th>是否使用</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody id="list-content">
+                            {foreach $list as $vo}
+                            <tr class="long-td">
+                                <td>{$vo.id}</td>
+                                <td>{$vo.question}</td>
+                                <td>{$vo.possible_answers}</td>
+                                <td>{$vo.answer}</td>
+                                <td>
+                                    {if $vo.is_use == 1}
+                                    使用中
+                                    {else /}
+                                    未使用
+                                    {/if}
+                                </td>
+                                <td>
+                                    {if condition="$vo['is_use'] eq 1"}
+                                    <a class="red" href="{:url('deactivate',['id' => $vo['id']])}">
+                                        <div><span class="label label-info">已上架</span></div>
+                                    </a>
+                                    {else /}
+                                    <a class="red" href="{:url('activate',['id' => $vo['id']])}">
+                                        <div><span class="label label-danger">已下架</span></div>
+                                    </a>
+                                    {/if}
+                                </td>
+                            </tr>
+                            {/foreach}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="laypage"></div>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+</div>
+<!-- End Panel Other -->
+</div>
+
+{include file="public/footer" /}
+<script type="text/javascript" src="/static/admin/js/laypage.js"></script>
+<script type="text/javascript">
+    layer.photos({
+        photos: '.layer-photos-demo'
+//  ,anim: 5 //0-6的选择，指定弹出图片动画类型，默认随机（请注意，3.0之前的版本用shift参数）
+    });
+
+    layui.use(['laypage', 'layer'], function(){
+        var laypage = layui.laypage
+            ,layer = layui.layer;
+
+        //完整功能
+        laypage.render({
+            elem: 'laypage'
+            ,count: '{$list->total()}' // 总数据条数
+            ,curr: '{$list->currentPage()}' // 当前第几页
+            ,limit: '{$list->listRows()}'   // 每页显示条数
+            ,layout: ['count', 'prev', 'page', 'next', 'refresh', 'skip']
+            ,jump: function(obj, first){
+                //首次不执行
+                if(!first){
+                    $("#searchForm").attr('action', '{:url("singleChoiceList")}?page='+obj.curr);
+                    $("#searchForm").submit();
+                }
+            }
+        });
+    });
+
+    function remove(id) {
+        layer.confirm('确定要删除吗？', {icon: 3}, function(index){
+            window.location.href="{:url('delete')}?id="+id
+        });
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,292 @@
+[v-cloak] {
+  display: none;
+}
+.user-center-bg{
+	background: url(../image/icon-vip-bg.png)no-repeat center;
+	background-size: 25.43rem 12.57rem;
+	position: relative;
+	z-index: 1;
+	width: 25.13rem;
+	min-height: 12.57rem;
+	margin: 0 0.71rem 0 0.71rem;
+	padding-top: 0.71rem;
+}
+.user-center-bg.active{
+	background: url('../image/icon-vip-bg.png')no-repeat center;
+	background-size: 25.43rem 13.29rem;
+	position: relative;
+	z-index: 1;
+	width: 25.13rem;
+	height: 13.29rem;
+	margin: 0 0.71rem 0 0.71rem;
+	padding-top: 0.71rem;
+}
+.user-head-img{
+	position: relative;
+	z-index: 2;
+	display: block;
+	width: 5rem;
+	height: 5rem;
+	border-radius: 50%;
+	margin: 1rem auto 0.35rem auto;
+}
+.nickname{
+	text-align: center;
+	color: #214778;
+	font-size: 1.29rem;
+}
+.icon-center-vip.inactive{
+	display: inline-block;
+	background: url('../image/icon-crown-dark.png')no-repeat center;
+	background-size: 1.71rem 1.36rem;
+	width: 1.71rem;
+	height: 1.36rem;
+	vertical-align: top;
+    margin-top: 0.3rem;
+    margin-left: 0.35rem;
+}
+.icon-center-vip.active{
+	display: inline-block;
+	background: url('../image/icon-crown-bright.png')no-repeat center;
+	background-size: 1.71rem 1.36rem;
+	background-size: 1.71rem 1.36rem;
+	width: 1.71rem;
+	height: 1.36rem;
+	vertical-align: top;
+	margin-top: 0.3rem;
+	margin-left: 0.35rem;
+}
+.vip-deadline{
+	margin-top: 0.68rem;
+	margin-bottom: 0.8rem;
+	text-align: center;
+}
+.vip-deadline.inactive{
+	font-size: 0.86rem;
+	color: #999;
+	text-align: center;
+}
+.vip-deadline.active{
+	font-size: 0.86rem;
+	color: #999;
+	text-align: center;
+}
+.vip-deadline.active > span{
+	color: #c98b49;
+}
+.user-info{
+	margin-top: 0.71rem;
+	text-align: center;
+}
+.vip-purchase,.bind-phone{
+	display: inline-block;
+}
+.vip-purchase > .icon-money{
+	display: inline-block;
+	background: url('../image/icon-add.png')no-repeat center;
+	background-size: 1.07rem;
+	width: 1.07rem;
+	height: 1.07rem;
+	vertical-align: top;
+	margin-top: 0.3rem;
+}
+.vip-purchase:after{
+	content: '加入会员';
+	display: inline-block;
+	color: #c98b49;
+	font-size: 1.07rem;
+	text-decoration:underline;
+}
+.vip-purchase.active > .icon-money{
+	background: url('../image/icon-money.png')no-repeat center;
+	background-size: 1.21rem;
+	width: 1.21rem;
+	height: 1.21rem;
+}
+.vip-purchase.active:after{
+	content: '会员续费';
+	display: inline-block;
+	color: #c98b49;
+	font-size: 1.07rem;
+	text-decoration:underline;
+}
+.user-info > span{
+	display: inline-block;
+	color: #c98b49;
+}
+.icon-phone{
+	display: inline-block;
+	background: url('../image/icon-phone.png')no-repeat center;
+	background-size: 0.86rem 1.07rem;
+	width: 0.86rem;
+	height: 1.07rem;
+	vertical-align: top;
+	margin-top: 0.3rem;
+}
+.bind-phone:after{
+	content: '绑定手机';
+	display: inline-block;
+	color: #c98b49;
+	font-size: 1.07rem;
+	text-decoration:underline;
+}
+.bind-phone.active:after{
+	content: '已绑定手机';
+	text-decoration: none;
+}
+.user-content{
+	display: flex;
+	margin: 1.5rem 0.71rem 0.71rem;
+	background: #fff;
+}
+.user-item{
+	flex-grow:1;
+	width: 50%;
+	text-align: center;
+	margin: 0.71rem 0;
+	padding: 0 0.71rem;
+}
+.user-item:first-child{
+    border-right: 1px solid #e7e7e7;
+}
+.user-word{
+	display: inline-block;
+}
+.icon-has-listen{
+	display: inline-block;
+	vertical-align: top;
+	background: url('../image/icon-has-listen.png')no-repeat center;
+	background-size: 2.71rem 2.86rem;
+	width: 2.71rem;
+	height: 2.86rem;
+	margin-right: 0.35rem;
+}
+.user-word-2{
+	color: #999;
+}
+.icon-purchase{
+	display: inline-block;
+	vertical-align: top;
+	background: url('../image/icon-currency.png')no-repeat center;
+	background-size: 1.36rem 2.71rem;
+	width: 1.36rem;
+	height: 2.71rem;
+	margin-right: 0.35rem;
+}
+.user-list{
+	margin: 0.35rem 0.71rem 70px 0.71rem;
+	background: #fff;
+}
+.user-item-list{
+	padding: 0.71rem 0;
+	margin: 0 0.71rem;
+	border-bottom: 1px solid #e7e7e7;
+	position: relative;
+	color: #666;
+}
+.user-item-list:last-child{
+	border: none;
+}
+.icon-clock{
+	display: inline-block;
+	background: url('../image/icon-clock.png')no-repeat center;
+	background-size: 1.21rem 1.29rem;
+	width: 1.21rem;
+	height: 1.29rem;
+	vertical-align: top;
+	margin-right: 0.35rem;
+	margin-top: 0.2rem;
+}
+.user-item-list > p{
+	display: inline-block;
+}
+.icon-right{
+	position: absolute;
+	right: 0;
+	top: 1.2rem;
+	background: url('../image/icon-right.png')no-repeat center;
+	background-size: 0.43rem 0.86rem;
+	width: 0.43rem;
+	height: 0.86rem;
+}
+.icon-collect{
+	display: inline-block;
+	background: url('../image/icon-collect.png')no-repeat center;
+	background-size: 1.29rem 1.07rem;
+	width: 1.29rem;
+	height: 1.07rem;
+	vertical-align: top;
+	margin-right: 0.35rem;
+	margin-top: 0.2rem;
+}
+.icon-order{
+	display: inline-block;
+	background: url('../image/icon-order.png')no-repeat center;
+	background-size: 1.14rem;
+	width: 1.14rem;
+	height: 1.14rem;
+	vertical-align: top;
+	margin-right: 0.35rem;
+	margin-top: 0.2rem;
+}
+.icon-personal{
+	display: inline-block;
+	background: url('../image/icon-personal.png')no-repeat center;
+	background-size: 1.21rem;
+	width: 1.21rem;
+	height: 1.21rem;
+	vertical-align: top;
+	margin-right: 0.35rem;
+	margin-top: 0.1rem;
+}
+.icon-invite{
+	display: inline-block;
+	background: url('../image/icon-invite.png')no-repeat center;
+	background-size: 1.14rem 1.29rem;
+	width: 1.14rem;
+	height: 1.29rem;
+	vertical-align: top;
+	margin-right: 0.35rem;
+}
+.share-zone{
+	display: none;
+}
+.bg-black{
+	background: #000;
+	position: fixed;
+	z-index: 1000;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	opacity: 0.6;
+}
+.share{
+	background: url('../image/share-it.png')no-repeat center;
+	background-size: 197px 261px;
+	width: 197px;
+	height: 261px;
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: 1001;
+}
+.index{
+	position: fixed;
+	bottom: 2rem;
+	right: 1rem;
+}
+.index-btn{
+	margin-bottom: 0.71rem;
+	right: 1rem;
+	width: 2.86rem;
+	height: 2.86rem;
+	border-radius: 50%;
+	border: 1px solid rgb(201,139,73);
+	line-height: 2.86rem;
+	text-align: center;
+	color: #FFF;
+	background-color: rgb(201,139,73);
+	font-size: 0.857rem;
+}

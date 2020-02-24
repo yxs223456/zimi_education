@@ -1,0 +1,89 @@
+{include file="public/header" /}
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>配置列表</h5>
+        </div>
+        <div class="ibox-content">
+            <!--搜索框开始-->           
+            <div class="row">
+                <div class="col-sm-12">   
+                <div  class="col-sm-2" style="width: 100px">
+                    <div class="input-group" >  
+                        <a href="{:url('add')}"><button class="btn btn-outline btn-primary" type="button">添加配置</button></a>
+                    </div>
+                </div>                                            
+                    <form name="admin_list_sea" class="form-search" method="post" action="{:url('index')}">
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                <input type="text" id="key" class="form-control" name="title-like" value="{$title|default=''}" placeholder="输入需查询的标题" />
+                                <span class="input-group-btn"> 
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> 搜索</button> 
+                                </span>
+                            </div>
+                        </div>
+                    </form>                         
+                </div>
+            </div>
+            <!--搜索框结束-->
+            <div class="hr-line-dashed"></div>
+
+            <div class="example-wrap">
+                <div class="example">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="long-tr">
+                                <th>ID</th>
+                                <th>名称</th>
+                                <th>标题</th>
+                                <th>类型</th>
+                                <th>分组</th>
+                                <th>创建时间</th>
+                                <th>更新时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="list-content">
+                            {foreach $list as $vo}
+                                <tr class="long-td">
+                                    <td>{$vo["id"]}</td>
+                                    <td>{$vo["name"]}</td>
+                                    <td>{$vo["title"]}</td>
+                                    <td>{$vo["type"]}</td>
+                                    <td>{$vo["group"]}</td>
+                                    <td>{$vo["create_time"]}</td>
+                                    <td>{$vo["update_time"]}</td>
+                                    <td>
+                                        {if condition="$vo['status'] eq 1"}
+                                            <a class="red" href="{:url('deactivate',['id' => $vo['id']])}">
+                                                <div><span class="label label-info">已开启</span></div>
+                                            </a>
+                                        {else /}
+                                            <a class="red" href="{:url('activate',['id' => $vo['id']])}">
+                                                <div><span class="label label-danger">已禁用</span></div>
+                                            </a>
+                                        {/if}
+                                    </td>
+                                    <td>
+                                        <a href="{:url('edit',['id'=>$vo['id']])}" class="btn btn-primary btn-xs">
+                                            <i class="fa fa-paste"></i> 编辑</a>&nbsp;&nbsp;
+                                        <a href="{:url('delete',['id'=>$vo['id']])}" class="btn btn-danger btn-xs">
+                                            <i class="fa fa-trash-o"></i> 删除</a> 
+                                    </td>
+                                </tr>
+                            {/foreach}
+                        </tbody>
+                    </table>
+                    {$list->render()}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+{include file="public/footer" /}
+</body>
+</html>

@@ -1,0 +1,54 @@
+[v-cloak] {
+  display: none;
+}
+
+.speech-introduction{
+	margin: 0.71rem 0.71rem 70px 0.71rem;
+	background: #fff;
+	padding-bottom: 1rem;
+}
+.speech-head{
+	padding: 1.14rem 0;
+}
+.speech-head-img{
+	display: block;
+	border-radius: 50%;
+	width: 5.86rem;
+	height: 5.86rem;
+	margin: 0 auto;
+}
+.speech-name{
+	text-align: center;
+	font-size: 1.29rem;
+	margin-top: 0.35rem;
+}
+.speech-info{
+	text-align: center;
+	color: #999;
+	margin-top: 0.35rem;
+	font-size: 0.93rem;
+}
+.description{
+	margin: 0 0.71rem;
+}
+.bg{
+	background: url('../image/default-img.png')no-repeat center;
+	background-size: 100% 14.29rem;
+	width: 100%;
+	height: 14.29rem;
+}
+.bg-info{
+	text-align: right;
+	color: #999;
+	font-size: 0.93rem;
+	margin-top: 0.35rem;
+}
+.title{
+	text-align: center;
+	color: #999;
+	font-size: 0.85rem;
+	margin: 0.71rem 0;
+}
+.content{
+	color: #666;
+}

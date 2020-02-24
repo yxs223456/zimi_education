@@ -1,0 +1,178 @@
+.reward-bg{
+	background: url('../image/icon-red-bg.png')no-repeat center;
+	background-size: 100% 8.14rem;
+	width: 100%;
+	height: 8.14rem;
+	position: relative;
+}
+.reward-title{
+	position: absolute;
+	top: 0.71rem;
+	left: 1rem;
+	font-size: 1.14rem;
+	color: #fff;
+}
+.speech-head-img{
+	background: url('../image/logo-hulu.jpg')no-repeat center;
+	background-size: 5rem;
+	width: 5rem;
+	height: 5rem;
+	position: absolute;
+	left: 50%;
+	margin-left: -2.5rem;
+	top: 5rem;
+}
+.nickname{
+	text-align: center;
+	margin-top: 2.5rem;
+	font-size: 1.14rem;
+}
+.money-line1{
+	display: flex;
+	width: 100%;
+	margin-top: 2.5rem;
+}
+.money-line2{
+	display: flex;
+	width: 100%;
+	margin-top: 1.5rem;
+}
+.money-line1 > div,.money-line2 > div{
+	flex-grow:1;
+	width: 33.3%;
+}
+.money-btn{
+	width: 6.5rem;
+	height: 3.57rem;
+	border: 1px solid #b01f24;
+	border-radius: 2px;
+	margin: 0 auto 0 2.14rem;
+}
+.money-middle-btn{
+	width: 6.5rem;
+	height: 3.57rem;
+	border: 1px solid #b01f24;
+	border-radius: 2px;
+	margin: 0 auto;
+}
+.money-last-btn{
+	width: 6.5rem;
+	height: 3.57rem;
+	border: 1px solid #b01f24;
+	border-radius: 2px;
+	margin: 0 2.14rem 0 auto;
+}
+.money-number{
+	line-height: 3.57rem;
+	color: #b01f24;
+	text-align: center;
+	font-size: 1.71rem;
+}
+.money-number > span{
+	font-size: 0.86rem;
+}
+.other-money{
+	font-size: 1.14rem;
+	color: #576b95;
+	margin-top: 1rem;
+	text-align: center;
+}
+.bg-black{
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	width: 100%;
+	background: #000;
+	opacity: 0.5;
+	z-index: 1000;
+	display: none;
+}
+@keyframes alertAnimation{
+	0%{
+		transform: scale(0.2);
+	}
+	25%{
+		transform: scale(0.7);
+	}
+	50%{
+		transform: scale(0.9);
+	}
+	75%{
+		transform: scale(1.2);
+	}
+	100%{
+		transform: scale(1);
+	}
+}
+.delete-alert{
+	display: none;
+	position: fixed;
+	width: 19.5rem;
+	height: 10.71rem;
+	z-index: 1001;
+	top: 40%;
+	left: 50%;
+	margin-top: -5.35rem;
+	margin-left: -9.75rem;
+	background: #f8f8f8;
+	border-radius: 2px;
+	animation: alertAnimation .3s 1;
+}
+.alert-title{
+	padding: 0.71rem 0 0.35rem 0;
+	margin: 0 0.71rem;
+	border-bottom: 1px solid #e4e4e4;
+}
+.icon-close{
+	background: url('../image/icon-close.png')no-repeat center;
+	background-size: 0.79rem;
+	width: 0.79rem;
+	height: 0.79rem;
+	display: block;
+	position: absolute;
+	top: 1.1rem;
+	left: 0.71rem;
+}
+.alert-title > p{
+	text-align: center;
+	font-size: 1.07rem;
+}
+.expect-money{
+	background: #fff;
+	margin: 0.71rem;
+}
+.expect-money > p{
+	display: inline-block;
+	padding: 0.71rem 0 0.71rem 0.71rem;
+}
+.expect-money > input{
+	display: inline-block;
+	border: none;
+	padding: 0.25rem 0.2rem;
+	font-size: 1rem;
+}
+.expect-money > input::-webkit-input-placeholder{
+	font-size: 1rem;
+}
+.expect-money > input::-moz-placeholder{
+	font-size: 1rem;
+}
+.expect-money > input:focus{
+	outline: none;
+	font-size: 1rem;
+}
+.reward-btn{
+	width: 7.14rem;
+	height: 2.5rem;
+	background: #b01f24;
+	border-radius: 2px;
+	margin: 0 auto;
+}
+.reward-btn > p{
+	line-height: 2.5rem;
+	text-align: center;
+	color: #fff;
+	font-size: 1.07rem;
+}

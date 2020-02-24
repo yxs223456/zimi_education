@@ -1,0 +1,127 @@
+{include file="public/header" /}
+<link rel="stylesheet" type="text/css" href="/static/admin/webupload/webuploader.css">
+<link rel="stylesheet" type="text/css" href="/static/admin/webupload/style.css">
+<style>
+    .file-item{float: left; position: relative; width: 110px;height: 110px; margin: 0 20px 20px 0; padding: 4px;}
+    .file-item .info{overflow: hidden;}
+    .uploader-list{width: 100%; overflow: hidden;}
+</style>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>添加配置枚举</h5>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal" name="add" id="add" method="post" action="{:url('addPost')}">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">配置枚举名称：</label>
+                            <div class="input-group col-sm-4">
+                                <input id="dictionary_name" type="text" class="form-control" name="dictionary_name" >
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">配置枚举编号：</label>
+                            <div class="input-group col-sm-4">
+                                <input id="dictionary_code" type="text" class="form-control" name="dictionary_code">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">键值对key：</label>
+                            <div class="input-group col-sm-4">
+                                <input id="key" type="text" class="form-control" name="key" >
+
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">键值对value：</label>
+                            <div class="input-group col-sm-4">
+                                <input id="value" type="text" class="form-control" name="value" >
+
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">对应键值对的描述：</label>
+                            <div class="input-group col-sm-4">
+                                <input id="desc" type="text" class="form-control" name="desc" >
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">排序：</label>
+                            <div class="col-sm-1">
+                                <input id="sort" type="text" class="form-control" name="sort" value="0">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-3">
+                                <button id="formSubmit" type="button" class="btn btn-primary"><i class="fa fa-save"></i> 保存</button>&nbsp;&nbsp;&nbsp;
+                                <a class="btn btn-danger" href="javascript:history.go(-1);"><i class="fa fa-close"></i> 返回</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{include file="public/footer" /}
+<script type="text/javascript" src="/static/admin/webupload/webuploader.min.js"></script>
+
+<script type="text/javascript">
+    var $list = $('#fileList');
+    //提交
+    $(function(){
+        $('#formSubmit').click(function() {
+
+            if(common.isNullOrEmpty($('#dictionary_name').val())){
+                layer.msg('请输入配置枚举名称',{icon:2,time:1500,shade: 0.1}, function(index){
+                    layer.close(index);
+                });
+                return false;
+            }
+
+            if(common.isNullOrEmpty($('#dictionary_code').val())){
+                layer.msg('请输入配置枚举编号',{icon:2,time:1500,shade: 0.1}, function(index){
+                    layer.close(index);
+                });
+                return false;
+            }
+
+            if(common.isNullOrEmpty($('#key').val())){
+                layer.msg('请输入对应键值对key',{icon:2,time:1500,shade: 0.1}, function(index){
+                    layer.close(index);
+                });
+                return false;
+            }
+
+            if(common.isNullOrEmptyForDictionary($('#value').val())){
+                layer.msg('请输入对应键值对value',{icon:2,time:1500,shade: 0.1}, function(index){
+                    layer.close(index);
+                });
+                return false;
+            }
+
+            if(common.isNullOrEmpty($('#desc').val())){
+                layer.msg('请输入对描述',{icon:2,time:1500,shade: 0.1}, function(index){
+                    layer.close(index);
+                });
+                return false;
+            }
+
+            $("form#add").submit();
+
+        });
+    });
+
+</script>
+</body>
+</html>

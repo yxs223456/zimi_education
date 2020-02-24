@@ -1,0 +1,99 @@
+[v-cloak] {
+  display: none;
+}
+
+.course-comment{
+	padding: 1rem 0.71rem 0 0.71rem;
+}
+.course-title{
+	color: #214778;
+	font-size: 1.3rem;
+	overflow: hidden;
+	text-overflow:ellipsis;
+	white-space: nowrap;
+	margin-left: 0.5rem;
+}
+.course-speech{
+	color: #666;
+	font-size: 0.79rem;
+	margin-left: 0.5rem;
+}
+.comment-content{
+	resize:none;
+	width: 96%;
+	height: 9.5rem;
+	padding: 0.5rem;
+	line-height: 1.6;
+	margin: 0.71rem 0;
+}
+.comment-point{
+	text-align: center;
+	margin-bottom: 1.43rem;
+}
+.comment-point > p{
+	font-size: 1.14rem;
+	display: inline-block;
+}
+.point{
+	display: inline-block;
+	background: url('../image/icon-point.png')no-repeat center;
+	background-size: 1.14rem;
+	width: 1.14rem;
+	height: 1.14rem;
+}
+.point.active{
+	background: url('../image/icon-point-active.png')no-repeat center;
+	background-size: 1.14rem;
+}
+.comment-btn{
+	display: inline-block;
+	width: 9.5rem;
+	height: 2.5rem;
+	border: 1px solid #b42c31;
+	border-radius: 3px;
+	margin-left: 1.5rem;
+}
+.icon-comment{
+	display: inline-block;
+	background: url('../image/icon-comment.png')no-repeat center;
+	background-size: 1.43rem 1.21rem;
+	width: 1.43rem;
+	height: 1.21rem;
+	vertical-align: top;
+	margin-top: 0.68rem;
+	margin-left: 1.5rem;
+}
+.comment-btn > p{
+	line-height: 2.5rem;
+	color: #b42c31;
+	font-size: 1.07rem;
+	margin-left: 0.6rem;
+	display: inline-block;
+	text-align: center;
+}
+.cancel-btn{
+	display: inline-block;
+	width: 9.5rem;
+	height: 2.5rem;
+	border: 1px solid #c98b49;
+	border-radius: 3px;
+	margin-left: 2rem;
+}
+.icon-cancel{
+	display: inline-block;
+	background: url('../image/icon-cancel.png')no-repeat center;
+	background-size: 1.43rem 1.21rem;
+	width: 1.43rem;
+	height: 1.21rem;
+	vertical-align: top;
+	margin-top: 0.68rem;
+	margin-left: 2.5rem;
+}
+.cancel-btn > p{
+	line-height: 2.5rem;
+	color: #c98b49;
+	font-size: 1.07rem;
+	margin-left: 0.6rem;
+	display: inline-block;
+	text-align: center;
+}

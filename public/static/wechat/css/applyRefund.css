@@ -1,0 +1,136 @@
+[v-cloak] {
+  display: none;
+}
+.apply-refund{
+	padding: 1rem 0.71rem 70px 0.71rem;
+}
+.course-title{
+	color: #214778;
+	font-size: 1.14rem;
+	overflow: hidden;
+	text-overflow:ellipsis;
+	white-space: nowrap;
+	margin-bottom: 0.71rem;
+	margin-left: 0.71rem;
+}
+.refund-reason{
+	background: #fff;
+	padding: 0 0.71rem 0.71rem 0.71rem;
+}
+.refund-title{
+	font-size: 1.14rem;
+	padding-top: 0.71rem;
+	font-weight: 600;
+}
+.repeat-purchase,.wrong-purchase,.other-reason{
+	font-size: 0.86rem;
+	color: #8c8c8c;
+	margin-top: 0.71rem;
+	position: relative;
+}
+.icon-check{
+	position: absolute;
+	right: 0;
+	top: 0;
+	background: url('../image/icon-check.png')no-repeat center;
+	background-size: 1.4rem;
+	width: 1.4rem;
+	height: 1.4rem;
+}
+.icon-check.active{
+	position: absolute;
+	right: 0;
+	top: 0;
+	background: url('../image/icon-check-active.png')no-repeat center;
+	background-size: 1.4rem;
+	width: 1.4rem;
+	height: 1.4rem;
+}
+.reason-area{
+	display: none;
+	resize:none;
+	width: 95%;
+	height: 9.5rem;
+	padding: 0.5rem;
+	line-height: 1.6;
+	border: 1px solid #e4e4e4;
+	margin: 0.71rem 0;	
+}
+.commit-btn{
+	width: 9.29rem;
+	height: 2.5rem;
+	border: 1px solid #b42c31;
+	border-radius: 5px;
+	margin: 1.5rem auto 0 auto;
+}
+.commit-btn > p{
+	line-height: 2.5rem;
+	text-align: center;
+	color: #b42c31;
+	font-size: 1.07rem;
+}
+.bg-black{
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	width: 100%;
+	background: #000;
+	opacity: 0.5;
+	z-index: 1000;
+	display: none;
+}
+@keyframes alertAnimation{
+	0%{
+		transform: scale(0.2);
+	}
+	25%{
+		transform: scale(0.7);
+	}
+	50%{
+		transform: scale(0.9);
+	}
+	75%{
+		transform: scale(1.2);
+	}
+	100%{
+		transform: scale(1);
+	}
+}
+.success-alert{
+	display: none;
+	position: fixed;
+	width: 19.5rem;
+	height: 10.71rem;
+	z-index: 1001;
+	top: 40%;
+	left: 50%;
+	margin-top: -5.35rem;
+	margin-left: -9.75rem;
+	background: #fff;
+	border-radius: 2px;
+	animation: alertAnimation .3s 1;
+}
+.alert-title{
+	padding: 0.71rem 0 0.35rem 0;
+	margin: 0 0.71rem;
+	border-bottom: 1px solid #e4e4e4;
+}
+.icon-close{
+	background: url('../image/icon-close.png')no-repeat center;
+	background-size: 0.79rem;
+	width: 0.79rem;
+	height: 0.79rem;
+	display: inline-block;
+}
+.alert-title > p{
+	display: inline-block;
+	font-size: 1.07rem;
+	margin-left: 0.71rem;
+}
+.alert-info{
+	font-size: 1.36rem;
+	text-align: center;
+	margin-top: 2.5rem;
+}

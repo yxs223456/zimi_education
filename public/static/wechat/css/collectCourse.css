@@ -1,0 +1,96 @@
+[v-cloak] {
+  display: none;
+}
+.section-list-body{
+	padding: 0.71rem 0.71rem 70px 0.71rem;
+}
+.course-type{
+	background: #fff;
+	padding-bottom: 0.71rem;
+	margin-bottom: 0.71rem;
+}
+.course-type-title{
+	font-size: 1.29rem;
+	padding: 0.71rem 0 0 0.71rem;
+}
+.section-list-content{
+	position: relative;
+	padding: 0.71rem 0.71rem 0.71rem 0;
+	margin: 0.71rem;
+	border: 1px solid #eee;
+	border-radius: 2px;
+}
+.section-course-title{
+	margin-left: 0.71rem;
+	color: #214778;
+	font-size: 1.14rem;
+	width: 75%;
+	overflow: hidden;
+	text-overflow:ellipsis;
+	white-space: nowrap;
+}
+.section-time{
+	color: #999;
+	font-size: 0.79rem;
+	position: absolute;
+	top: 0.85rem;
+	right: 0.71rem;
+}
+.section-head-img{
+	background: url('../image/default-head-img.png')no-repeat center;
+	background-size: cover;
+	width: 4.29rem;
+	height: 4.29rem;
+	border-radius: 50%;
+	position: absolute;
+	left: 1.43rem;
+	top: 3.1rem;
+}
+.section-list-info{
+	padding-left: 7.14rem;
+}
+.section-speech{
+	color: #666;
+	font-size: 0.89rem;
+	margin-top: 0.3rem;
+}
+.section-introduction{
+	color: #999;
+	font-size: 0.79rem;
+	margin-top: 0.3rem;
+	overflow:hidden; 
+	text-overflow:ellipsis;
+	display:-webkit-box; 
+	-webkit-box-orient:vertical;
+	-webkit-line-clamp:2;
+}
+.section-listen{
+	margin-top: 0.3rem;
+}
+.icon-earphone{
+	display: inline-block;
+	background: url('../image/icon-earphone.png')no-repeat center;
+	background-size: 1rem 0.86rem;
+	width: 1rem;
+	height: 0.86rem;
+}
+.section-listen > p,.section-point > p{
+	font-size: 0.85rem;
+	color: #666;
+	display: inline-block;
+}
+.section-point{
+	position: absolute;
+	right: 0.71rem;
+	bottom: 0.71rem;
+}
+.icon-point{
+	display: inline-block;
+	background: url('../image/icon-flower.png')no-repeat center;
+	background-size: 0.78rem 0.93rem;
+	width: 0.78rem;
+	height: 0.93rem;
+	vertical-align: top;
+	margin-top: 0.35rem;
+	margin-right: 0.35rem;
+}
