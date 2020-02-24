@@ -17,3 +17,6 @@ composer.phar
 /.idea
 /.vscode
 *.log
+config/cache.php
+config/log.php
+application/admin/config/*
