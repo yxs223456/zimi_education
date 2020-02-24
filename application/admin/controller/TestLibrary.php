@@ -104,6 +104,10 @@ class TestLibrary extends Common
 
         $list = $this->singleChoiceService->getListByCondition($condition);
 
+        foreach ($list as $item) {
+            $item["possible_answers"] = json_decode($item["possible_answers"], true);
+        }
+
         $this->assign('list', $list);
 
         return $this->fetch("singleChoiceList");

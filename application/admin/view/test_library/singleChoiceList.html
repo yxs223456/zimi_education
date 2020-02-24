@@ -56,7 +56,19 @@
                             <tr class="long-td">
                                 <td>{$vo.id}</td>
                                 <td>{$vo.question}</td>
-                                <td>{$vo.possible_answers}</td>
+                                <td>
+                                    {foreach $vo.possible_answers as $key=>$possible_answers}
+                                        {if $key == 0}
+                                            A：{$possible_answers} <br/>
+                                        {elseif $key == 1 /}
+                                            B：{$possible_answers} <br/>
+                                        {elseif $key == 2 /}
+                                            C：{$possible_answers} <br/>
+                                        {elseif $key == 3 /}
+                                            D：{$possible_answers}
+                                        {/if}
+                                    {/foreach}
+                                </td>
                                 <td>{$vo.answer}</td>
                                 <td>
                                     {if $vo.is_use == 1}
