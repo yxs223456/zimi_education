@@ -28,8 +28,8 @@ class TestLibrary extends Common
 
             switch ($key) {
 
-                case "name":
-                    $whereSql .= " and name LIKE '%".$value."%'";
+                case "question":
+                    $whereSql .= " and question LIKE '%".$value."%'";
                     break;
 
             }
