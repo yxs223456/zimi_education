@@ -8,6 +8,7 @@
 
 namespace app\admin\controller;
 
+use app\common\enum\TrueFalseQuestionAnswerEnum;
 use think\Db;
 
 class TestLibrary extends Common
@@ -232,6 +233,64 @@ class TestLibrary extends Common
         ];
 
         Db::name("writing")->insert($writingData);
+
+        $this->success("添加成功");
+    }
+
+    //判断题列表
+    public function trueFalseQuestionList()
+    {
+        $condition = $this->convertRequestToWhereSql();
+
+        $list = $this->trueFalseQuestionService->getListByCondition($condition);
+
+        foreach ($list as $item) {
+            $item["answer"] = $item["answer"] == TrueFalseQuestionAnswerEnum::DESC_TRUE ? "✅" : "❌";
+        }
+
+        $this->assign('list', $list);
+
+        return $this->fetch("trueFalseQuestionList");
+    }
+
+    //添加单选题页面
+    public function addTrueFalseQuestionList()
+    {
+        return $this->fetch("addTrueFalseQuestionList");
+    }
+
+    //执行添加单选题
+    public function doAddTrueFalseQuestionList()
+    {
+        $trueFalseQuestionList = input("trueFalseQuestionList");
+
+        $trueFalseQuestionList = json_decode($trueFalseQuestionList, true);
+
+        if (!is_array($trueFalseQuestionList)) {
+            $this->error('数据格式错误');
+        }
+
+        $time = time();
+        $data = [];
+        foreach ($trueFalseQuestionList as $trueFalseQuestion) {
+            if ($trueFalseQuestion["question"] == "" ||
+                $trueFalseQuestion["answer"] == "" ||
+                $trueFalseQuestion["difficulty_level"] == "") {
+                continue;
+            }
+            $data[] = [
+                "uuid" => createUuid(),
+                "question" => $trueFalseQuestion["question"],
+                "answer" => $trueFalseQuestion["answer"],
+                "difficulty_level" => $trueFalseQuestion["difficulty_level"],
+                "create_time" => $time,
+                "update_time" => $time,
+            ];
+        }
+
+        if ($data) {
+            Db::name("true_false_question")->insertAll($data);
+        }
 
         $this->success("添加成功");
     }
