@@ -49,10 +49,24 @@
                                     <input type="text" name="" class="form-control" v-model="item.requirement" >
                                 </div>
                             </div>
-
-                            <div class="hr-line-dashed"></div>
                         </div>
                         <a href="javascript:;" @click="addRequirement"><font color="blue" style="margin-left:200px;">添加要求</font></a href="javascript:">
+
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">难度等级：</label>
+                            <div class="input-group col-sm-5">
+                                <select name="difficulty_level" class="form-control">
+                                    <option value="1">1星</option>
+                                    <option value="2">2星</option>
+                                    <option value="3">3星</option>
+                                    <option value="4">4星</option>
+                                    <option value="5">5星</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <br><br>
 
                         <div class="form-group">

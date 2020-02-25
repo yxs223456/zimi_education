@@ -77,13 +77,16 @@ class TestLibrary extends Common
         $time = time();
         $data = [];
         foreach ($fillTheBlanksList as $fillTheBlanks) {
-            if ($fillTheBlanks["question"] == "" || $fillTheBlanks["answer"] == "") {
+            if ($fillTheBlanks["question"] == "" ||
+                $fillTheBlanks["answer"] == "" ||
+                $fillTheBlanks["difficulty_level"] == "") {
                 continue;
             }
             $data[] = [
                 "uuid" => createUuid(),
                 "question" => $fillTheBlanks["question"],
                 "answer" => $fillTheBlanks["answer"],
+                "difficulty_level" => $fillTheBlanks["difficulty_level"],
                 "create_time" => $time,
                 "update_time" => $time,
             ];
@@ -132,7 +135,9 @@ class TestLibrary extends Common
         $time = time();
         $data = [];
         foreach ($singleChoiceList as $singleChoice) {
-            if ($singleChoice["question"] == "" || !in_array($singleChoice["answer"], ["A","B","C","D"])) {
+            if ($singleChoice["question"] == "" ||
+                !in_array($singleChoice["answer"], ["A","B","C","D"]) ||
+                !is_numeric($singleChoice["difficulty_level"])) {
                 continue;
             }
             if ($singleChoice["A"] == "" || $singleChoice["B"] == "" ||
@@ -149,6 +154,7 @@ class TestLibrary extends Common
                     $singleChoice["D"],
                 ], JSON_UNESCAPED_UNICODE),
                 "answer" => $singleChoice["answer"],
+                "difficulty_level" => $singleChoice["difficulty_level"],
                 "create_time" => $time,
                 "update_time" => $time,
             ];
@@ -188,8 +194,13 @@ class TestLibrary extends Common
     {
         $topic = input("topic", "");
         $requirements = input("requirements", "");
+        $difficultyLevel = input("difficulty_level", "");
         if ($topic === "") {
             $this->error('题目不能为空');
+        }
+
+        if (!is_numeric($difficultyLevel)) {
+            $this->error('难度等级格式错误');
         }
 
         $requirements = json_decode($requirements, true);
@@ -215,6 +226,7 @@ class TestLibrary extends Common
             "uuid" => createUuid(),
             "topic" => $topic,
             "requirements" => json_encode($requirementsData, JSON_UNESCAPED_UNICODE),
+            "difficulty_level" => $difficultyLevel,
             "create_time" => $time,
             "update_time" => $time,
         ];
