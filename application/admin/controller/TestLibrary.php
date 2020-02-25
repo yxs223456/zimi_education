@@ -44,10 +44,10 @@ class TestLibrary extends Common
         return $data;
 
     }
+
     //填空题列表
     public function fillTheBlanksList()
     {
-
         $condition = $this->convertRequestToWhereSql();
 
         $list = $this->fillTheBlanksService->getListByCondition($condition);
@@ -55,7 +55,6 @@ class TestLibrary extends Common
         $this->assign('list', $list);
 
         return $this->fetch("fillTheBlanksList");
-
     }
 
     //添加填空题页面
@@ -91,7 +90,7 @@ class TestLibrary extends Common
         }
 
         if ($data) {
-            Db::name("fill_the_blanks_library")->insertAll($data);
+            Db::name("fill_the_blanks")->insertAll($data);
         }
 
         $this->success("添加成功");
@@ -156,9 +155,73 @@ class TestLibrary extends Common
         }
 
         if ($data) {
-            Db::name("single_choice_library")->insertAll($data);
+            Db::name("single_choice")->insertAll($data);
         }
 
         $this->success("添加成功");
     }
+
+    //作文题列表
+    public function writingList()
+    {
+        $condition = $this->convertRequestToWhereSql();
+
+        $list = $this->writingLibraryService->getListByCondition($condition);
+
+        foreach ($list as $item) {
+            $item["requirements"] = json_decode($item["requirements"], true);
+        }
+
+        $this->assign('list', $list);
+
+        return $this->fetch("writingList");
+    }
+
+    //添加作文题页面
+    public function addWriting()
+    {
+        return $this->fetch("addWriting");
+    }
+
+    //执行添加作文题
+    public function doAddWriting()
+    {
+        $topic = input("topic", "");
+        $requirements = input("requirements", "");
+        if ($topic === "") {
+            $this->error('题目不能为空');
+        }
+
+        $requirements = json_decode($requirements, true);
+
+        if (!is_array($requirements)) {
+            $this->error('要求不能为空');
+        }
+
+        $requirementsData = [];
+        foreach ($requirements as $requirement) {
+            if ($requirement["requirement"] == "") {
+                continue;
+            }
+            $requirementsData[] = $requirement["requirement"];
+        }
+
+        if (count($requirementsData) == 0) {
+            $this->error('要求不能为空');
+        }
+
+        $time = time();
+        $writingData = [
+            "uuid" => createUuid(),
+            "topic" => $topic,
+            "requirements" => json_encode($requirementsData, JSON_UNESCAPED_UNICODE),
+            "create_time" => $time,
+            "update_time" => $time,
+        ];
+
+        Db::name("writing")->insert($writingData);
+
+        $this->success("添加成功");
+    }
+
 }

@@ -11,5 +11,5 @@ namespace app\admin\model;
 use think\Model;
 
 class SingleChoiceLibraryModel extends Model {
-    protected $table = "single_choice_library";
+    protected $table = "single_choice";
 }

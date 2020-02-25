@@ -10,5 +10,5 @@ namespace app\admin\model;
 use think\Model;
 
 class FillTheBlanksLibraryModel extends Model {
-    protected $table = "fill_the_blanks_library";
+    protected $table = "fill_the_blanks";
 }
