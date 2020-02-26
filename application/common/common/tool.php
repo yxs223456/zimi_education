@@ -212,6 +212,17 @@ function checkUrl($url) {
     return true;
 }
 
+function createInviteCode($length = 10)
+{
+    $chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+
+    $str = '';
+    for ($i = 0; $i < $length; $i++) {
+        $str .= substr($chars, mt_rand(0, strlen($chars) - 1), 1);
+    }
+    return $str;
+}
+
 function gmt_iso8601($time) {
     $dtStr = date("c", $time);
     $datetime = new DateTime($dtStr);

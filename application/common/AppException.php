@@ -9,16 +9,20 @@ namespace app\common;
 
 class AppException extends \Exception
 {
-    const COM_PARAMS_ERR = [2, '请求参数错误'];
-    const COM_FILE_ERR = [3, '上传文件不存在或超过服务器限制'];
-    const COM_DATE_ERR = [4, '日期格式错误'];
-    const COM_MOBILE_ERR = [5, '手机号合格错误'];
-    const COM_ADDRESS_ERR = [6, '地址信息不全'];
+    const COM_PARAMS_ERR = [1, "请求参数错误"];
+    const COM_FILE_ERR = [2, "上传文件不存在或超过服务器限制"];
+    const COM_DATE_ERR = [3, "日期格式错误"];
+    const COM_MOBILE_ERR = [4, "手机号格式错误"];
+    const COM_ADDRESS_ERR = [5, "地址信息不全"];
 
-    const USER_NOT_LOGIN = [1000, '您还未登录'];
-    const USER_TOKEN_ERR = [1000, '登录信息已过期,请重新登录'];
-    const USER_NOT_EXISTS = [1002, '用户不存在'];
-    const USER_INVITE_CODE_NOT_EXISTS = [1003, '邀请码不存在'];
+    const USER_NOT_LOGIN = [1000, "您还未登录"];
+    const USER_TOKEN_ERR = [1001, "登录信息已过期,请重新登录"];
+    const USER_PASSWORD_FORMAT_ERROR = [1002, "密码格式错误"];
+    const USER_INVITE_CODE_NOT_EXISTS = [1003, "邀请码不存在"];
+    const USER_PHONE_EXISTS_ALREADY = [1004, "手机号已被注册"];
+    const USER_PHONE_VERIFY_CODE_ERROR = [1005, "验证码错误"];
+    const USER_NOT_EXISTS = [1006, "用户不存在"];
+    const USER_PASSWORD_ERROR = [1007, "密码错误"];
 
     public static function factory($errConst)
     {

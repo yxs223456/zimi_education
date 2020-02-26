@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.6.0",
+        "php": ">=7.0.0",
         "topthink/framework": "5.1.*",
         "topthink/think-captcha": "^2.0",
         "phpoffice/phpexcel": "^1.8",
@@ -25,7 +25,8 @@
         "aliyuncs/oss-sdk-php": "^2.3",
       "ext-json": "*",
       "ext-bcmath": "*",
-        "naixiaoxin/think-wechat": "^1.4"
+        "naixiaoxin/think-wechat": "^1.4",
+      "ext-redis": "*"
     },
     "autoload": {
         "psr-4": {
