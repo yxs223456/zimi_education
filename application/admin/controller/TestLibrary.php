@@ -321,12 +321,12 @@ class TestLibrary extends Common
         if ($do == "add") {
             $dbUpdateData = [
                 "is_use" => QuestionIsUseEnum::YES,
-                "update" => time(),
+                "update_time" => time(),
             ];
         } else {
             $dbUpdateData = [
                 "is_use" => QuestionIsUseEnum::NO,
-                "update" => time(),
+                "update_time" => time(),
             ];
         }
 
