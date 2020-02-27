@@ -15,4 +15,8 @@ return [
         'timeout' => 0,
     ],
 
+    "mob_tech" => [
+        "app_key" => "2c291c52e0889",
+    ],
+
 ];

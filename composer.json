@@ -26,7 +26,8 @@
       "ext-json": "*",
       "ext-bcmath": "*",
         "naixiaoxin/think-wechat": "^1.4",
-      "ext-redis": "*"
+      "ext-redis": "*",
+      "ext-curl": "*"
     },
     "autoload": {
         "psr-4": {

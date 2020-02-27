@@ -21,18 +21,18 @@ class User extends Base
     ];
 
     //发送注册验证码
-    public function getCodeForSignUp()
-    {
-        $phone = input("phone");
-        if (!checkIsMobile($phone)) {
-            throw AppException::factory(AppException::COM_MOBILE_ERR);
-        }
-
-        $userService = new UserService();
-        $returnData = $userService->getCodeForSignUp($phone);
-
-        return $this->jsonResponse($returnData);
-    }
+//    public function getCodeForSignUp()
+//    {
+//        $phone = input("phone");
+//        if (!checkIsMobile($phone)) {
+//            throw AppException::factory(AppException::COM_MOBILE_ERR);
+//        }
+//
+//        $userService = new UserService();
+//        $returnData = $userService->getCodeForSignUp($phone);
+//
+//        return $this->jsonResponse($returnData);
+//    }
 
     //手机号注册
     public function signUp()
@@ -52,18 +52,18 @@ class User extends Base
     }
 
     //发送注册验证码
-    public function getCodeForSignIn()
-    {
-        $phone = input("phone");
-        if (!checkIsMobile($phone)) {
-            throw AppException::factory(AppException::COM_MOBILE_ERR);
-        }
-
-        $userService = new UserService();
-        $returnData = $userService->getCodeForSignIn($phone);
-
-        return $this->jsonResponse($returnData);
-    }
+//    public function getCodeForSignIn()
+//    {
+//        $phone = input("phone");
+//        if (!checkIsMobile($phone)) {
+//            throw AppException::factory(AppException::COM_MOBILE_ERR);
+//        }
+//
+//        $userService = new UserService();
+//        $returnData = $userService->getCodeForSignIn($phone);
+//
+//        return $this->jsonResponse($returnData);
+//    }
 
     //手机验证码登录
     public function signInByCode()
@@ -98,18 +98,18 @@ class User extends Base
     }
 
     //发送重置密码验证码
-    public function getCodeForResetPassword()
-    {
-        $phone = input("phone");
-        if (!checkIsMobile($phone)) {
-            throw AppException::factory(AppException::COM_MOBILE_ERR);
-        }
-
-        $userService = new UserService();
-        $returnData = $userService->getCodeForResetPassword($phone);
-
-        return $this->jsonResponse($returnData);
-    }
+//    public function getCodeForResetPassword()
+//    {
+//        $phone = input("phone");
+//        if (!checkIsMobile($phone)) {
+//            throw AppException::factory(AppException::COM_MOBILE_ERR);
+//        }
+//
+//        $userService = new UserService();
+//        $returnData = $userService->getCodeForResetPassword($phone);
+//
+//        return $this->jsonResponse($returnData);
+//    }
 
     //重置密码
     public function resetPassword()

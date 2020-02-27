@@ -11,6 +11,7 @@ use app\common\AppException;
 use app\common\Constant;
 use app\common\enum\PhoneVerificationCodeStatusEnum;
 use app\common\enum\PhoneVerificationCodeTypeEnum;
+use app\common\helper\MobTech;
 use app\common\helper\Pbkdf2;
 use app\common\helper\Redis;
 use app\common\model\PhoneVerificationCodeModel;
@@ -52,21 +53,25 @@ class UserService extends Base
 
 
         //判断验证码是否正确（不验证手机号是否注册）
-        $phoneVerificationCodeModel = new PhoneVerificationCodeModel();
-        $useType = PhoneVerificationCodeTypeEnum::SIGN_UP;
-        $status = PhoneVerificationCodeStatusEnum::VALID;
-        $codeInfo = $phoneVerificationCodeModel->getLastPhoneVerificationCode($phone, $useType, $status);
-
-        if ($codeInfo == null || $codeInfo["code"] != $code) {
-            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
+        if (MobTech::verify($phone, $code) == false) {
+//            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
         }
 
-        if ($codeInfo["create_time"] + Constant::PHONE_VERIFICATION_CODE_VALID_TIME < time()) {
-            $phoneVerificationCodeModel->updateStatusToInvalid($phone, $useType);
-            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
-        }
-
-        $phoneVerificationCodeModel->updateStatusToHasBeenUsed($codeInfo["id"]);
+//        $phoneVerificationCodeModel = new PhoneVerificationCodeModel();
+//        $useType = PhoneVerificationCodeTypeEnum::SIGN_UP;
+//        $status = PhoneVerificationCodeStatusEnum::VALID;
+//        $codeInfo = $phoneVerificationCodeModel->getLastPhoneVerificationCode($phone, $useType, $status);
+//
+//        if ($codeInfo == null || $codeInfo["code"] != $code) {
+//            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
+//        }
+//
+//        if ($codeInfo["create_time"] + Constant::PHONE_VERIFICATION_CODE_VALID_TIME < time()) {
+//            $phoneVerificationCodeModel->updateStatusToInvalid($phone, $useType);
+//            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
+//        }
+//
+//        $phoneVerificationCodeModel->updateStatusToHasBeenUsed($codeInfo["id"]);
 
 
         //通过手机号创建用户
@@ -151,21 +156,24 @@ class UserService extends Base
     public function signInByCode($phone, $code)
     {
         //判断验证码是否正确
-        $phoneVerificationCodeModel = new PhoneVerificationCodeModel();
-        $useType = PhoneVerificationCodeTypeEnum::SIGN_IN;
-        $status = PhoneVerificationCodeStatusEnum::VALID;
-        $codeInfo = $phoneVerificationCodeModel->getLastPhoneVerificationCode($phone, $useType, $status);
-
-        if ($codeInfo == null || $codeInfo["code"] != $code) {
-            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
+        if (MobTech::verify($phone, $code) == false) {
+//            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
         }
-
-        if ($codeInfo["create_time"] + Constant::PHONE_VERIFICATION_CODE_VALID_TIME < time()) {
-            $phoneVerificationCodeModel->updateStatusToInvalid($phone, $useType);
-            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
-        }
-
-        $phoneVerificationCodeModel->updateStatusToHasBeenUsed($codeInfo["id"]);
+//        $phoneVerificationCodeModel = new PhoneVerificationCodeModel();
+//        $useType = PhoneVerificationCodeTypeEnum::SIGN_IN;
+//        $status = PhoneVerificationCodeStatusEnum::VALID;
+//        $codeInfo = $phoneVerificationCodeModel->getLastPhoneVerificationCode($phone, $useType, $status);
+//
+//        if ($codeInfo == null || $codeInfo["code"] != $code) {
+//            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
+//        }
+//
+//        if ($codeInfo["create_time"] + Constant::PHONE_VERIFICATION_CODE_VALID_TIME < time()) {
+//            $phoneVerificationCodeModel->updateStatusToInvalid($phone, $useType);
+//            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
+//        }
+//
+//        $phoneVerificationCodeModel->updateStatusToHasBeenUsed($codeInfo["id"]);
 
         //通过手机号获取用户
         $userBaseModel = new UserBaseModel();
@@ -219,21 +227,24 @@ class UserService extends Base
         }
 
         //判断验证码是否正确
-        $phoneVerificationCodeModel = new PhoneVerificationCodeModel();
-        $useType = PhoneVerificationCodeTypeEnum::RESET_PASSWORD;
-        $status = PhoneVerificationCodeStatusEnum::VALID;
-        $codeInfo = $phoneVerificationCodeModel->getLastPhoneVerificationCode($phone, $useType, $status);
-
-        if ($codeInfo == null || $codeInfo["code"] != $code) {
-            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
+        if (MobTech::verify($phone, $code) == false) {
+//            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
         }
-
-        if ($codeInfo["create_time"] + Constant::PHONE_VERIFICATION_CODE_VALID_TIME < time()) {
-            $phoneVerificationCodeModel->updateStatusToInvalid($phone, $useType);
-            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
-        }
-
-        $phoneVerificationCodeModel->updateStatusToHasBeenUsed($codeInfo["id"]);
+//        $phoneVerificationCodeModel = new PhoneVerificationCodeModel();
+//        $useType = PhoneVerificationCodeTypeEnum::RESET_PASSWORD;
+//        $status = PhoneVerificationCodeStatusEnum::VALID;
+//        $codeInfo = $phoneVerificationCodeModel->getLastPhoneVerificationCode($phone, $useType, $status);
+//
+//        if ($codeInfo == null || $codeInfo["code"] != $code) {
+//            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
+//        }
+//
+//        if ($codeInfo["create_time"] + Constant::PHONE_VERIFICATION_CODE_VALID_TIME < time()) {
+//            $phoneVerificationCodeModel->updateStatusToInvalid($phone, $useType);
+//            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
+//        }
+//
+//        $phoneVerificationCodeModel->updateStatusToHasBeenUsed($codeInfo["id"]);
 
 
         //修改用户密码

@@ -16,17 +16,17 @@ Route::get('think', function () {
 Route::get('hello/:name', 'index/hello');
 
 //发送注册验证码
-Route::rule('user/getCodeForSignUp', 'api/user/getCodeForSignUp', 'post');
+//Route::rule('user/getCodeForSignUp', 'api/user/getCodeForSignUp', 'post');
 //手机号注册
 Route::rule('user/signUp', 'api/user/signUp', 'post');
 //发送登录验证码
-Route::rule('user/getCodeForSignIn', 'api/user/getCodeForSignIn', 'post');
-//手机号验证码注册
+//Route::rule('user/getCodeForSignIn', 'api/user/getCodeForSignIn', 'post');
+//手机号验证码登录
 Route::rule('user/signInByCode', 'api/user/signInByCode', 'post');
-//手机号密码注册
+//手机号密码登录
 Route::rule('user/signInByPassword', 'api/user/signInByPassword', 'post');
 //发送重置密码验证码
-Route::rule('user/getCodeForResetPassword', 'api/user/getCodeForResetPassword', 'post');
+//Route::rule('user/getCodeForResetPassword', 'api/user/getCodeForResetPassword', 'post');
 //重置密码验
 Route::rule('user/resetPassword', 'api/user/resetPassword', 'post');
 
