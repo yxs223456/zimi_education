@@ -340,7 +340,7 @@ class TestLibrary extends Common
                 Db::name("fill_the_blanks")
                     ->where("uuid", $uuid)
                     ->update($dbUpdateData);
-                $this->fetch("fillTheBlanksList");
+                $this->fillTheBlanksList();
                 break;
             case "singleChoice":
                 if ($do == "add") {
@@ -351,7 +351,7 @@ class TestLibrary extends Common
                 Db::name("single_choice")
                     ->where("uuid", $uuid)
                     ->update($dbUpdateData);
-                $this->fetch("singleChoiceList");
+                $this->singleChoiceList();
                 break;
             case "trueFalseQuestion":
                 if ($do == "add") {
@@ -362,7 +362,7 @@ class TestLibrary extends Common
                 Db::name("true_false_question")
                     ->where("uuid", $uuid)
                     ->update($dbUpdateData);
-                $this->fetch("trueFalseQuestionList");
+                $this->trueFalseQuestionList();
                 break;
             case "writing":
                 if ($do == "add") {
@@ -373,7 +373,7 @@ class TestLibrary extends Common
                 Db::name("writing")
                     ->where("uuid", $uuid)
                     ->update($dbUpdateData);
-                $this->fetch("writingList");
+                $this->writingList();
                 break;
 
         }
