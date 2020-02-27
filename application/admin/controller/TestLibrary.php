@@ -310,7 +310,7 @@ class TestLibrary extends Common
     }
 
     //操作题库缓存
-    public function operateLibrary()
+    public function operateLibraryCache()
     {
 
         $libraryType = input("type");
