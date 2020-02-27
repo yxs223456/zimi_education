@@ -46,6 +46,7 @@
                                 <th>ID</th>
                                 <th>问题</th>
                                 <th>答案</th>
+                                <th>难度</th>
                                 <th>是否使用</th>
                                 <th>操作</th>
                             </tr>
@@ -56,6 +57,7 @@
                                 <td>{$vo.id}</td>
                                 <td>{$vo.question}</td>
                                 <td>{$vo.answer}</td>
+                                <td>{$vo.difficulty_level}星</td>
                                 <td>
                                     {if $vo.is_use == 1}
                                     使用中
@@ -66,11 +68,11 @@
                                 <td>
                                     {if condition="$vo['is_use'] eq 1"}
                                     <a class="red" href="{:url('operateLibraryCache',['uuid'=>$vo['uuid'],'difficulty_level'=>$vo['difficulty_level'],'do'=>'remove','type'=>'trueFalseQuestion'])}">
-                                        <div><span class="label label-info">移出题库</span></div>
+                                        <div><span class="label label-danger">移出题库</span></div>
                                     </a>
                                     {else /}
                                     <a class="red" href="{:url('operateLibraryCache',['uuid'=>$vo['uuid'],'difficulty_level'=>$vo['difficulty_level'],'do'=>'add','type'=>'trueFalseQuestion'])}">
-                                        <div><span class="label label-danger">加入题库</span></div>
+                                        <div><span class="label label-info">加入题库</span></div>
                                     </a>
                                     {/if}
                                 </td>
