@@ -8,7 +8,9 @@
 
 namespace app\admin\controller;
 
+use app\common\enum\QuestionIsUseEnum;
 use app\common\enum\TrueFalseQuestionAnswerEnum;
+use app\common\helper\Redis;
 use think\Db;
 
 class TestLibrary extends Common
@@ -88,6 +90,7 @@ class TestLibrary extends Common
                 "question" => $fillTheBlanks["question"],
                 "answer" => $fillTheBlanks["answer"],
                 "difficulty_level" => $fillTheBlanks["difficulty_level"],
+                "is_use" => $fillTheBlanks["is_use"],
                 "create_time" => $time,
                 "update_time" => $time,
             ];
@@ -95,8 +98,9 @@ class TestLibrary extends Common
 
         if ($data) {
             Db::name("fill_the_blanks")->insertAll($data);
+            $redis = Redis::factory();
+            addFillTheBlanksArray($data, $redis);
         }
-
         $this->success("添加成功");
     }
 
@@ -156,6 +160,7 @@ class TestLibrary extends Common
                 ], JSON_UNESCAPED_UNICODE),
                 "answer" => $singleChoice["answer"],
                 "difficulty_level" => $singleChoice["difficulty_level"],
+                "is_use" => $singleChoice["is_use"],
                 "create_time" => $time,
                 "update_time" => $time,
             ];
@@ -163,6 +168,8 @@ class TestLibrary extends Common
 
         if ($data) {
             Db::name("single_choice")->insertAll($data);
+            $redis = Redis::factory();
+            addSingleChoiceArray($data, $redis);
         }
 
         $this->success("添加成功");
@@ -200,7 +207,7 @@ class TestLibrary extends Common
             $this->error('题目不能为空');
         }
 
-        if (!is_numeric($difficultyLevel)) {
+        if (empty($difficultyLevel) || !is_numeric($difficultyLevel)) {
             $this->error('难度等级格式错误');
         }
 
@@ -228,11 +235,16 @@ class TestLibrary extends Common
             "topic" => $topic,
             "requirements" => json_encode($requirementsData, JSON_UNESCAPED_UNICODE),
             "difficulty_level" => $difficultyLevel,
+            "is_use" => input("is_use"),
             "create_time" => $time,
             "update_time" => $time,
         ];
 
         Db::name("writing")->insert($writingData);
+        if ($writingData["is_use"] == QuestionIsUseEnum::YES) {
+            $redis = Redis::factory();
+            addWriting($writingData["uuid"], $difficultyLevel, $redis);
+        }
 
         $this->success("添加成功");
     }
@@ -290,9 +302,83 @@ class TestLibrary extends Common
 
         if ($data) {
             Db::name("true_false_question")->insertAll($data);
+            $redis = Redis::factory();
+            addTrueFalseQuestionArray($data, $redis);
         }
 
         $this->success("添加成功");
+    }
+
+    //操作题库缓存
+    public function operateLibrary()
+    {
+
+        $libraryType = input("type");
+        $uuid = input("uuid");
+        $difficultyLevel = input("difficulty_level");
+        $do = input("do");
+        $redis = Redis::factory();
+        if ($do == "add") {
+            $dbUpdateData = [
+                "is_use" => QuestionIsUseEnum::YES,
+                "update" => time(),
+            ];
+        } else {
+            $dbUpdateData = [
+                "is_use" => QuestionIsUseEnum::NO,
+                "update" => time(),
+            ];
+        }
+
+        switch ($libraryType) {
+            case "fillTheBlanks":
+                if ($do == "add") {
+                    addFillTheBlanks($uuid, $difficultyLevel, $redis);
+                } else {
+                    removeFillTheBlanks($uuid, $difficultyLevel, $redis);
+                }
+                Db::name("fill_the_blanks")
+                    ->where("uuid", $uuid)
+                    ->update($dbUpdateData);
+                $this->fetch("fillTheBlanksList");
+                break;
+            case "singleChoice":
+                if ($do == "add") {
+                    addSingleChoice($uuid, $difficultyLevel, $redis);
+                } else {
+                    removeSingleChoice($uuid, $difficultyLevel, $redis);
+                }
+                Db::name("single_choice")
+                    ->where("uuid", $uuid)
+                    ->update($dbUpdateData);
+                $this->fetch("singleChoiceList");
+                break;
+            case "trueFalseQuestion":
+                if ($do == "add") {
+                    addTrueFalseQuestion($uuid, $difficultyLevel, $redis);
+                } else {
+                    removeTrueFalseQuestion($uuid, $difficultyLevel, $redis);
+                }
+                Db::name("true_false_question")
+                    ->where("uuid", $uuid)
+                    ->update($dbUpdateData);
+                $this->fetch("trueFalseQuestionList");
+                break;
+            case "writing":
+                if ($do == "add") {
+                    addWriting($uuid, $difficultyLevel, $redis);
+                } else {
+                    removeWriting($uuid, $difficultyLevel, $redis);
+                }
+                Db::name("writing")
+                    ->where("uuid", $uuid)
+                    ->update($dbUpdateData);
+                $this->fetch("writingList");
+                break;
+
+        }
+
+
     }
 
 }

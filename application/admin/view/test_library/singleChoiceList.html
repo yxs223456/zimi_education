@@ -79,12 +79,12 @@
                                 </td>
                                 <td>
                                     {if condition="$vo['is_use'] eq 1"}
-                                    <a class="red" href="{:url('deactivate',['id' => $vo['id']])}">
-                                        <div><span class="label label-info">已上架</span></div>
+                                    <a class="red" href="{:url('operateLibraryCache',['uuid'=>$vo['uuid'],'difficulty_level'=>$vo['difficulty_level'],'do'=>'remove','type'=>'singleChoice'])}">
+                                        <div><span class="label label-info">移出题库</span></div>
                                     </a>
                                     {else /}
-                                    <a class="red" href="{:url('activate',['id' => $vo['id']])}">
-                                        <div><span class="label label-danger">已下架</span></div>
+                                    <a class="red" href="{:url('operateLibraryCache',['uuid'=>$vo['uuid'],'difficulty_level'=>$vo['difficulty_level'],'do'=>'add','type'=>'singleChoice'])}">
+                                        <div><span class="label label-danger">加入题库</span></div>
                                     </a>
                                     {/if}
                                 </td>

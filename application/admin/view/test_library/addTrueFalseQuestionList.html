@@ -64,6 +64,14 @@
                                 </div>
                             </div>
 
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">加入题库：</label>
+                                <div class="input-group col-sm-5">
+                                    <input type="radio" v-model="item.is_use" value="1">立即加入 &nbsp;&nbsp;
+                                    <input type="radio" v-model="item.is_use" value="0">稍后加入
+                                </div>
+                            </div>
+
                             <div class="hr-line-dashed"></div>
                         </div>
                         <a href="javascript:;" @click="addtrueFalseQuestion"><font color="blue" style="margin-left:200px;">添加一题</font></a href="javascript:">
@@ -103,7 +111,8 @@
                 {
                     question: "",
                     answer: "",
-                    difficulty_level: "1",
+                    difficulty_level: "",
+                    is_use: 1,
                 }
             ],
             selectedLoading: false,
@@ -121,7 +130,8 @@
                 let trueFalseQuestion = {
                     question: "",
                     answer: "",
-                    difficulty_level: "1",
+                    difficulty_level: "",
+                    is_use: 1,
                 };
                 this.trueFalseQuestionList.push(trueFalseQuestion);
             },
@@ -205,6 +215,12 @@
                     if (common.isNullOrEmpty(trueFalseQuestionList[i]['answer'])) {
                         flag = false;
                         alert = "题目中有答案还空着呢";
+                        break;
+                    }
+
+                    if (common.isNullOrEmpty(trueFalseQuestionList[i]['difficulty_level'])) {
+                        flag = false;
+                        alert = "题目中有难度还空着呢";
                         break;
                     }
 
