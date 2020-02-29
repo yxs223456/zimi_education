@@ -45,7 +45,7 @@ class Base extends Controller
 
     protected function checkToken()
     {
-        $token = input("token");
+        $token = $this->request->header('token');
         if (empty($token)) {
             $isLogin = false;
             $user = [];
