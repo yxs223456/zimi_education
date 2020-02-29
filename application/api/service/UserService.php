@@ -46,6 +46,12 @@ class UserService extends Base
     //通过手机号注册用户
     public function singUp($phone, $code, $password)
     {
+        //判断手机号是否已注册
+        $userModel = new UserBaseModel();
+        $userByPhone = $userModel->getUserByPhone($phone);
+        if ($userByPhone) {
+            throw AppException::factory(AppException::USER_PHONE_EXISTS_ALREADY);
+        }
 
         //验证密码格式是否正确
         if ($this->checkPasswordFormat($password) == false) {
@@ -148,7 +154,9 @@ class UserService extends Base
 
         $userBaseModel = new UserBaseModel();
 
-        $userInfo["id"] = $userBaseModel->insertGetId($userInfo);
+        $id = $userBaseModel->insertGetId($userInfo);
+
+        $userInfo = $userBaseModel->where("id", $id)->find()->toArray();
 
         return $userInfo;
     }

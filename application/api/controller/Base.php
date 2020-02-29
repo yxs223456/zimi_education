@@ -29,6 +29,7 @@ class Base extends Controller
         $host = $_SERVER['HTTP_ORIGIN'] ?? '';
         header("Access-Control-Allow-Origin:$host");
         header('Access-Control-Allow-Credentials: true');
+        header("Access-Control-Allow-Headers:token");
         parent::initialize();
         static::checkToken();
     }
