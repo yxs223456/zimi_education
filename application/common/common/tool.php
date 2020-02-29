@@ -66,12 +66,16 @@ function curl($url, $method = 'get', $postData = null, $isPostDataJsonEncode = f
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
     }
     $data = curl_exec($ch);
-    $status = curl_getinfo($ch);
     $err = curl_error($ch);
     if ($err) {
-        return false;
-    }
-    if (intval($status['http_code']) != 200) {
+        $log = json_encode([
+            "url" => $url,
+            "data" => $postData,
+            "header" => $header,
+            "cookie" => $cookie,
+            "reason" => $err,
+        ], JSON_UNESCAPED_UNICODE);
+        \think\facade\Log::write("curl exec error: $log");
         return false;
     }
     if ($isResponseJson) {

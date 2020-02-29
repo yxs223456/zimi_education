@@ -16,7 +16,7 @@ class User extends Base
     protected $beforeActionList = [
         'checkAuth' => [
             'except' => 'getCodeForSignUp,signUp,getCodeForSignIn,signInByCode,signInByPassword,
-            getCodeForResetPassword,resetPassword',
+            getCodeForResetPassword,resetPassword,weChatSignIn',
         ],
     ];
 
@@ -124,6 +124,36 @@ class User extends Base
 
         $userService = new UserService();
         $returnData = $userService->resetPassword($phone, $code, $password);
+
+        return $this->jsonResponse($returnData);
+    }
+
+    //移动客户端绑定微信
+    public function bindWeChat()
+    {
+        $code = input("code");
+        if (empty($code)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $userInfo = $this->query["user"];
+
+        $userService = new UserService();
+        $returnData = $userService->bindWeChat($code, $userInfo);
+
+        return $this->jsonResponse($returnData);
+    }
+
+    //移动客户端微信登录
+    public function weChatSignIn()
+    {
+        $code = input("code");
+        if (empty($code)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $userService = new UserService();
+        $returnData = $userService->weChatSignIn($code);
 
         return $this->jsonResponse($returnData);
     }

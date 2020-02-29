@@ -16,6 +16,7 @@ use app\common\helper\Pbkdf2;
 use app\common\helper\Redis;
 use app\common\model\PhoneVerificationCodeModel;
 use app\common\model\UserBaseModel;
+use think\facade\Log;
 use think\Model;
 
 class UserService extends Base
@@ -253,6 +254,102 @@ class UserService extends Base
         $user->save();
 
         return [];
+    }
+
+    public function bindWeChat($code, $userInfo)
+    {
+        //获取access token
+        $weChatConfig = config("account.we_chat.mobile");
+        $accessTokenResp = $this->getAccessTokenForMobileApp($weChatConfig["app_id"], $weChatConfig["app_secret"], $code);
+
+        //获取用户微信信息
+        $userWeChatInfo = $this->getUserInfoForMobileApp($accessTokenResp["access_token"], $accessTokenResp["openid"]);
+
+        //纪录用户微信信息
+        $userModel = new UserBaseModel();
+        $user = $userModel->where("uuid", $userInfo["uuid"])->find();
+        if (empty($user)) {
+            throw AppException::factory(AppException::USER_NOT_EXISTS);
+        }
+        $this->recordUserWeChatInfo($user, $userWeChatInfo);
+
+        //把用户信息记入缓存
+        $userInfo = $user->toArray();
+        $redis = Redis::factory();
+        cacheUserInfoByToken($userInfo, $redis);
+
+        return [
+            "head_image_url" => $userWeChatInfo["headimgurl"],
+            "nickname" => $userWeChatInfo["nickname"],
+            "sex" => $userWeChatInfo["sex"],
+        ];
+    }
+
+    public function weChatSignIn($code)
+    {
+        //获取access token
+        $weChatConfig = config("account.we_chat.mobile");
+        $accessTokenResp = $this->getAccessTokenForMobileApp($weChatConfig["app_id"], $weChatConfig["app_secret"], $code);
+
+        //获取用户微信信息
+        $userWeChatInfo = $this->getUserInfoForMobileApp($accessTokenResp["access_token"], $accessTokenResp["openid"]);
+
+        //获取用户
+        $userModel = new UserBaseModel();
+        $user = $userModel->where("unionid", $userWeChatInfo["unionid"])->find();
+        if (empty($user)) {
+            throw AppException::factory(AppException::WE_CHAT_NOT_BIND_USER);
+        }
+
+        //纪录用户微信信息
+        $this->recordUserWeChatInfo($user, $userWeChatInfo);
+
+        //把用户信息记入缓存
+        $userInfo = $user->toArray();
+        $redis = Redis::factory();
+        cacheUserInfoByToken($userInfo, $redis);
+
+        return $this->userInfoForRequire($userInfo);
+    }
+
+    private function recordUserWeChatInfo(Model $user, $userWeChatInfo)
+    {
+        $user->unionid = $userWeChatInfo["unionid"];
+        $user->mobile_openid = $userWeChatInfo["openid"];
+        $user->nickname = $userWeChatInfo["nickname"];
+        $user->head_image_url = $userWeChatInfo["headimgurl"];
+        $user->sex = $userWeChatInfo["sex"];
+        $user->country = $userWeChatInfo["country"];
+        $user->province = $userWeChatInfo["province"];
+        $user->city = $userWeChatInfo["city"];
+        $user->update_time = time();
+        $user->save();
+
+    }
+
+    private function getAccessTokenForMobileApp($appId, $appSecret, $code)
+    {
+        $accessTokenResp = getAccessTokenForMobileApp($appId, $appSecret, $code);
+        if (!is_array($accessTokenResp) ||
+            empty($accessTokenResp["access_token"]) ||
+            empty($accessTokenResp["openid"])) {
+            Log::write("get access token error:" . json_encode($accessTokenResp, JSON_UNESCAPED_UNICODE));
+            throw AppException::factory(AppException::WE_CHAT_GET_ACCESS_TOKEN_ERROR);
+        }
+
+        return $accessTokenResp;
+    }
+
+    private function getUserInfoForMobileApp($accessToken, $openid)
+    {
+        $userWeChatInfo = getUserInfoForMobileApp($accessToken, $openid);
+        if (!is_array($userWeChatInfo) ||
+            empty($userWeChatInfo["unionid"])) {
+            Log::write("get access token error:" . json_encode($userWeChatInfo, JSON_UNESCAPED_UNICODE));
+            throw AppException::factory(AppException::WE_CHAT_GET_ACCESS_TOKEN_ERROR);
+        }
+
+        return $userWeChatInfo;
     }
 
     private function updateUserToken(Model $user, \Redis $redis = null)

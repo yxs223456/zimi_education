@@ -19,4 +19,11 @@ return [
         "app_key" => "2c291c52e0889",
     ],
 
+    "we_chat" => [
+        "mobile" => [
+            "app_id" => "",
+            "app_secret" => "",
+        ],
+    ],
+
 ];

@@ -29,6 +29,10 @@ Route::rule('user/signInByPassword', 'api/user/signInByPassword', 'post');
 //Route::rule('user/getCodeForResetPassword', 'api/user/getCodeForResetPassword', 'post');
 //重置密码验
 Route::rule('user/resetPassword', 'api/user/resetPassword', 'post');
+//绑定微信
+Route::rule('user/bindWeChat', 'api/user/bindWeChat', 'post');
+//微信登录
+Route::rule('user/weChatSignIn', 'api/user/weChatSignIn', 'post');
 
 return [
 
