@@ -33,6 +33,8 @@ Route::rule('user/resetPassword', 'api/user/resetPassword', 'post');
 Route::rule('user/bindWeChat', 'api/user/bindWeChat', 'post');
 //微信登录
 Route::rule('user/weChatSignIn', 'api/user/weChatSignIn', 'post');
+//微信登录
+Route::rule('user/userInfo', 'api/user/userInfo', 'post');
 
 return [
 

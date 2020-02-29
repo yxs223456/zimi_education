@@ -10,6 +10,7 @@ namespace app\api\controller;
 
 use app\common\AppException;
 use app\common\helper\Redis;
+use app\common\model\UserBaseModel;
 use think\Controller;
 
 class Base extends Controller
@@ -52,8 +53,17 @@ class Base extends Controller
             $redis = Redis::factory();
             $cacheUser = getUserInfoByToken($token, $redis);
             if (empty($cacheUser['uuid'])) {
-                $isLogin = false;
-                $user = [];
+                $model = new UserBaseModel();
+                $userModel = $model->where("token", $token)->find();
+                if (!$userModel) {
+                    $isLogin = false;
+                    $user = [];
+                } else {
+                    $redis = Redis::factory();
+                    $user = $userModel->toArray();
+                    $isLogin = true;
+                    cacheUserInfoByToken($user, $redis);
+                }
             } else {
                 $isLogin = true;
                 $user = $cacheUser;

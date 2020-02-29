@@ -78,6 +78,10 @@ class UserService extends Base
         //通过手机号创建用户
         $userInfo = $this->createUserByPhone($phone, $password);
 
+        //把用户信息记录到redis
+        $redis = Redis::factory();
+        cacheUserInfoByToken($userInfo, $redis);
+
         return $this->userInfoForRequire($userInfo);
     }
 
@@ -145,10 +149,6 @@ class UserService extends Base
         $userBaseModel = new UserBaseModel();
 
         $userInfo["id"] = $userBaseModel->insertGetId($userInfo);
-
-        //把用户信息记录到redis
-        $redis = Redis::factory();
-        cacheUserInfoByToken($userInfo, $redis);
 
         return $userInfo;
     }
@@ -312,6 +312,11 @@ class UserService extends Base
         return $this->userInfoForRequire($userInfo);
     }
 
+    public function userInfo($user)
+    {
+        return $this->userInfoForRequire($user);
+    }
+
     private function recordUserWeChatInfo(Model $user, $userWeChatInfo)
     {
         $user->unionid = $userWeChatInfo["unionid"];
@@ -372,7 +377,14 @@ class UserService extends Base
     private function userInfoForRequire(array $userInfo)
     {
         return [
-            "token" => $userInfo["token"]
+            "token" => $userInfo["token"],
+            "nickname" => $userInfo["nickname"],
+            "head_image_url" => $userInfo["head_image_url"],
+            "sex" => (int) $userInfo["sex"],
+            "level" => (int) $userInfo["level"],
+            "coin" => (int) $userInfo["coin"],
+            "invite_code" => $userInfo["invite_code"],
+            "bind_wechat" => empty($userInfo["unionid"]) ? 0 : 1,
         ];
     }
 

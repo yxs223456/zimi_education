@@ -157,4 +157,15 @@ class User extends Base
 
         return $this->jsonResponse($returnData);
     }
+
+    //用户详情
+    public function userInfo()
+    {
+        $userInfo = $this->query["user"];
+
+        $userService = new UserService();
+        $returnData = $userService->userInfo($userInfo);
+
+        return $this->jsonResponse($returnData);
+    }
 }
