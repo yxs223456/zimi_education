@@ -259,9 +259,14 @@ class UserService extends Base
         //修改用户密码
         $encryptPassword = Pbkdf2::create_hash($password);
         $user->password = $encryptPassword;
+        $user->update_time = time();
         $user->save();
 
-        return [];
+        $userInfo = $user->toArray();
+        $redis = Redis::factory();
+        cacheUserInfoByToken($userInfo, $redis);
+
+        return new \stdClass();
     }
 
     public function bindWeChat($code, $userInfo)
