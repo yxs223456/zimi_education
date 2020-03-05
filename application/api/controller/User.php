@@ -169,4 +169,21 @@ class User extends Base
 
         return $this->jsonResponse($returnData);
     }
+
+    //修改用户信息
+    public function modifyUserInfo()
+    {
+        $params = input();
+        if (!isset($params["head_image_url"]) || !isset($params["nickname"]) ||
+            !isset($params["parent_invite_code"]) || !isset($params["sign"]) ||
+            !isset($params["province"]) || !isset($params["city"])) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+        $userInfo = $this->query["user"];
+
+        $userService = new UserService();
+        $returnData = $userService->modifyUserInfo($userInfo, $params);
+
+        return $this->jsonResponse($returnData);
+    }
 }

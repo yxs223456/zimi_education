@@ -90,13 +90,14 @@ class UserService extends Base
             $parentUuid = $inviteUser["uuid"];
         } else {
             $parentUuid = "";
+            $inviteCode = "";
         }
 
         Db::startTrans();
         try {
 
             //通过手机号创建用户
-            $userInfo = $this->createUserByPhone($phone, $password, $parentUuid);
+            $userInfo = $this->createUserByPhone($phone, $password, $parentUuid, $inviteCode);
 
             $userModel->addUserInviteCountByUuid($parentUuid);
 
@@ -104,7 +105,7 @@ class UserService extends Base
 
         } catch (\Throwable $e) {
             Db::rollback();
-            Log::write("create user by phone error:" . $e->getMessage());
+            Log::write("create user by phone error:" . $e->getMessage(), "ERROR");
             throw AppException::factory(AppException::USER_CREATE_ERROR);
         }
 
@@ -159,7 +160,7 @@ class UserService extends Base
         return [];
     }
 
-    private function createUserByPhone($phone, $password, $parentUuid)
+    private function createUserByPhone($phone, $password, $parentUuid, $parentInviteCode)
     {
         $encryptPassword = Pbkdf2::create_hash($password);
         $inviteCode = createInviteCode(8);
@@ -174,6 +175,7 @@ class UserService extends Base
             "token" => $token,
             "invite_code" => $inviteCode,
             "parent_uuid" => $parentUuid,
+            "parent_invite_code" => $parentInviteCode,
             "create_time" => $time,
             "update_time" => $time,
         ];
@@ -356,6 +358,61 @@ class UserService extends Base
         return $this->userInfoForRequire($user);
     }
 
+    public function modifyUserInfo($userInfo, $modifyUserInfo)
+    {
+        //获取用户
+        $userModel = new UserBaseModel();
+        $user = $userModel->getUserByUuid($userInfo["uuid"]);
+        if (!$user) {
+            throw AppException::factory(AppException::USER_NOT_EXISTS);
+        }
+
+        //1.邀请用户不可改变 2.只要没有邀请人即可添加任意用户为邀请人
+        if ($userInfo["parent_invite_code"] == "" && $modifyUserInfo["parent_invite_code"] != "") {
+            $inviteUser = $userModel->getUserByInviteCode($modifyUserInfo["parent_invite_code"]);
+            if (!$inviteUser) {
+                throw AppException::factory(AppException::USER_INVITE_CODE_NOT_EXISTS);
+            }
+        } else if ($userInfo["parent_invite_code"] != "" &&
+            $userInfo["parent_invite_code"] != $modifyUserInfo["parent_invite_code"]) {
+            throw AppException::factory(AppException::USER_PARENT_NOT_ALLOW_MODIFY);
+        }
+
+
+        Db::startTrans();
+        try {
+            //修改用户信息
+            $user->head_image_url = $modifyUserInfo["head_image_url"];
+            $user->nickname = $modifyUserInfo["nickname"];
+            $user->parent_invite_code = $modifyUserInfo["parent_invite_code"];
+            $user->sign = $modifyUserInfo["sign"];
+            $user->province = $modifyUserInfo["province"];
+            $user->city = $modifyUserInfo["city"];
+            if (isset($inviteUser)) {
+                $user->parent_uuid = $inviteUser["uuid"];
+            }
+            $user->save();
+
+            //添加邀请人后修改邀请人信息
+            if (isset($inviteUser)) {
+                $userModel->addUserInviteCountByUuid($inviteUser["uuid"]);
+            }
+
+            Db::commit();
+        } catch (\Throwable $e) {
+            Db::rollback();
+            Log::write("user info modify error:" . $e->getMessage(), "ERROR");
+            throw AppException::factory(AppException::USER_MODIFY_ERROR);
+        }
+
+        //缓存用户信息
+        $userInfo = $user->toArray();
+        $redis = Redis::factory();
+        cacheUserInfoByToken($userInfo, $redis);
+
+        return $this->userInfoForRequire($userInfo);
+    }
+
     private function recordUserWeChatInfo(Model $user, $userWeChatInfo)
     {
         $user->unionid = $userWeChatInfo["unionid"];
@@ -423,11 +480,14 @@ class UserService extends Base
             "level" => (int) $userInfo["level"],
             "coin" => (int) $userInfo["coin"],
             "invite_code" => $userInfo["invite_code"],
+            "parent_invite_code" => $userInfo["parent_invite_code"],
+            "sign" => $userInfo["sign"],
+            "phone" => hidePhone($userInfo["phone"]),
+            "province" => $userInfo["province"],
+            "city" => $userInfo["city"],
             "bind_wechat" => empty($userInfo["unionid"]) ? 0 : 1,
         ];
     }
-
-
 
     //验证密码是否符合要求。密码长度8~32位，需包含数字、字母、符号至少2种或以上元素
     private function checkPasswordFormat($password)

@@ -35,6 +35,8 @@ Route::rule('user/bindWeChat', 'api/user/bindWeChat', 'post');
 Route::rule('user/weChatSignIn', 'api/user/weChatSignIn', 'post');
 //微信登录
 Route::rule('user/userInfo', 'api/user/userInfo', 'post');
+//修改用户信息
+Route::rule('user/modifyUserInfo', 'api/user/modifyUserInfo', 'post');
 
 return [
 

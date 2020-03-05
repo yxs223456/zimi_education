@@ -836,3 +836,16 @@ function xmlToArray($xml)
     $values = json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
     return $values;
 }
+
+//隐藏手机号
+function hidePhone($phone)
+{
+    if (strlen($phone) != 11) {
+        return $phone;
+    }
+    $phone[3] = "*";
+    $phone[4] = "*";
+    $phone[5] = "*";
+    $phone[6] = "*";
+    return $phone;
+}
