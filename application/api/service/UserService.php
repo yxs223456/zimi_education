@@ -323,6 +323,8 @@ class UserService extends Base
             "head_image_url" => $userWeChatInfo["headimgurl"],
             "nickname" => $userWeChatInfo["nickname"],
             "sex" => $userWeChatInfo["sex"],
+            "province" => $userWeChatInfo["province"],
+            "city" => $userWeChatInfo["city"],
         ];
     }
 
