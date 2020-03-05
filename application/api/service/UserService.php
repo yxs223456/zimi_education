@@ -16,6 +16,7 @@ use app\common\helper\Pbkdf2;
 use app\common\helper\Redis;
 use app\common\model\PhoneVerificationCodeModel;
 use app\common\model\UserBaseModel;
+use think\Db;
 use think\facade\Log;
 use think\Model;
 
@@ -44,7 +45,7 @@ class UserService extends Base
     }
 
     //通过手机号注册用户
-    public function singUp($phone, $code, $password)
+    public function singUp($phone, $code, $password, $inviteCode)
     {
         //判断手机号是否已注册
         $userModel = new UserBaseModel();
@@ -80,9 +81,33 @@ class UserService extends Base
 //
 //        $phoneVerificationCodeModel->updateStatusToHasBeenUsed($codeInfo["id"]);
 
+        //判断邀请码是否存在
+        if ($inviteCode) {
+            $inviteUser = $userModel->getUserByInviteCode($inviteCode);
+            if (!$inviteUser) {
+                throw AppException::factory(AppException::USER_INVITE_CODE_NOT_EXISTS);
+            }
+            $parentUuid = $inviteUser["uuid"];
+        } else {
+            $parentUuid = "";
+        }
 
-        //通过手机号创建用户
-        $userInfo = $this->createUserByPhone($phone, $password);
+        Db::startTrans();
+        try {
+
+            //通过手机号创建用户
+            $userInfo = $this->createUserByPhone($phone, $password, $parentUuid);
+
+            $userModel->addUserInviteCountByUuid($parentUuid);
+
+            Db::commit();
+
+        } catch (\Throwable $e) {
+            Db::rollback();
+            Log::write("create user by phone error:" . $e->getMessage());
+            throw AppException::factory(AppException::USER_CREATE_ERROR);
+        }
+
 
         //把用户信息记录到redis
         $redis = Redis::factory();
@@ -134,7 +159,7 @@ class UserService extends Base
         return [];
     }
 
-    private function createUserByPhone($phone, $password)
+    private function createUserByPhone($phone, $password, $parentUuid)
     {
         $encryptPassword = Pbkdf2::create_hash($password);
         $inviteCode = createInviteCode(8);
@@ -148,6 +173,7 @@ class UserService extends Base
             "password" => $encryptPassword,
             "token" => $token,
             "invite_code" => $inviteCode,
+            "parent_uuid" => $parentUuid,
             "create_time" => $time,
             "update_time" => $time,
         ];

@@ -40,13 +40,14 @@ class User extends Base
         $phone = input("phone");
         $code = input("code", null);
         $password = input("password", null);
+        $inviteCode = input("invite_code");
 
         if (!checkIsMobile($phone) || $code === null || $password === null) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
         $userService = new UserService();
-        $returnData = $userService->singUp($phone, $code, $password);
+        $returnData = $userService->singUp($phone, $code, $password, $inviteCode);
 
         return $this->jsonResponse($returnData);
     }
