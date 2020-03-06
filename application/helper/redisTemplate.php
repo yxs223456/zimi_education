@@ -33,22 +33,22 @@ function addFillTheBlanksArray(array $fillTheBlanksList, Redis $redis) {
         if ($fillTheBlanks["is_use"] == 1) {
             switch ($fillTheBlanks["difficulty_level"]) {
                 case 1:
-                    $list["one"][] = $fillTheBlanksList["uuid"];
+                    $list["one"][] = $fillTheBlanks["uuid"];
                     break;
                 case 2:
-                    $list["two"][] = $fillTheBlanksList["uuid"];
+                    $list["two"][] = $fillTheBlanks["uuid"];
                     break;
                 case 3:
-                    $list["three"][] = $fillTheBlanksList["uuid"];
+                    $list["three"][] = $fillTheBlanks["uuid"];
                     break;
                 case 4:
-                    $list["four"][] = $fillTheBlanksList["uuid"];
+                    $list["four"][] = $fillTheBlanks["uuid"];
                     break;
                 case 5:
-                    $list["five"][] = $fillTheBlanksList["uuid"];
+                    $list["five"][] = $fillTheBlanks["uuid"];
                     break;
                 case 6:
-                    $list["six"][] = $fillTheBlanksList["uuid"];
+                    $list["six"][] = $fillTheBlanks["uuid"];
                     break;
             }
         }
@@ -149,22 +149,22 @@ function addSingleChoiceArray(array $singleChoiceList, Redis $redis) {
         if ($singleChoice["is_use"] == 1) {
             switch ($singleChoice["difficulty_level"]) {
                 case 1:
-                    $list["one"][] = $singleChoiceList["uuid"];
+                    $list["one"][] = $singleChoice["uuid"];
                     break;
                 case 2:
-                    $list["two"][] = $singleChoiceList["uuid"];
+                    $list["two"][] = $singleChoice["uuid"];
                     break;
                 case 3:
-                    $list["three"][] = $singleChoiceList["uuid"];
+                    $list["three"][] = $singleChoice["uuid"];
                     break;
                 case 4:
-                    $list["four"][] = $singleChoiceList["uuid"];
+                    $list["four"][] = $singleChoice["uuid"];
                     break;
                 case 5:
-                    $list["five"][] = $singleChoiceList["uuid"];
+                    $list["five"][] = $singleChoice["uuid"];
                     break;
                 case 6:
-                    $list["six"][] = $singleChoiceList["uuid"];
+                    $list["six"][] = $singleChoice["uuid"];
                     break;
             }
         }
@@ -321,22 +321,22 @@ function addTrueFalseQuestionArray(array $trueFalseQuestionList, Redis $redis) {
         if ($trueFalseQuestion["is_use"] == 1) {
             switch ($trueFalseQuestion["difficulty_level"]) {
                 case 1:
-                    $list["one"][] = $trueFalseQuestionList["uuid"];
+                    $list["one"][] = $trueFalseQuestion["uuid"];
                     break;
                 case 2:
-                    $list["two"][] = $trueFalseQuestionList["uuid"];
+                    $list["two"][] = $trueFalseQuestion["uuid"];
                     break;
                 case 3:
-                    $list["three"][] = $trueFalseQuestionList["uuid"];
+                    $list["three"][] = $trueFalseQuestion["uuid"];
                     break;
                 case 4:
-                    $list["four"][] = $trueFalseQuestionList["uuid"];
+                    $list["four"][] = $trueFalseQuestion["uuid"];
                     break;
                 case 5:
-                    $list["five"][] = $trueFalseQuestionList["uuid"];
+                    $list["five"][] = $trueFalseQuestion["uuid"];
                     break;
                 case 6:
-                    $list["six"][] = $trueFalseQuestionList["uuid"];
+                    $list["six"][] = $trueFalseQuestion["uuid"];
                     break;
             }
         }
