@@ -295,6 +295,7 @@ class TestLibrary extends Common
                 "question" => $trueFalseQuestion["question"],
                 "answer" => $trueFalseQuestion["answer"],
                 "difficulty_level" => $trueFalseQuestion["difficulty_level"],
+                "is_use" => $trueFalseQuestion["is_use"],
                 "create_time" => $time,
                 "update_time" => $time,
             ];
