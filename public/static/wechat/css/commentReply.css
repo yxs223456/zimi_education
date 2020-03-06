@@ -1,0 +1,113 @@
+.reply-comment-head{
+	position: fixed;
+	z-index: 100;
+	background: #faf8f7;
+	top: 0;
+	width: 95%;
+	padding: 1rem 0.71rem 0 0.71rem;
+}
+.course-title{
+	color: #214778;
+	font-size: 1.14rem;
+	overflow: hidden;
+	text-overflow:ellipsis;
+	white-space: nowrap;
+}
+.course-speech{
+	color: #666;
+	font-size: 0.79rem;
+	margin-left: 0.5rem;
+}
+.create-time{
+	font-size: 0.79rem;
+	color: #999;
+	margin-left: 0.5rem;
+}
+.section-listen{
+	display: inline-block;
+	margin-left: 0.5rem;
+}
+.icon-earphone{
+	display: inline-block;
+	background: url('../image/icon-earphone.png')no-repeat center;
+	background-size: 1rem 0.86rem;
+	width: 1rem;
+	height: 0.86rem;
+}
+.section-listen > p,.section-point > p{
+	font-size: 0.85rem;
+	color: #666;
+	display: inline-block;
+}
+.section-point{
+	display: inline-block;
+	margin-left: 2.86rem;
+}
+.icon-point{
+	display: inline-block;
+	background: url('../image/icon-flower.png')no-repeat center;
+	background-size: 0.78rem 0.93rem;
+	width: 0.78rem;
+	height: 0.93rem;
+	vertical-align: top;
+	margin-top: 0.35rem;
+	margin-right: 0.35rem;
+}
+.course-comment{
+	background: #fff;
+	margin: 7.5rem 0.71rem 0 0.71rem;
+	padding: 1.43rem 0.71rem 70px 0.71rem;
+	position: relative;
+}
+.vip-comment{
+	color: #214778;
+	font-size: 1.07rem;
+}
+.comment-list{
+	position: relative;
+	margin-bottom: 0.71rem;
+}
+.user-head-img{
+	background: url('../image/default-head-img.png')no-repeat center;
+	background-size: cover;
+	width: 3.64rem;
+	height: 3.64rem;
+	position: absolute;
+	top: 0.8rem;
+	left: 0;
+	border-radius: 50%;
+}
+.vip-comment-info{
+	padding-left: 4.4rem;
+	padding-top: 0.5rem;
+	position: relative;
+}
+.comment-time{
+	color: #999;
+	position: absolute;
+	right: 0.71rem;
+	top: 0.6rem;
+	font-size: 0.79rem;
+}
+.comment-content{
+	color: #666;
+	font-size: 0.86rem;
+}
+.reply-comment-content{
+	margin-top: 0.5rem;
+	border: 1px solid #e8e8e8;
+	padding: 0.71rem 0;
+}
+.reply-speech-name{
+	color: #214778;
+}
+.reply-time{
+	font-size: 0.79rem;
+	color: #999;
+	margin-left: 1.43rem;
+}
+.reply-content{
+	margin-left: 1.43rem;
+	color: #666;
+	font-size: 0.86rem;
+}

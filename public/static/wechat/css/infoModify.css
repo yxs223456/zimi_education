@@ -1,0 +1,76 @@
+[v-cloak] {
+  display: none;
+}
+.user-center-bg{
+	background: url('../image/icon-vip-bg.png')no-repeat center;
+	background-size: 25.43rem 10.78rem;
+	position: relative;
+	z-index: 1;
+	width: 25.13rem;
+	height: 10.78rem;
+	margin: 0.71rem 0.71rem 0 0.71rem;
+	padding-top: 0.71rem;
+}
+.user-head-img{
+	position: relative;
+	z-index: 2;
+	width: 5rem;
+	height: 5rem;
+	border-radius: 50%;
+	margin: 1rem auto 0.35rem auto;
+	display: block;
+}
+.file {
+    position: absolute;
+    z-index: 3;
+    display: inline-block;
+    border-radius: 50%;
+    text-decoration: none;
+    width: 5rem;
+    height: 5rem;
+    background: transparent;
+    top: 1.71rem;
+    left: 50%;
+    margin-left: -2.5rem;
+}
+.file input {
+    position: absolute;
+    font-size: 5rem;
+    right: 0;
+    top: 0;
+    opacity: 0;
+}
+.file:hover {
+    background: transparent;
+    text-decoration: none;
+}
+.info-title{
+	color: #214778;
+	text-align: center;
+	font-size: 1.29rem;
+}
+.bind-phone{
+	background: #fff;
+	margin: 0.71rem 0.71rem 70px 0.71rem;
+	position: relative;
+	padding: 0.71rem;
+}
+.bind-phone-title{
+	color: #666;
+}
+.phone{
+	position: absolute;
+	right: 1.6rem;
+	top: 0.71rem;
+	color: #999;
+}
+.icon-right{
+	position: absolute;
+	right: 0.71rem;
+	top: 1rem;
+	display: inline-block;
+	background: url('../image/icon-right.png')no-repeat center;
+	background-size: 0.43rem 0.86rem;
+	width: 0.43rem;
+	height: 0.86rem;
+}

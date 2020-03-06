@@ -1,0 +1,123 @@
+[v-cloak] {
+  display: none;
+}
+
+.section-list-body{
+	padding: 0.71rem 0.71rem 70px 0.71rem;
+}
+.section-list-content{
+	background: #fff;
+	position: relative;
+	padding: 0.71rem 0.71rem 0.71rem 0;
+	margin-bottom: 0.71rem;
+}
+.section-course-title{
+	color: #214778;
+	font-size: 1.14rem;
+	overflow: hidden;
+	text-overflow:ellipsis;
+	white-space: nowrap;
+	margin-left: 0.5rem;
+}
+.section-head-img{
+	background: url('../image/default-head-img.png')no-repeat center;
+	background-size: cover;
+	width: 4.29rem;
+	height: 4.29rem;
+	border-radius: 50%;
+	position: absolute;
+	left: 1.43rem;
+	top: 3.1rem;
+}
+.section-list-info{
+	padding-left: 7.14rem;
+	position: relative;
+}
+.section-speech{
+	color: #666;
+	font-size: 0.89rem;
+	margin-top: 0.3rem;
+}
+.section-introduction{
+	color: #999;
+	font-size: 0.79rem;
+	margin-top: 0.3rem;
+	overflow:hidden; 
+	text-overflow:ellipsis;
+	display:-webkit-box; 
+	-webkit-box-orient:vertical;
+	-webkit-line-clamp:2;
+}
+.section-list-info > div{
+	position: relative;
+	padding: 0.71rem 0 1rem 0;
+}
+.course-price{
+	color: #c98b49;
+	margin-top: 0.71rem;
+}
+.purchase-btn{
+	position: absolute;
+	right: 0;
+	top: 0.75rem;
+	height: 2.5rem;
+	width: 7.14rem;
+	border: 1px solid #c98b49;
+	border-radius: 2px;
+}
+.purchase-btn > p{
+	color: #c98b49;
+	text-align: center;
+	line-height: 2.5rem;
+}
+.bg-black{
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	width: 100%;
+	background: #000;
+	opacity: 0.5;
+	z-index: 1000;
+	display: none;
+}
+.success-alert{
+	display: none;
+	position: fixed;
+	width: 19.5rem;
+	height: 10.71rem;
+	z-index: 1001;
+	top: 40%;
+	left: 50%;
+	margin-top: -5.35rem;
+	margin-left: -9.75rem;
+	background: #fff;
+	border-radius: 2px;
+}
+.alert-title{
+	padding: 0.71rem 0 0.35rem 0;
+	margin: 0 0.71rem;
+	border-bottom: 1px solid #e4e4e4;
+}
+.icon-close{
+	background: url('../image/icon-close.png')no-repeat center;
+	background-size: 0.79rem;
+	width: 0.79rem;
+	height: 0.79rem;
+	display: inline-block;
+}
+.alert-title > p{
+	display: inline-block;
+	font-size: 1.07rem;
+	margin-left: 0.71rem;
+}
+.alert-info{
+	font-size: 1.36rem;
+	text-align: center;
+	margin-top: 1.78rem;
+}
+.success-info{
+	text-align: center;
+	margin-top: 0.35rem;
+}

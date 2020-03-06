@@ -1,0 +1,307 @@
+{include file="public/header" /}
+<link rel="stylesheet" type="text/css" href="/static/admin/webupload/webuploader.css">
+<link rel="stylesheet" type="text/css" href="/static/admin/webupload/style.css">
+<link href="/static/admin/css/select2.min.css" rel="stylesheet">
+<!-- 配置文件 -->
+<script type="text/javascript" src="/static/admin/ueditor/ueditor.config.js"></script>
+<!-- 编辑器源码文件 -->
+<script type="text/javascript" src="/static/admin/ueditor/ueditor.all.js"></script>
+<style>
+    .file-item{float: left; position: relative; width: 110px;height: 110px; margin: 0 20px 20px 0; padding: 4px;}
+    .file-item .info{overflow: hidden;}
+    .uploader-list{width: 100%; overflow: hidden;}
+</style>
+<style type="text/css">
+    .laydate-icon {
+        background: transparent !important;
+    }
+</style>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight" id="app">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>添加填空题</h5>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal" name="edit" id="signupForm" method="post">
+                        <input type="hidden" name="singleChoiceList" v-model="JSON.stringify(singleChoiceList)">
+                        <div v-for="(item, index) in singleChoiceList">
+                            <div class="form-group" id="searchGoods">
+                                <label class="col-sm-2 control-label">题目{{index+1}}：</label>
+                                <div class="input-group col-sm-5">
+                                    <a href="javascript:;" @click="delSingleChoice(index)"><font style="color:red;">删除</font></a>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">题目：</label>
+                                <div class="input-group col-sm-5">
+                                    <input type="text" name="" class="form-control" v-model="item.question">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">备选答案A：</label>
+                                <div class="input-group col-sm-5">
+                                    <input type="text" name="" class="form-control" v-model="item.A">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">备选答案B：</label>
+                                <div class="input-group col-sm-5">
+                                    <input type="text" name="" class="form-control" v-model="item.B">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">备选答案C：</label>
+                                <div class="input-group col-sm-5">
+                                    <input type="text" name="" class="form-control" v-model="item.C">
+                                </div>
+                                </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">备选答案D：</label>
+                                <div class="input-group col-sm-5">
+                                    <input type="text" name="" class="form-control" v-model="item.D">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">答案：</label>
+                                <div class="input-group col-sm-5">
+                                    <input type="text" name="" class="form-control" v-model="item.answer">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">难度等级：</label>
+                                <div class="input-group col-sm-5">
+                                    <select name="" class="form-control" v-model="item.difficulty_level">
+                                        <option value="1">1星</option>
+                                        <option value="2">2星</option>
+                                        <option value="3">3星</option>
+                                        <option value="4">4星</option>
+                                        <option value="5">5星</option>
+                                        <option value="6">6星</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">加入题库：</label>
+                                <div class="input-group col-sm-5">
+                                    <input type="radio" v-model="item.is_use" value="1">立即加入 &nbsp;&nbsp;
+                                    <input type="radio" v-model="item.is_use" value="0">稍后加入
+                                </div>
+                            </div>
+
+                            <div class="hr-line-dashed"></div>
+                        </div>
+                        <a href="javascript:;" @click="addSingleChoice"><font color="blue" style="margin-left:200px;">添加一题</font></a href="javascript:">
+                        <br><br>
+
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="hr-line-dashed"></div>
+                            </div>
+                            <div class="col-sm-4 col-sm-offset-3">
+                                <button id="formSubmit" type="submit" class="btn btn-primary"><i class="fa fa-check"></i> 提交</button>&nbsp;&nbsp;&nbsp;
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public/footer" /}
+<script type="text/javascript" src="/static/admin/webupload/webuploader.min.js"></script>
+<script type="text/javascript" src="/static/admin/js/common.js"></script>
+<script src="/static/admin/js/select2.full.min.js"></script>
+<script src="/static/admin/js/ajaxfileupload.js"></script>
+<!-- 开发环境版本，包含了有帮助的命令行警告 -->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<!-- 引入样式 -->
+<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<!-- 引入组件库 -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script type="text/javascript">
+
+    let app = new Vue({
+        el: "#app",
+        data: {
+            singleChoiceList: [
+                {
+                    question: "",
+                    A: "",
+                    B: "",
+                    C: "",
+                    D: "",
+                    answer: "",
+                    difficulty_level: "",
+                    is_use: 1,
+                }
+            ],
+            selectedLoading: false,
+        },
+        methods: {
+
+            // 添加一题
+            addSingleChoice: function() {
+
+                if(this.singleChoiceList.length >= 20) {
+                    alert('最多添加20个');
+                    return false;
+                }
+
+                let fillTheBlanks = {
+                    question: "",
+                    A: "",
+                    B: "",
+                    C: "",
+                    D: "",
+                    answer: "",
+                    difficulty_level: "",
+                    is_use: 1,
+                };
+                this.singleChoiceList.push(fillTheBlanks);
+            },
+            // 删除一题
+            delSingleChoice: function(index) {
+
+                if (this.singleChoiceList.length <= 1) {
+                    this.$message.error('至少留一个啊');
+                    return false;
+                }
+
+                this.singleChoiceList.splice(index, 1);
+
+            },
+            
+        }
+    });
+
+
+
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        // 年月范围
+        laydate.render({
+            elem: "#lotteryTime",
+            type: 'datetime',
+            done: function(value, date){
+                $("input[name='lotteryTime']").val(value);
+            }
+        });
+
+        laydate.render({
+            elem: "#onlineTime",
+            type: 'datetime',
+            done: function(value, date){
+                $("input[name='onlineTime']").val(value);
+            }
+        });
+    });
+
+    var editor = new UE.ui.Editor();
+    editor.render("myEditor");
+    // 在渲染 ueditor 的时候, 将 ueditor 交给一个全局变量
+    var ue = UE.getEditor('myEditor');
+
+    // 重写百度富文本编辑器监听上传图片事件
+    UE.Editor.prototype._bkGetActionUrl = UE.Editor.prototype.getActionUrl;
+    UE.Editor.prototype.getActionUrl = function(action) {
+        if (action == 'uploadimage') {
+            return '{:url("upload/uploadEditorToOss")}';
+        } else {
+            return this._bkGetActionUrl.call(this, action);
+        }
+    };
+
+    //以下为官方示例
+    $().ready(function () {
+
+        // validate signup form on keyup and submit
+        var icon = "<i class='fa fa-times-circle'></i> ";
+        $("#signupForm").validate({
+            rules: {
+                singleChoiceList: {
+                    required: true
+                },
+            },
+            focusCleanup:true,
+            submitHandler:function(form){
+
+                let singleChoiceList = app.singleChoiceList;
+                let flag = true;
+                let alert = "题目未填写完整，请检查";
+                for (let i=0; i < singleChoiceList.length; i++) {
+
+                    if (common.isNullOrEmpty(singleChoiceList[i]['question'])) {
+                        flag = false;
+                        alert = "题目中有问题还空着呢";
+                        break;
+                    }
+
+                    if (common.isNullOrEmpty(singleChoiceList[i]['answer'])) {
+                        flag = false;
+                        alert = "题目中有答案还空着呢";
+                        break;
+                    }
+
+                    if (common.isNullOrEmpty(singleChoiceList[i]['difficulty_level'])) {
+                        flag = false;
+                        alert = "题目中有难度还空着呢";
+                        break;
+                    }
+
+                }
+
+                if (!flag) {
+                    layer.msg(alert);
+                    return false;
+                }
+
+                $(form).ajaxSubmit({
+                    type: 'post',
+                    url: "{:url('doAddSingleChoiceList')}",
+                    beforeSend:function() {
+                        // 显示loading
+                        index2 = layer.load(0, {
+                            shade: [0.3,'#fff']
+                        });
+                        $("#formSubmit").attr('type', 'button')
+                    },
+                    success: function(data){
+
+                        if (data['code'] != 1) {
+                            layer.msg(data.msg,{icon:2,time:1000,shade: 0.1,}, function(index){
+                                layer.close(index)
+                            });
+                            $("#formSubmit").attr('type', 'submit')
+                            return false;
+                        }
+
+                        layer.msg(data.msg,{icon:1,time:1000,shade: 0.1,}, function(index){
+                            window.location.href="{:url('addsingleChoiceList')}"
+                        });
+                    },
+                    error: function(XmlHttpRequest, textStatus, errorThrown){
+                        layer.msg('error!',{icon:1,time:1000});
+                    },
+                    complete:function() {
+                        // 隐藏loading
+                        layer.close(index2);
+                    }
+                });
+            }
+        });
+    });
+
+</script>
+</body>
+</html>

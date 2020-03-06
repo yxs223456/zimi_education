@@ -1,0 +1,345 @@
+[v-cloak] {
+	display: none;
+}
+*{
+	margin: 0;
+	padding: 0;
+	font-family: Microsoft YaHei,Arial,sans-serif;
+}
+a{
+	text-decoration: none;
+}
+@media screen and (max-width: 414px){
+	html,body{
+		font-size: 16px;
+	}
+}
+@media screen and (max-width: 375px){
+	html,body{
+		font-size: 14px;
+	}
+}
+@media screen and (max-width: 320px){
+	html,body{
+		font-size: 12px;
+	}
+}
+body{
+	background-color: #faf8f7;
+}
+.orderInfo{
+	background:-moz-linear-gradient( left,#ce3c41,#b12025);
+	background: -webkit-linear-gradient(left,#ce3c41,#b12025);
+	height: 7.14rem;
+	width: 100%;
+}
+.trade-info{
+	color: #fff;
+	position: absolute;
+	top: 3.0rem;
+	left:3.07rem;
+}
+.icon-pic{
+	position: absolute;
+	top:0.7rem;
+	right: 4.07rem;
+	width:6.57rem ;
+	height: 5.7rem;
+}
+.no-active{
+	display: none;
+}
+
+.user-info{
+	height: 2.14rem;
+	margin-bottom: 0.71rem;
+	background-color: #fff;
+	color: rgb(51, 51, 51);
+	line-height:1.16;
+	letter-spacing: 0.1rem;
+}
+.icon-book{
+	float: left;
+	position: relative;
+	left:1.64rem;
+	top:0.5rem;
+}
+.user-name{
+	font-size: 0.85rem;
+	padding: 0.65rem 0 0.65rem 3.42rem;
+	width: 50%;
+}
+.phone-number{
+	font-size: 0.85rem;
+	float: right;
+	position: relative;
+	top: -1.6rem;
+	right:2rem;
+}
+.order-content{
+	background: #fff;
+	border-radius: 2px;
+	margin: 0.71rem 0.71rem 0.71rem 0.95rem;
+	position: relative;
+	min-height: 8.5rem;
+}
+.course-img{
+	z-index: 2;
+	float: left;
+	width: 4.28rem;
+	height: 4.5rem;
+	border-radius: 50%;
+	position:relative;
+	top:-0.5rem;
+	left:1.3rem;
+}
+
+.course-name>a{
+	display: inline-block;
+	font-size: 1.14rem;
+	color: rgb(33, 71, 120);
+	line-height: 1.743;
+	padding: 0.2rem 0 0.21rem 0.5rem;
+}
+.payment-info{
+	font-size: 0.85rem;
+	color: rgb(205,148, 91);
+	line-height: 1.367;
+	margin-left:20.5rem;
+	position: relative;
+	top:-1.72rem;
+
+}
+.teacher-description {
+	margin-left: 7.5rem;
+	margin-top: -1.2rem;
+}
+
+.teacher-list{
+	display: inline-block;
+	font-size: 1rem;
+	color: rgb(102, 102, 102);
+}
+.teacher-introduction{
+	line-height: 2;
+	font-size: 0.76rem;
+	color: rgb(102, 102, 102);
+}
+.course-description{
+	margin-left: 7.5rem;
+	margin-right: 1.21rem;
+	font-size: 0.75rem;
+	color: rgb(153, 153, 153);
+	line-height: 1.636;
+}
+.cashNumber{
+	width: 100%;
+	margin-top: 2rem;
+}
+.cash-number{
+	margin-right: 0.9rem;
+	padding-bottom: 1.1rem;
+	font-size: 0.75rem;
+	color: rgb(176, 31, 36);
+	line-height: 1.636;
+	height: 0.95rem;
+	text-align: right;
+}
+
+.order-info{
+	margin: 0 0.71rem 0.71rem 0.95rem;
+	background: #fff;
+	padding: 1.1rem 2.2rem 1.2rem 0.71rem;
+	font-size: 0.85rem;
+	color:rgb(102,102,102);
+}
+.transaction-number{
+	line-height: 2rem;
+}
+.course-recommend{
+	margin:0.71rem 0.71rem 0 0.95rem;
+	padding-top: 0.71rem;
+	padding-left: 0.71rem;
+	background: #FFF;
+	clear: both;
+	height: 22rem;
+}
+.recommend{
+	vertical-align:middle;
+	margin-left: 1.3rem;
+	margin-bottom: 1.1rem;
+	line-height: 2;
+	background: #fff;
+}
+.recommend-line{
+	padding-bottom: 0.3rem;
+}
+.icon-leaf{
+	position: relative;
+	top: 0.3rem;
+}
+.course-body{
+	background: #fff;
+	width: 45%;
+	margin-right: 4%;
+	float: left;
+	border: 1px solid #e8e7e6;
+	margin-bottom: 15px;
+	height: 13.7rem;
+}
+.course-type-free{
+	width: 2.4rem;
+	height:2.4rem;
+	background: url('../image/free-2.png')no-repeat center;
+	background-size: 2.4rem 2.4rem;
+	position: relative;
+	top: 0;
+	left: 0;
+
+}
+.course-type-vip{
+	background: url('../image/vip-2.png')no-repeat center;
+	background-size: 2.4rem 2.4rem;
+	width: 2.4rem;
+	height: 2.4rem;
+	position: relative;
+	top: 0;
+	left:0;
+	z-index: 3;
+}
+.course-type-pay{
+	width: 2.4rem;
+	height:2.4rem;
+	background: url('../image/pay-2.png')no-repeat center;
+	background-size: 2.4rem 2.4rem;
+	position: relative;
+	top: 0;
+	left: 0;
+
+}
+.course-type-vip{
+	background: url('../image/vip-2.png')no-repeat center;
+	background-size: 2.4rem 2.4rem;
+	width: 2.4rem;
+	height: 2.4rem;
+	position: relative;
+	top: 0;
+	left:0;
+	z-index: 3;
+}
+.bg{
+	width: 5.86rem;
+	height: 5.86rem;
+	border-radius: 50%;
+	position: relative;
+	top: -0.5rem;
+	left:2.5rem;
+}
+.bg img {
+	height: 5.86rem;
+	width: 5.86rem;
+	border-radius: 50%;
+}
+.course-title{
+
+	font-size: 1rem;
+	color: rgb(51, 51, 51);
+	line-height: 1.2;
+	text-align: center;
+
+}
+.course-speech{
+	font-size: 0.75rem;
+	color: rgb(153, 153, 153);
+	line-height: 2;
+	text-align: center;
+}
+.course-info{
+	font-size: 0.85rem;
+	color: rgb(87, 107, 149);
+	line-height: 1.5;
+	text-align: center;
+}
+
+.order-operation{
+	height: 3.6rem;
+	width: 100%;
+	background: #fff;
+	position: fixed;
+	bottom: 0;
+	clear: both;
+}
+.cancel-order{
+	border-width: 0.5px;
+	border-color: rgb(205, 205, 205);
+	border-style: solid;
+	border-radius: 2px;
+	width: 5.71rem;
+	height: 2.2rem;
+	margin-left:12.5rem;
+	margin-top:0.71rem;
+	background: #fff;
+	float: left;
+}
+.pay-now{
+	border-color: rgb(176, 31, 36);
+	border-width: 0.5px;
+	border-style: solid;
+	border-radius: 2px;
+	width: 5.71rem;
+	height: 2.2rem;
+	margin-left:1.5rem;
+	margin-top:0.71rem;
+	background: rgb(176, 31, 36) ;
+	color: #fff;
+	float: left;
+}
+
+
+.aside{
+	position: fixed;
+	z-index: 10000;
+	top: 45%;
+	right: 2%;
+}
+.index-btn{
+	margin-bottom: 0.71rem;
+	right: 1rem;
+	width: 2.86rem;
+	height: 2.86rem;
+	border-radius: 50%;
+	border: 1px solid rgb(229,229,229);
+	line-height: 2.86rem;
+	text-align: center;
+	color: rgb(153, 153, 153);
+	background-color: #FFF;
+	font-size: 0.857rem;
+}
+.backToTop-btn{
+	margin-bottom: 0.71rem;
+	width: 2.86rem;
+	height: 2.86rem;
+	border-radius: 50%;
+	border: 1px solid rgb(229,229,229);
+	line-height: 1rem;
+	text-align: center;
+	color: rgb(153, 153, 153);
+	background-color: #FFF;
+	font-size: 0.71rem;
+}
+.backToTop-btn>p{
+	padding-top: 15%;
+}
+.my-btn{
+	margin-bottom: 0.71rem;
+	right: 1rem;
+	width: 2.86rem;
+	height: 2.86rem;
+	border-radius: 50%;
+	border: 1px solid rgb(201,139,73);
+	line-height: 2.86rem;
+	text-align: center;
+	color: #FFF;
+	background-color: rgb(201,139,73);
+	font-size: 0.857rem;
+}

@@ -1,0 +1,323 @@
+[v-cloak] {
+  display: none;
+}
+
+.reply-comment-head{
+	position: relative;
+	background: #faf8f7;
+	padding: 1rem 0.71rem 0 0.71rem;
+}
+.course-title{
+	color: #214778;
+	font-size: 1.14rem;
+	overflow: hidden;
+	text-overflow:ellipsis;
+	margin-left: 0.5rem;
+}
+.course-speech{
+	color: #666;
+	font-size: 0.89rem;
+	margin-left: 0.5rem;
+}
+.create-time{
+	font-size: 0.79rem;
+	color: #999;
+	margin-left: 0.5rem;
+}
+.section-listen{
+	display: inline-block;
+	margin-left: 0.5rem;
+}
+.icon-earphone{
+	display: inline-block;
+	background: url('../image/icon-earphone.png')no-repeat center;
+	background-size: 1rem 0.86rem;
+	width: 1rem;
+	height: 0.86rem;
+}
+.section-listen > p,.section-point > p{
+	font-size: 0.85rem;
+	color: #666;
+	display: inline-block;
+}
+.section-point{
+	display: inline-block;
+	margin-left: 2.86rem;
+}
+.icon-point{
+	display: inline-block;
+	background: url('../image/icon-flower.png')no-repeat center;
+	background-size: 0.78rem 0.93rem;
+	width: 0.78rem;
+	height: 0.93rem;
+	vertical-align: top;
+	margin-top: 0.35rem;
+	margin-right: 0.35rem;
+}
+.speech-introduction{
+	background: #fff;
+	margin: 0.71rem 0.71rem 0 0.71rem;
+	padding: 0.71rem;
+	position: relative;
+}
+.speech-title{
+	color: #214778;
+	font-size: 1.07rem;
+}
+.speech-head-img{
+	position: absolute;
+	display: block;
+	width: 5.86rem;
+	height: 5.86rem;
+	right: 2.14rem;
+	top: -2.5rem;
+	border-radius: 50%;
+}
+.speech-info{
+	color: #666;
+	font-size: 0.86rem;
+	margin-left: 0.5rem;
+	margin-top: 0.35rem;
+}
+.speech-content{
+	font-size: 0.86rem;
+	color: #999;
+	margin-top: 0.35rem;
+	margin-left: 0.5rem;
+}
+.content-details{
+	color: #576b95;
+	font-size: 0.86rem;
+}
+.pay-btn{
+	display: inline-block;
+	width: 10.71rem;
+	height: 2.5em;
+	border: 1px solid #b42c31;
+	border-radius: 2px;
+	margin-left: 1.8rem;
+	margin-top: 0.71rem;
+	margin-bottom: 0.71rem;
+}
+.icon-shopping{
+	display: inline-block;
+	background: url('../image/icon-shopping.png')no-repeat center;
+	background-size: 1.21rem 1.14rem;
+	width: 1.21rem;
+	height: 1.14rem;
+	vertical-align: top;
+	margin-top: 0.68rem;
+	margin-left: 2.1rem;
+}
+.pay-btn > p{
+	line-height: 2.5rem;
+	color: #b42c31;
+	font-size: 1.07rem;
+	margin-left: 0.6rem;
+	display: inline-block;
+	text-align: center;
+}
+.listen-btn{
+	display: inline-block;
+	width: 40%;
+	margin-left: 6.66%;
+	height: 2.5em;
+	border: 1px solid #b42c31;
+	border-radius: 2px;
+	margin-top: 0.71rem;
+	margin-bottom: 0.71rem;
+}
+.icon-listen{
+	display: inline-block;
+	background: url('../image/icon-earphone2x.png')no-repeat center;
+	background-size: 1.29rem 1.07rem;
+	width: 1.29rem;
+	height: 1.07rem;
+	vertical-align: top;
+	margin-top: 0.68rem;
+	margin-left: 2.1rem;
+}
+.listen-btn > p{
+	line-height: 2.5rem;
+	color: #b42c31;
+	font-size: 1.07rem;
+	margin-left: 0.6rem;
+	display: inline-block;
+	text-align: center;
+}
+.love-btn{
+	display: inline-block;
+	width: 40%;
+	margin-left: 4.66%;
+	height: 2.5rem;
+	border: 1px solid #c98b49;
+	border-radius: 2px;
+	margin-top: 0.71rem;
+	margin-bottom: 0.71rem;
+}
+.icon-love{
+	display: inline-block;
+	background: url('../image/icon-love.png')no-repeat center;
+	background-size: 1.29rem 1.07rem;
+	width: 1.29rem;
+	height: 1.07rem;
+	vertical-align: top;
+	margin-top: 0.68rem;
+	margin-left: 2.1rem;
+}
+.love-btn:after{
+	content: '收藏课程';
+	line-height: 2.5rem;
+	color: #c98b49;
+	font-size: 1.07rem;
+	margin-left: 0.6rem;
+	display: inline-block;
+	text-align: center
+}
+.love-btn.active > .icon-love{
+	display: inline-block;
+	background: url('../image/icon-love-active.png')no-repeat center;
+	background-size: 1.29rem 1.07rem;
+	vertical-align: top;
+	margin-top: 0.68rem;
+	margin-left: 1.6rem;
+}
+.love-btn.active:after{
+	content: '课程已收藏';
+	line-height: 2.5rem;
+	color: #c98b49;
+	font-size: 1.07rem;
+	margin-left: 0.6rem;
+	display: inline-block;
+	text-align: center
+}
+.course-content{
+	background: #fff;
+	margin: 0 0.71rem 0 0.71rem;
+	padding: 0.71rem;
+	position: relative;
+}
+.course-details{
+	font-size: 0.86rem;
+	color: #666;
+	font-size: 0.86rem;
+	margin-left: 0.5rem;
+	margin-top: 0.35rem;
+}
+.course-comment{
+	background: #fff;
+	margin: 0.71rem 0.71rem 75px 0.71rem;
+	padding: 1.43rem 0.71rem 0.71rem 0.71rem;
+	position: relative;
+}
+.vip-comment{
+	color: #214778;
+	font-size: 1.07rem;
+	margin-bottom: 0.71rem;
+}
+.comment-list{
+	position: relative;
+	margin-bottom: 0.71rem;
+}
+.user-head-img{
+	display: inline-block;
+	width: 3.64rem;
+	height: 3.64rem;
+	border-radius: 50%;
+}
+.vip-comment-info{
+	display: inline-block;
+	width: 78%;
+	vertical-align: top;
+	position: relative;
+	margin-left: 0.71rem;
+}
+.comment-time{
+	color: #999;
+	position: absolute;
+	right: 0;
+	top: 0;
+	font-size: 0.79rem;
+}
+.comment-content{
+	color: #666;
+	font-size: 0.86rem;
+}
+.reply-comment-content{
+	margin-top: 0.5rem;
+	border: 1px solid #e8e8e8;
+	padding: 0.71rem 0;
+}
+.reply-speech-name{
+	color: #214778;
+}
+.reply-time{
+	font-size: 0.79rem;
+	color: #999;
+	margin-left: 1.43rem;
+}
+.reply-content{
+	margin-left: 1.43rem;
+	color: #666;
+	font-size: 0.86rem;
+}
+.aside{
+	position: fixed;
+	z-index: 10000;
+	top: 45%;
+	right: 2%;
+}
+.index-btn{
+	margin-bottom: 0.71rem;
+	right: 1rem;
+	width: 2.86rem;
+	height: 2.86rem;
+	border-radius: 50%;
+	border: 1px solid rgb(229,229,229);
+	line-height: 2.86rem;
+	text-align: center;
+	color: rgb(153, 153, 153);
+	background-color: #FFF;
+	font-size: 0.857rem;
+}
+.my-btn{
+	margin-bottom: 0.71rem;
+	right: 1rem;
+	width: 2.86rem;
+	height: 2.86rem;
+	border-radius: 50%;
+	border: 1px solid rgb(229,229,229);
+	line-height: 2.86rem;
+	text-align: center;
+	color: rgb(153, 153, 153);
+	background-color: #FFF;
+	font-size: 0.857rem;
+}
+.backToTop-btn{
+	margin-bottom: 0.71rem;
+	width: 2.86rem;
+	height: 2.86rem;
+	border-radius: 50%;
+	border: 1px solid rgb(229,229,229);
+	line-height: 1rem;
+	text-align: center;
+	color: rgb(153, 153, 153);
+	background-color: #FFF;
+	font-size: 0.71rem;
+}
+.backToTop-btn>p{
+	padding-top: 15%;
+}
+.listened-btn{
+	margin-bottom: 0.71rem;
+	right: 1rem;
+	width: 2.86rem;
+	height: 2.86rem;
+	border-radius: 50%;
+	border: 1px solid rgb(201,139,73);
+	line-height: 2.86rem;
+	text-align: center;
+	color: #FFF;
+	background-color: rgb(201,139,73);
+	font-size: 0.857rem;
+}

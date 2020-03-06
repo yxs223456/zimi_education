@@ -1,0 +1,450 @@
+[v-cloak] {
+  display: none;
+}
+*{
+    box-sizing: content-box;
+}
+.section-details{
+    padding-bottom: 60px;
+    position: relative;
+}
+.reply-comment-head{
+    position: relative;
+    background: #faf8f7;
+    padding: 1rem 0.71rem 0 0.71rem;
+}
+.course-title{
+    color: #214778;
+    font-size: 1.14rem;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    margin-left: 0.5rem;
+}
+.course-speech{
+    color: #666;
+    font-size: 0.89rem;
+    margin-left: 0.5rem;
+}
+.create-time{
+    font-size: 0.79rem;
+    color: #999;
+    margin-left: 0.5rem;
+}
+.section-listen{
+    display: inline-block;
+    margin-left: 0.5rem;
+}
+.icon-earphone{
+    display: inline-block;
+    background: url('../image/icon-earphone.png')no-repeat center;
+    background-size: 1rem 0.86rem;
+    width: 1rem;
+    height: 0.86rem;
+}
+.section-listen > p,.section-point > p{
+    font-size: 0.85rem;
+    color: #666;
+    display: inline-block;
+}
+.section-point{
+    display: inline-block;
+    margin-left: 2.86rem;
+}
+.icon-point{
+    display: inline-block;
+    background: url('../image/icon-flower.png')no-repeat center;
+    background-size: 0.78rem 0.93rem;
+    width: 0.78rem;
+    height: 0.93rem;
+    vertical-align: top;
+    margin-top: 0.35rem;
+    margin-right: 0.35rem;
+}
+.section-content img{
+    width: 100%;
+}
+.custom-richtext img{
+    width: 100%;
+}
+.control-group {
+    margin: 0;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    min-height: 30px;
+}
+.custom-audio {
+    padding: 10px;
+}
+.custom-word-bar {
+    width: auto;
+    max-width: 240px;
+    height: auto;
+    display: inline-block;
+    position: relative;
+    left: 6px;
+    cursor: pointer;
+}
+.custom-audio-bar {
+    width: 185px;
+    height: 42px;
+    display: inline-block;
+    position: absolute;
+    left: 60px;
+    cursor: pointer;
+    background: url('/static/admin/images/sprite_v5.png')no-repeat scroll 0 0;
+    background-size: 400px 175px;
+}
+.custom-audio-animation-static {
+    background-position: -180px -105px;
+    width: 13px;
+    height: 17px;
+    display: block;
+    position: absolute;
+    left: 21px;
+    top: 12px;
+    z-index: 1;
+}
+.custom-word-logo {
+    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.3);
+    box-shadow: 0 1px 1px rgba(0,0,0,0.3);
+    height: auto;
+    max-width: 100%;
+    vertical-align: top;
+    border: 0;
+}
+.custom-audio-bar img {
+    position: absolute;
+    left: 21px;
+    top: 12px;
+    z-index: 2;
+    width: 13px;
+    height: 16px;
+}
+.borderballoon {
+    width: auto;
+    max-width: 240px;
+    min-height: 42px;
+    height: auto;
+    background: #faf8f7;
+    border-radius: 5px;
+    position: relative;
+    top: 0;
+    left: 8px;
+}
+
+.borderballoon:after {
+    content: "";
+    position: absolute;
+    right: 100%;
+    top: 10px;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-right: 9px solid #faf8f7;
+    border-bottom: 5px solid transparent;
+}
+
+.word {
+    padding: 10px 8px;
+    color: #999;
+}
+
+.custom-word-logo {
+    -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    height: auto;
+    max-width: 100%;
+    vertical-align: top;
+    border: 0;
+}
+
+.app-design .app-sidebar {
+    position: fixed;
+    float: left;
+    left: 550px;
+    width: 420px;
+    margin-left: 10px;
+    padding-bottom: 50px;
+    font-size: 14px;
+}
+
+.text-area {
+    width: 350px;
+    min-height: 200px;
+    resize: none;
+}
+
+.custom-richtext p {
+    margin-bottom: 5px;
+}
+
+.bg-white {
+    background: transparent;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+.red-point {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: red;
+    border-radius: 100%;
+    top: 25px;
+    left: 250px;
+    display: block;
+}
+.play-time{
+    position: absolute;
+    top: 20px;
+    left: 250px;
+    font-size: 12px;
+}
+.edit-audio-avatar {
+    float: left;
+    width: 60px;
+    height: 60px;
+    margin-right: 16px;
+    border: 1px solid #797979;
+}
+
+.edit-audio-avatar-action {
+    float: left;
+    width: 180px;
+}
+.custom-richtext {
+    padding: 0 10px;
+    padding-top: 10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    font-size: 16px;
+    color: #333;
+    line-height: 1.5;
+    overflow: hidden;
+    text-align: left;
+    word-wrap: break-word;
+    position: relative;
+}
+.comment-btn{
+    background: #576b95;
+    width: 10.71rem;
+    height: 2.5rem;
+    margin: 1rem auto 0 auto;
+}
+.icon-comment-white{
+    background: url('../image/icon-comment-white.png')no-repeat center;
+    background-size: 1.43rem 1.21rem;
+    width: 1.43rem;
+    height: 1.21rem;
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 0.65rem;
+    margin-left: 2.1rem;
+    margin-right: 0.5rem;
+}
+.comment-btn > p{
+    color: #fff;
+    text-align: center;
+    line-height: 2.5rem;
+    font-size: 1.07rem;
+    display: inline-block;
+}
+.course-comment{
+    background: #fff;
+    margin: 0.71rem 0.71rem 75px 0.71rem;
+    padding: 1.43rem 0.71rem 0.71rem 0.71rem;
+    position: relative;
+}
+.vip-comment{
+    color: #214778;
+    font-size: 1.07rem;
+    margin-bottom: 0.71rem;
+}
+.comment-list{
+    position: relative;
+    margin-bottom: 0.71rem;
+}
+.user-head-img{
+    display: inline-block;
+    width: 3.64rem;
+    height: 3.64rem;
+    border-radius: 50%;
+}
+.vip-comment-info{
+    display: inline-block;
+    width: 78%;
+    vertical-align: top;
+    position: relative;
+    margin-left: 0.71rem;
+}
+.comment-time{
+    color: #999;
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-size: 0.79rem;
+}
+.comment-content{
+    color: #666;
+    font-size: 0.86rem;
+}
+.reply-comment-content{
+    margin-top: 0.5rem;
+    border: 1px solid #e8e8e8;
+    padding: 0.71rem 0;
+}
+.reply-speech-name{
+    color: #214778;
+}
+.reply-time{
+    font-size: 0.79rem;
+    color: #999;
+    margin-left: 1.43rem;
+}
+.reply-content{
+    margin-left: 1.43rem;
+    color: #666;
+    font-size: 0.86rem;
+}
+/*.reward-btn{*/
+    /*position: fixed;*/
+    /*z-index: 10000;*/
+    /*top: 45%;*/
+    /*margin-top: -1.43rem;*/
+    /*right: 1rem;*/
+    /*width: 2.86rem;*/
+    /*height: 2.86rem;*/
+    /*border-radius: 50%;*/
+    /*border: 1px solid #c99362;*/
+    /*line-height: 2.86rem;*/
+    /*text-align: center;*/
+    /*color: #c99362;*/
+/*}*/
+.audioCss{
+    border: 8px solid #faf8f7;
+    -webkit-border-image:url("/static/admin/images/icon-bomb.png")10 10 10 15; /* Safari 5 */
+    -o-border-image:url("/static/admin/images/icon-bomb.png")10 10 10 15; /* Opera */
+    border-image: url("/static/admin/images/icon-bomb.png")10 10 10 15;
+    width: 185px;
+    height: 26px;
+    display: inline-block;
+    position: absolute;
+    left: 60px;
+    cursor: pointer;
+    background: #faf8f7;
+}
+.audio_length{
+    vertical-align: top;
+    margin-top: -8px;
+}
+.audioIcon{
+    position: absolute;
+    top: 22px;
+    left: 80px;
+    z-index: 1000;
+}
+#audio_area{
+    background: #fff;
+    display: inline-block;
+    height: 30px;
+}
+
+/********新UI**********/
+.no-access{
+    opacity: 0.2;
+    filter: blur(3px);
+}
+.no-access-audio{
+    opacity: 0.2;
+}
+.buy-btn{
+    position: fixed;
+    bottom:1rem;
+    width: 100%;
+    z-index: 10000;
+}
+.aside{
+    position: fixed;
+    z-index: 10000;
+    top: 45%;
+    right: 2%;
+}
+.index-btn{
+    margin-bottom: 0.71rem;
+    right: 1rem;
+    width: 2.86rem;
+    height: 2.86rem;
+    border-radius: 50%;
+    border: 1px solid rgb(229,229,229);
+    line-height: 2.86rem;
+    text-align: center;
+    color: rgb(153, 153, 153);
+    background-color: #FFF;
+    font-size: 0.857rem;
+}
+.my-btn{
+    margin-bottom: 0.71rem;
+    right: 1rem;
+    width: 2.86rem;
+    height: 2.86rem;
+    border-radius: 50%;
+    border: 1px solid rgb(229,229,229);
+    line-height: 2.86rem;
+    text-align: center;
+    color: rgb(153, 153, 153);
+    background-color: #FFF;
+    font-size: 0.857rem;
+}
+.backToTop-btn{
+    margin-bottom: 0.71rem;
+    width: 2.86rem;
+    height: 2.86rem;
+    border-radius: 50%;
+    border: 1px solid rgb(229,229,229);
+    line-height: 1rem;
+    text-align: center;
+    color: rgb(153, 153, 153);
+    background-color: #FFF;
+    font-size: 0.71rem;
+}
+.backToTop-btn>p{
+    padding-top: 15%;
+}
+.reward-btn{
+    margin-bottom: 0.71rem;
+    right: 1rem;
+    width: 2.86rem;
+    height: 2.86rem;
+    border-radius: 50%;
+    border: 1px solid rgb(201,139,73);
+    line-height: 2.86rem;
+    text-align: center;
+    color: #FFF;
+    background-color: rgb(201,139,73);
+    font-size: 0.857rem;
+}
+.buy-course{
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 2px;
+    background-color: rgb(176,31,36);
+    width: 87%;
+    height: 2.85rem;
+    position: relative;
+    margin-left: 6.5%;
+}
+.buy-course>img{
+    position: relative;
+    top:0.2rem;
+}
+.buy-course>span{
+    color: #FFF;
+    margin-left: 0.7rem;
+    line-height: 2.85rem;
+    letter-spacing: 0.2px;
+}
