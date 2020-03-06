@@ -500,6 +500,7 @@ class UserService extends Base
     //验证密码是否符合要求。密码长度8~32位，需包含数字、字母、符号至少2种或以上元素
     private function checkPasswordFormat($password)
     {
+        return true;
         $length = strlen($password);
         if ($length < 8 || $length > 32) {
             return false;
