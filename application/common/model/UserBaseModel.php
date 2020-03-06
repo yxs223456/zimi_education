@@ -31,6 +31,12 @@ class UserBaseModel extends Base
         return $this->where("invite_code", $inviteCode)->find();
     }
 
+    //通过微信unionid获取用户
+    public function getUserByUnionid($unionid)
+    {
+        return $this->where("unionid", $unionid)->find();
+    }
+
     //用户邀请数+1
     public function addUserInviteCountByUuid($uuid)
     {

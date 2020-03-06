@@ -306,8 +306,14 @@ class UserService extends Base
         //获取用户微信信息
         $userWeChatInfo = $this->getUserInfoForMobileApp($accessTokenResp["access_token"], $accessTokenResp["openid"]);
 
-        //纪录用户微信信息
+        //判断微信是否绑定了其他账号
         $userModel = new UserBaseModel();
+        $userByWeChat = $userModel->getUserByUnionid($userWeChatInfo["unionid"]);
+        if ($userByWeChat) {
+            throw AppException::factory(AppException::WE_CHAT_BIND_ALREADY);
+        }
+
+        //纪录用户微信信息
         $user = $userModel->where("uuid", $userInfo["uuid"])->find();
         if (empty($user)) {
             throw AppException::factory(AppException::USER_NOT_EXISTS);

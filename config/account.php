@@ -16,7 +16,7 @@ return [
     ],
 
     "mob_tech" => [
-        "app_key" => "2c291c52e0889",
+        "app_key" => "2e3e2662be696",
     ],
 
     "we_chat" => [
