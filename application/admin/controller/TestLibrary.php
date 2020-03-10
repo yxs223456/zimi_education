@@ -8,6 +8,7 @@
 
 namespace app\admin\controller;
 
+use app\common\enum\DbIsDeleteEnum;
 use app\common\enum\QuestionIsUseEnum;
 use app\common\enum\TrueFalseQuestionAnswerEnum;
 use app\common\helper\Redis;
@@ -17,7 +18,7 @@ class TestLibrary extends Common
 {
     public function convertRequestToWhereSql() {
 
-        $whereSql = " 1=1";
+        $whereSql = " is_delete = 0";
         $pageMap = [];
 
         $params = input("param.");
@@ -104,6 +105,55 @@ class TestLibrary extends Common
         $this->success("添加成功");
     }
 
+    public function editFillTheBlanks()
+    {
+        $id = input('param.id');
+
+        $this->assign("info",$this->fillTheBlanksService->findById($id));
+
+        return $this->fetch("editFillTheBlanks");
+    }
+
+    public function editFillTheBlanksPost()
+    {
+        $id = input('param.id');
+        $info = $this->fillTheBlanksService->findById($id);
+
+        $updateData = [
+            "question" => input("question"),
+            "answer" => input("answer"),
+            "difficulty_level" => input("difficulty_level"),
+            "update_time" => time(),
+        ];
+        $this->fillTheBlanksService->updateByIdAndData($id, $updateData);
+
+        if ($info["difficulty_level"] != $updateData["difficulty_level"]) {
+            $redis = Redis::factory();
+            removeFillTheBlanks($info["uuid"], $info["difficulty_level"], $redis);
+            if ($info["is_use"] == QuestionIsUseEnum::YES) {
+                addFillTheBlanks($info["uuid"], $updateData["difficulty_level"], $redis);
+            }
+        }
+
+        $this->success("修改成功",url("fillTheBlanksList"));
+    }
+
+    public function deleteFillTheBlanks()
+    {
+        $id = input('param.id');
+        $info = $this->fillTheBlanksService->findById($id);
+        $redis = Redis::factory();
+        removeFillTheBlanks($info["uuid"], $info["difficulty_level"], $redis);
+
+        $updateData = [
+            "is_delete" => DbIsDeleteEnum::YES,
+            "update_time" => time(),
+        ];
+        $this->fillTheBlanksService->updateByIdAndData($id, $updateData);
+
+        $this->success("删除成功");
+    }
+
     //单选题列表
     public function singleChoiceList()
     {
@@ -145,19 +195,26 @@ class TestLibrary extends Common
                 !is_numeric($singleChoice["difficulty_level"])) {
                 continue;
             }
-            if ($singleChoice["A"] == "" || $singleChoice["B"] == "" ||
-                $singleChoice["C"] == "" || $singleChoice["D"] == "") {
+            if (trim($singleChoice["A"]) === "" || trim($singleChoice["B"]) === "") {
                 continue;
+            }
+            $answers = [];
+            if (trim($singleChoice["A"]) !== "") {
+                $answers[] = trim($singleChoice["A"]);
+            }
+            if (trim($singleChoice["B"]) !== "") {
+                $answers[] = trim($singleChoice["B"]);
+            }
+            if (trim($singleChoice["C"]) !== "") {
+                $answers[] = trim($singleChoice["C"]);
+            }
+            if (trim($singleChoice["D"]) !== "") {
+                $answers[] = trim($singleChoice["D"]);
             }
             $data[] = [
                 "uuid" => createUuid(),
                 "question" => $singleChoice["question"],
-                "possible_answers" => json_encode([
-                    $singleChoice["A"],
-                    $singleChoice["B"],
-                    $singleChoice["C"],
-                    $singleChoice["D"],
-                ], JSON_UNESCAPED_UNICODE),
+                "possible_answers" => json_encode($answers, JSON_UNESCAPED_UNICODE),
                 "answer" => $singleChoice["answer"],
                 "difficulty_level" => $singleChoice["difficulty_level"],
                 "is_use" => $singleChoice["is_use"],
@@ -173,6 +230,98 @@ class TestLibrary extends Common
         }
 
         $this->success("添加成功");
+    }
+
+    public function editSingleChoice()
+    {
+        $id = input('param.id');
+
+        $info = $this->singleChoiceService->findById($id);
+
+        $possibleAnswers = json_decode($info["possible_answers"], true);
+
+        $answers = [
+            "A" => "",
+            "B" => "",
+            "C" => "",
+            "D" => "",
+        ];
+        foreach ($possibleAnswers as $key=>$answer) {
+            switch ($key) {
+                case 0:
+                    $answers["A"] = $answer;
+                    break;
+                case 1:
+                    $answers["B"] = $answer;
+                    break;
+                case 2:
+                    $answers["C"] = $answer;
+                    break;
+                case 3:
+                    $answers["D"] = $answer;
+                    break;
+            }
+        }
+
+        $this->assign("info", $info);
+        $this->assign("answers", $answers);
+
+        return $this->fetch("editSingleChoice");
+    }
+
+    public function editSingleChoicePost()
+    {
+        $id = input('param.id');
+        $info = $this->singleChoiceService->findById($id);
+
+        $answers = [];
+        if (trim(input("answerA")) !== "") {
+            $answers[] = trim(input("answerA"));
+        }
+        if (trim(input("answerB")) !== "") {
+            $answers[] = trim(input("answerB"));
+        }
+        if (trim(input("answerC")) !== "") {
+            $answers[] = trim(input("answerC"));
+        }
+        if (trim(input("answerD")) !== "") {
+            $answers[] = trim(input("answerD"));
+        }
+
+        $updateData = [
+            "question" => input("question"),
+            "possible_answers" => json_encode($answers, JSON_UNESCAPED_UNICODE),
+            "answer" => trim(input("answer")),
+            "difficulty_level" => input("difficulty_level"),
+            "update_time" => time(),
+        ];
+        $this->singleChoiceService->updateByIdAndData($id, $updateData);
+
+        if ($info["difficulty_level"] != $updateData["difficulty_level"]) {
+            $redis = Redis::factory();
+            removeSingleChoice($info["uuid"], $info["difficulty_level"], $redis);
+            if ($info["is_use"] == QuestionIsUseEnum::YES) {
+                addSingleChoice($info["uuid"], $updateData["difficulty_level"], $redis);
+            }
+        }
+
+        $this->success("修改成功",url("singleChoiceList"));
+    }
+
+    public function deleteSingleChoice()
+    {
+        $id = input('param.id');
+        $info = $this->singleChoiceService->findById($id);
+        $redis = Redis::factory();
+        removeSingleChoice($info["uuid"], $info["difficulty_level"], $redis);
+
+        $updateData = [
+            "is_delete" => DbIsDeleteEnum::YES,
+            "update_time" => time(),
+        ];
+        $this->singleChoiceService->updateByIdAndData($id, $updateData);
+
+        $this->success("删除成功");
     }
 
     //作文题列表
@@ -265,13 +414,13 @@ class TestLibrary extends Common
         return $this->fetch("trueFalseQuestionList");
     }
 
-    //添加单选题页面
+    //添加判断题页面
     public function addTrueFalseQuestionList()
     {
         return $this->fetch("addTrueFalseQuestionList");
     }
 
-    //执行添加单选题
+    //执行添加判断题
     public function doAddTrueFalseQuestionList()
     {
         $trueFalseQuestionList = input("trueFalseQuestionList");
@@ -308,6 +457,55 @@ class TestLibrary extends Common
         }
 
         $this->success("添加成功");
+    }
+
+    public function editTrueFalseQuestion()
+    {
+        $id = input('param.id');
+
+        $this->assign("info",$this->trueFalseQuestionService->findById($id));
+
+        return $this->fetch("editTrueFalseQuestion");
+    }
+
+    public function editTrueFalseQuestionPost()
+    {
+        $id = input('param.id');
+        $info = $this->trueFalseQuestionService->findById($id);
+
+        $updateData = [
+            "question" => input("question"),
+            "answer" => trim(input("answer")),
+            "difficulty_level" => input("difficulty_level"),
+            "update_time" => time(),
+        ];
+        $this->trueFalseQuestionService->updateByIdAndData($id, $updateData);
+
+        if ($info["difficulty_level"] != $updateData["difficulty_level"]) {
+            $redis = Redis::factory();
+            removeTrueFalseQuestion($info["uuid"], $info["difficulty_level"], $redis);
+            if ($info["is_use"] == QuestionIsUseEnum::YES) {
+                addTrueFalseQuestion($info["uuid"], $updateData["difficulty_level"], $redis);
+            }
+        }
+
+        $this->success("修改成功",url("trueFalseQuestionList"));
+    }
+
+    public function deleteTrueFalseQuestion()
+    {
+        $id = input('param.id');
+        $info = $this->trueFalseQuestionService->findById($id);
+        $redis = Redis::factory();
+        removeTrueFalseQuestion($info["uuid"], $info["difficulty_level"], $redis);
+
+        $updateData = [
+            "is_delete" => DbIsDeleteEnum::YES,
+            "update_time" => time(),
+        ];
+        $this->trueFalseQuestionService->updateByIdAndData($id, $updateData);
+
+        $this->success("删除成功");
     }
 
     //操作题库缓存
