@@ -12,7 +12,12 @@
     <!-- Panel Other -->
     <div class="ibox float-e-margins">
         <div class="ibox-title">
-            <h5>判断题列表</h5>
+            <h5>各星级难度题目题库数量：一星:{$allCount.one}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                二星:{$allCount.two}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                三星:{$allCount.three}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                四星:{$allCount.four}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                五星:{$allCount.five}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                六星:{$allCount.six}</h5>
         </div>
         <div class="ibox-content">
             <!--搜索框开始-->
@@ -27,6 +32,10 @@
                         <form method="post" action="{:url('trueFalseQuestionList')}" id="searchForm" class="form-inline">
                             <label for="">题目</label>
                             <input type="text" name="question" value="{$question|default=''}" class="form-control">
+
+                            <label for="">增加类型</label>
+                            {:getEnumSelectWidget($allDifficultyLevel, 'difficulty_level', '-全部-', isset($difficulty_level) ? $difficulty_level : '', 1)}
+
 
                             <button class="btn btn-success btn-sm" type="submit" style="margin-bottom:0;margin-left:4px"><i class="fa fa-filter"></i> 筛选</button>
                             <a class="btn btn-primary btn-sm"  style="margin-bottom:0" href="{:url('trueFalseQuestionList')}"><i class="fa fa-filter"></i> 重置</a>
@@ -119,18 +128,14 @@
             ,jump: function(obj, first){
                 //首次不执行
                 if(!first){
-                    $("#searchForm").attr('action', '{:url("trueFalseQuestionList")}?page='+obj.curr);
+                    $("#searchForm").attr('action', '{:url("trueFalseQuestionList")}?page='+obj.curr +
+                        "&difficulty_level={$difficulty_level|default=''}"
+                    );
                     $("#searchForm").submit();
                 }
             }
         });
     });
-
-    function remove(id) {
-        layer.confirm('确定要删除吗？', {icon: 3}, function(index){
-            window.location.href="{:url('delete')}?id="+id
-        });
-    }
 </script>
 
 </body>
