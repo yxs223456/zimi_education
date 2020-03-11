@@ -62,7 +62,7 @@ class UserService extends Base
 
         //判断验证码是否正确（不验证手机号是否注册）
         if (MobTech::verify($phone, $code) == false) {
-//            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
+            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
         }
 
 //        $phoneVerificationCodeModel = new PhoneVerificationCodeModel();
@@ -194,7 +194,7 @@ class UserService extends Base
     {
         //判断验证码是否正确
         if (MobTech::verify($phone, $code) == false) {
-//            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
+            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
         }
 //        $phoneVerificationCodeModel = new PhoneVerificationCodeModel();
 //        $useType = PhoneVerificationCodeTypeEnum::SIGN_IN;
@@ -265,7 +265,7 @@ class UserService extends Base
 
         //判断验证码是否正确
         if (MobTech::verify($phone, $code) == false) {
-//            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
+            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
         }
 //        $phoneVerificationCodeModel = new PhoneVerificationCodeModel();
 //        $useType = PhoneVerificationCodeTypeEnum::RESET_PASSWORD;
@@ -500,6 +500,7 @@ class UserService extends Base
     //验证密码是否符合要求。密码长度8~32位，需包含数字、字母、符号至少2种或以上元素
     private function checkPasswordFormat($password)
     {
+        return true;
         $length = strlen($password);
         if ($length < 8 || $length > 32) {
             return false;

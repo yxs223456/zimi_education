@@ -70,6 +70,9 @@
                                     {/if}
                                 </td>
                                 <td>
+                                    <a href="{:url('editWriting',['id'=>$vo['id']])}" class="btn btn-primary btn-xs">
+                                        <i class="fa fa-paste"></i> 编辑</a>&nbsp;
+
                                     {if condition="$vo['is_use'] eq 1"}
                                     <a class="red" href="{:url('operateLibraryCache',['uuid'=>$vo['uuid'],'difficulty_level'=>$vo['difficulty_level'],'do'=>'remove','type'=>'writing'])}">
                                         <div><span class="label label-danger">移出题库</span></div>
@@ -79,6 +82,9 @@
                                         <div><span class="label label-info">加入题库</span></div>
                                     </a>
                                     {/if}
+
+                                    <a href="{:url('deleteWriting',['id'=>$vo['id']])}" class="btn btn-danger btn-xs">
+                                        <i class="fa fa-trash-o"></i> 删除</a>
                                 </td>
                             </tr>
                             {/foreach}

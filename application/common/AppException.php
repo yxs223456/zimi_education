@@ -28,7 +28,7 @@ class AppException extends \Exception
     const USER_MODIFY_ERROR = [1010, "信息修改失败"];
 
     const WE_CHAT_GET_ACCESS_TOKEN_ERROR = [2000, "获取用户微信信息失败"];
-    const WE_CHAT_NOT_BIND_USER = [2001, "当前微信号还没有绑定任何账号,请先使用手机号注册或登录"];
+    const WE_CHAT_NOT_BIND_USER = [2001, "当前微信号还没有绑定任何账号,请先使用手机号注册"];
     const WE_CHAT_BIND_ALREADY = [2002, "当前微信号已绑定其他手机账号"];
 
     public static function factory($errConst)
