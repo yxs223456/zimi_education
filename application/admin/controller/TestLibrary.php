@@ -9,6 +9,7 @@
 namespace app\admin\controller;
 
 use app\common\enum\DbIsDeleteEnum;
+use app\common\enum\QuestionDifficultyLevelEnum;
 use app\common\enum\QuestionIsUseEnum;
 use app\common\enum\TrueFalseQuestionAnswerEnum;
 use app\common\helper\Redis;
@@ -34,6 +35,9 @@ class TestLibrary extends Common
                 case "question":
                     $whereSql .= " and question LIKE '%".$value."%'";
                     break;
+                case "difficulty_level":
+                    $whereSql .= " and difficulty_level = '$value'";
+                    break;
 
             }
 
@@ -41,6 +45,8 @@ class TestLibrary extends Common
             $this->assign($key, $value);
 
         }
+        $allDifficultyLevel = QuestionDifficultyLevelEnum::getAllList();
+        $this->assign("allDifficultyLevel", $allDifficultyLevel);
 
         $data["whereSql"] = $whereSql;
         $data["pageMap"] = $pageMap;
@@ -56,6 +62,39 @@ class TestLibrary extends Common
 
         $list = $this->fillTheBlanksService->getListByCondition($condition);
 
+        $countArr = [
+            "one" => 0,
+            "two" => 0,
+            "three" => 0,
+            "four" => 0,
+            "five" => 0,
+            "six" => 0,
+        ];
+        $allDifficultyLevelCount = $this->fillTheBlanksService->allDifficultyLevelCount();
+        foreach ($allDifficultyLevelCount as $item) {
+            switch ($item["difficulty_level"]) {
+                case "1":
+                    $countArr["one"] = $item["total"];
+                    break;
+                case "2":
+                    $countArr["two"] = $item["total"];
+                    break;
+                case "3":
+                    $countArr["three"] = $item["total"];
+                    break;
+                case "4":
+                    $countArr["four"] = $item["total"];
+                    break;
+                case "5":
+                    $countArr["five"] = $item["total"];
+                    break;
+                case "6":
+                    $countArr["six"] = $item["total"];
+                    break;
+            }
+        }
+
+        $this->assign("allCount", $countArr);
         $this->assign('list', $list);
 
         return $this->fetch("fillTheBlanksList");
@@ -166,6 +205,40 @@ class TestLibrary extends Common
         }
 
         $this->assign('list', $list);
+
+        $countArr = [
+            "one" => 0,
+            "two" => 0,
+            "three" => 0,
+            "four" => 0,
+            "five" => 0,
+            "six" => 0,
+        ];
+        $allDifficultyLevelCount = $this->singleChoiceService->allDifficultyLevelCount();
+        foreach ($allDifficultyLevelCount as $item) {
+            switch ($item["difficulty_level"]) {
+                case "1":
+                    $countArr["one"] = $item["total"];
+                    break;
+                case "2":
+                    $countArr["two"] = $item["total"];
+                    break;
+                case "3":
+                    $countArr["three"] = $item["total"];
+                    break;
+                case "4":
+                    $countArr["four"] = $item["total"];
+                    break;
+                case "5":
+                    $countArr["five"] = $item["total"];
+                    break;
+                case "6":
+                    $countArr["six"] = $item["total"];
+                    break;
+            }
+        }
+
+        $this->assign("allCount", $countArr);
 
         return $this->fetch("singleChoiceList");
     }
@@ -337,6 +410,40 @@ class TestLibrary extends Common
 
         $this->assign('list', $list);
 
+        $countArr = [
+            "one" => 0,
+            "two" => 0,
+            "three" => 0,
+            "four" => 0,
+            "five" => 0,
+            "six" => 0,
+        ];
+        $allDifficultyLevelCount = $this->writingLibraryService->allDifficultyLevelCount();
+        foreach ($allDifficultyLevelCount as $item) {
+            switch ($item["difficulty_level"]) {
+                case "1":
+                    $countArr["one"] = $item["total"];
+                    break;
+                case "2":
+                    $countArr["two"] = $item["total"];
+                    break;
+                case "3":
+                    $countArr["three"] = $item["total"];
+                    break;
+                case "4":
+                    $countArr["four"] = $item["total"];
+                    break;
+                case "5":
+                    $countArr["five"] = $item["total"];
+                    break;
+                case "6":
+                    $countArr["six"] = $item["total"];
+                    break;
+            }
+        }
+
+        $this->assign("allCount", $countArr);
+
         return $this->fetch("writingList");
     }
 
@@ -499,6 +606,40 @@ class TestLibrary extends Common
         }
 
         $this->assign('list', $list);
+
+        $countArr = [
+            "one" => 0,
+            "two" => 0,
+            "three" => 0,
+            "four" => 0,
+            "five" => 0,
+            "six" => 0,
+        ];
+        $allDifficultyLevelCount = $this->trueFalseQuestionService->allDifficultyLevelCount();
+        foreach ($allDifficultyLevelCount as $item) {
+            switch ($item["difficulty_level"]) {
+                case "1":
+                    $countArr["one"] = $item["total"];
+                    break;
+                case "2":
+                    $countArr["two"] = $item["total"];
+                    break;
+                case "3":
+                    $countArr["three"] = $item["total"];
+                    break;
+                case "4":
+                    $countArr["four"] = $item["total"];
+                    break;
+                case "5":
+                    $countArr["five"] = $item["total"];
+                    break;
+                case "6":
+                    $countArr["six"] = $item["total"];
+                    break;
+            }
+        }
+
+        $this->assign("allCount", $countArr);
 
         return $this->fetch("trueFalseQuestionList");
     }
