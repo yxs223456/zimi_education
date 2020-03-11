@@ -398,6 +398,95 @@ class TestLibrary extends Common
         $this->success("添加成功");
     }
 
+    public function editWriting()
+    {
+        $id = input('param.id');
+
+        $info = $this->writingLibraryService->findById($id);
+        $requirementsArr = json_decode($info["requirements"], true);
+
+        $requirements = [];
+        foreach ($requirementsArr as $item) {
+            $requirements[]["requirement"] = $item;
+        }
+
+        $this->assign("info", $info);
+        $this->assign("requirements", json_encode($requirements));
+
+        return $this->fetch("editWriting");
+    }
+
+    public function editWritingPost()
+    {
+        $id = input('param.id');
+
+        $topic = input("topic", "");
+        $requirements = input("requirements", "");
+        $difficultyLevel = input("difficulty_level", "");
+        if ($topic === "") {
+            $this->error('题目不能为空');
+        }
+
+        if (empty($difficultyLevel) || !is_numeric($difficultyLevel)) {
+            $this->error('难度等级格式错误');
+        }
+
+        $requirements = json_decode($requirements, true);
+
+        if (!is_array($requirements)) {
+            $this->error('要求不能为空');
+        }
+
+        $requirementsData = [];
+        foreach ($requirements as $requirement) {
+            if ($requirement["requirement"] == "") {
+                continue;
+            }
+            $requirementsData[] = $requirement["requirement"];
+        }
+
+        if (count($requirementsData) == 0) {
+            $this->error('要求不能为空');
+        }
+
+        $info = $this->writingLibraryService->findById($id);
+
+        $updateData = [
+            "topic" => $topic,
+            "requirements" => json_encode($requirementsData, JSON_UNESCAPED_UNICODE),
+            "difficulty_level" => $difficultyLevel,
+            "update_time" => time(),
+        ];
+        $this->writingLibraryService->updateByIdAndData($id, $updateData);
+
+        if ($info["difficulty_level"] != $updateData["difficulty_level"]) {
+            $redis = Redis::factory();
+            removeWriting($info["uuid"], $info["difficulty_level"], $redis);
+            if ($info["is_use"] == QuestionIsUseEnum::YES) {
+                addWriting($info["uuid"], $updateData["difficulty_level"], $redis);
+            }
+        }
+
+        $this->success("修改成功",url("writingList"));
+
+    }
+
+    public function deleteWriting()
+    {
+        $id = input('param.id');
+        $info = $this->writingLibraryService->findById($id);
+        $redis = Redis::factory();
+        removeWriting($info["uuid"], $info["difficulty_level"], $redis);
+
+        $updateData = [
+            "is_delete" => DbIsDeleteEnum::YES,
+            "update_time" => time(),
+        ];
+        $this->writingLibraryService->updateByIdAndData($id, $updateData);
+
+        $this->success("删除成功");
+    }
+
     //判断题列表
     public function trueFalseQuestionList()
     {
