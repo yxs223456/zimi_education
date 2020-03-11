@@ -33,7 +33,7 @@
                             <label for="">题目</label>
                             <input type="text" name="question" value="{$question|default=''}" class="form-control">
 
-                            <label for="">增加类型</label>
+                            <label for="">题目难度</label>
                             {:getEnumSelectWidget($allDifficultyLevel, 'difficulty_level', '-全部-', isset($difficulty_level) ? $difficulty_level : '', 1)}
 
 
