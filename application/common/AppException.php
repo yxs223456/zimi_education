@@ -26,6 +26,7 @@ class AppException extends \Exception
     const USER_CREATE_ERROR = [1008, "创建用户失败"];
     const USER_PARENT_NOT_ALLOW_MODIFY = [1009, "邀请人不允许修改"];
     const USER_MODIFY_ERROR = [1010, "信息修改失败"];
+    const USER_INFO_NOT_MODIFY = [1011, "没有修改任何个人信息"];
 
     const WE_CHAT_GET_ACCESS_TOKEN_ERROR = [2000, "获取用户微信信息失败"];
     const WE_CHAT_NOT_BIND_USER = [2001, "当前微信号还没有绑定任何账号,请先使用手机号注册"];

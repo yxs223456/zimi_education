@@ -379,29 +379,33 @@ class UserService extends Base
         }
 
         //1.邀请用户不可改变 2.只要没有邀请人即可添加任意用户为邀请人
-        if ($userInfo["parent_invite_code"] == "" && $modifyUserInfo["parent_invite_code"] != "") {
+        if (isset($modifyUserInfo["parent_invite_code"])) {
+            if ($userInfo["parent_invite_code"]) {
+                throw AppException::factory(AppException::USER_PARENT_NOT_ALLOW_MODIFY);
+            }
+            if (empty($modifyUserInfo["parent_invite_code"])) {
+                throw AppException::factory(AppException::COM_PARAMS_ERR);
+            }
+
             $inviteUser = $userModel->getUserByInviteCode($modifyUserInfo["parent_invite_code"]);
             if (!$inviteUser) {
                 throw AppException::factory(AppException::USER_INVITE_CODE_NOT_EXISTS);
             }
-        } else if ($userInfo["parent_invite_code"] != "" &&
-            $userInfo["parent_invite_code"] != $modifyUserInfo["parent_invite_code"]) {
-            throw AppException::factory(AppException::USER_PARENT_NOT_ALLOW_MODIFY);
         }
-
 
         Db::startTrans();
         try {
             //修改用户信息
-            $user->head_image_url = $modifyUserInfo["head_image_url"];
-            $user->nickname = $modifyUserInfo["nickname"];
-            $user->parent_invite_code = $modifyUserInfo["parent_invite_code"];
-            $user->sign = $modifyUserInfo["sign"];
-            $user->province = $modifyUserInfo["province"];
-            $user->city = $modifyUserInfo["city"];
+            if (!empty($modifyUserInfo["head_image_url"])) $user->head_image_url = $modifyUserInfo["head_image_url"];
+            if (!empty($modifyUserInfo["nickname"])) $user->nickname = $modifyUserInfo["nickname"];
+            if (!empty($modifyUserInfo["sign"])) $user->sign = $modifyUserInfo["sign"];
+            if (!empty($modifyUserInfo["province"])) $user->province = $modifyUserInfo["province"];
+            if (!empty($modifyUserInfo["city"])) $user->city = $modifyUserInfo["city"];
             if (isset($inviteUser)) {
+                $user->parent_invite_code = $modifyUserInfo["parent_invite_code"];
                 $user->parent_uuid = $inviteUser["uuid"];
             }
+            $user->update_time = time();
             $user->save();
 
             //添加邀请人后修改邀请人信息

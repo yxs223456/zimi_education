@@ -173,12 +173,12 @@ class User extends Base
     //修改用户信息
     public function modifyUserInfo()
     {
-        $params = input();
-        if (!isset($params["head_image_url"]) || !isset($params["nickname"]) ||
-            !isset($params["parent_invite_code"]) || !isset($params["sign"]) ||
-            !isset($params["province"]) || !isset($params["city"])) {
-            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        $params = file_get_contents("php://input");
+        $params = json_decode($params, true);
+        if (!is_array($params) || count($params) == 0) {
+            throw AppException::factory(AppException::USER_INFO_NOT_MODIFY);
         }
+
         $userInfo = $this->query["user"];
 
         $userService = new UserService();
