@@ -13,9 +13,9 @@ return [
     // 数据库类型
     'type'            => 'mysql',
     // 服务器地址
-    'hostname'        => '39.97.111.12',
+    'hostname'        => '47.92.77.145',
     // 数据库名
-    'database'        => 'de_education',
+    'database'        => 'zimi',
     // 用户名
     'username'        => 'web',
     // 密码
