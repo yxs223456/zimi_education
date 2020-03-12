@@ -15,6 +15,9 @@ Route::get('think', function () {
 
 Route::get('hello/:name', 'index/hello');
 
+//上传文件
+Route::rule('upload/index', 'api/upload/index', 'post');
+
 //发送注册验证码
 //Route::rule('user/getCodeForSignUp', 'api/user/getCodeForSignUp', 'post');
 //手机号注册
