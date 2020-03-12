@@ -1,0 +1,34 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: yangxiushan
+ * Date: 2020-03-12
+ * Time: 13:49
+ */
+
+namespace app\api\controller;
+
+use think\facade\Env;
+
+class Upload extends Base
+{
+    protected $beforeActionList = [
+        'checkAuth' => [
+            'except' => '',
+        ],
+    ];
+
+    public function index()
+    {
+        $tempFile = $_FILES['file']['tmp_name'];
+        $fileName = md5(uniqid(mt_rand(), true)).".".strtolower(pathinfo($_FILES['file']['name'])["extension"]);
+        $fileUrl = "static/api/headimage/" . $fileName;
+        $filePath = "public/" . $fileUrl;
+        move_uploaded_file($tempFile, Env::get("root_path") . $filePath);
+
+        return [
+            "url" => $fileUrl,
+        ];
+    }
+
+}

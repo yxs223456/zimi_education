@@ -11,11 +11,14 @@ use app\common\AppException;
 use app\common\Constant;
 use app\common\enum\PhoneVerificationCodeStatusEnum;
 use app\common\enum\PhoneVerificationCodeTypeEnum;
+use app\common\enum\UserCoinAddTypeEnum;
+use app\common\enum\UserIsBindWeChatEnum;
 use app\common\helper\MobTech;
 use app\common\helper\Pbkdf2;
 use app\common\helper\Redis;
 use app\common\model\PhoneVerificationCodeModel;
 use app\common\model\UserBaseModel;
+use app\common\model\UserCoinLogModel;
 use think\Db;
 use think\facade\Log;
 use think\Model;
@@ -421,6 +424,29 @@ class UserService extends Base
         return $this->userInfoForRequire($userInfo);
     }
 
+    public function checkUserInfoComplete($user)
+    {
+        if (empty($user["head_image_url"] || empty($user["nickname"]) ||
+            empty($user["province"]) || empty($user["city"]) || empty($user["sign"])) ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function checkGetCoinByCompleteUserInfo($user)
+    {
+        $userCoinLogModel = new UserCoinLogModel();
+        $data = $userCoinLogModel->getByUserUuidAndAddType($user["uuid"], UserCoinAddTypeEnum::USER_INFO);
+
+        if ($data) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
     private function recordUserWeChatInfo(Model $user, $userWeChatInfo)
     {
         $user->unionid = $userWeChatInfo["unionid"];
@@ -493,7 +519,7 @@ class UserService extends Base
             "phone" => hidePhone($userInfo["phone"]),
             "province" => $userInfo["province"],
             "city" => $userInfo["city"],
-            "bind_wechat" => empty($userInfo["unionid"]) ? 0 : 1,
+            "bind_wechat" => empty($userInfo["mobile_openid"]) ? UserIsBindWeChatEnum::NO : UserIsBindWeChatEnum::YES,
         ];
     }
 
