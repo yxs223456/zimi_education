@@ -226,9 +226,11 @@ class AddCoinByFinishTask extends Command
         Db::startTrans();
         try {
             //增加用户书币数
-            $user->inc("coin", Constant::TASK_COIN_NUM["share"])
+
+            $userModel->where("uuid", $userUuid)
+                ->inc("coin", Constant::TASK_COIN_NUM["share"])
                 ->update(["update_time"=>time()]);
-            $newUser = $user->toArray();
+            $newUser = $userModel->findByUuid($userUuid)->toArray();
 
             //纪录书币流水
             $userCoinLogModel->recordAddLog(
@@ -240,7 +242,6 @@ class AddCoinByFinishTask extends Command
                 UserCoinAddTypeEnum::SHARE_DESC);
 
             Db::commit();
-            Log::write("1111111111");
             //缓存用户信息
             cacheUserInfoByToken($newUser, $redis);
             //用户今日分享领书币次数+1
