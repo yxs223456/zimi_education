@@ -231,7 +231,6 @@ class UserService extends Base
     //通过手机号和验证码登录
     public function signInByPassword($phone, $password)
     {
-
         //通过手机号获取用户
         $userBaseModel = new UserBaseModel();
         $user = $userBaseModel->getUserByPhone($phone);
@@ -428,6 +427,7 @@ class UserService extends Base
         return $this->userInfoForRequire($userInfo);
     }
 
+    //判断用户信息是否完整
     public function checkUserInfoComplete($user)
     {
         if (empty($user["head_image_url"] || empty($user["nickname"]) ||
@@ -438,6 +438,7 @@ class UserService extends Base
         return true;
     }
 
+    //判断用户是否通过完成用户信息领取了积分
     public function checkGetCoinByCompleteUserInfo($user)
     {
         $userCoinLogModel = new UserCoinLogModel();

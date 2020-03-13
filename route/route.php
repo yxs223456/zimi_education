@@ -18,6 +18,7 @@ Route::get('hello/:name', 'index/hello');
 //上传文件
 Route::rule('upload/index', 'api/upload/index', 'post');
 
+
 //发送注册验证码
 //Route::rule('user/getCodeForSignUp', 'api/user/getCodeForSignUp', 'post');
 //手机号注册
@@ -40,6 +41,10 @@ Route::rule('user/weChatSignIn', 'api/user/weChatSignIn', 'post');
 Route::rule('user/userInfo', 'api/user/userInfo', 'post');
 //修改用户信息
 Route::rule('user/modifyUserInfo', 'api/user/modifyUserInfo', 'post');
+
+
+//任务中心首页
+Route::rule('task/index', 'api/task/index', 'post');
 
 return [
 

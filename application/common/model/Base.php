@@ -17,6 +17,11 @@ class Base extends Model
         return $this->where(static::getPk(), $id)->find();
     }
 
+    public function findByUuid($uuid)
+    {
+        return $this->where("uuid", $uuid)->find();
+    }
+
     public function saveByData($data)
     {
         $returnData = $data;

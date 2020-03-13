@@ -2,7 +2,7 @@
 
 //缓存用户信息
 function cacheUserInfoByToken(array $userInfo, Redis $redis) {
-    $key = "zimi_education:userInfoByToken:" . $userInfo["token"];
+    $key = "de_education:userInfoByToken:" . $userInfo["token"];
     $redis->hMSet($key, $userInfo);
     //缓存有效期72小时
     $redis->expire($key, 259200);
@@ -14,7 +14,7 @@ function getUserInfoByToken($token, Redis $redis) {
     if ($token == "") {
         return [];
     }
-    $key = "zimi_education:userInfoByToken:$token";
+    $key = "de_education:userInfoByToken:$token";
     return $redis->hGetAll($key);
 }
 
@@ -54,26 +54,26 @@ function addFillTheBlanksArray(array $fillTheBlanksList, Redis $redis) {
         }
     }
     if (count($list["one"]) != 0) {
-        $key = "zimi_education:fillTheBlanksLibrary:oneStar";
+        $key = "de_education:fillTheBlanksLibrary:oneStar";
         $redis->sAddArray($key, $list["one"]);
     }
     if (count($list["two"]) != 0) {
-        $key = "zimi_education:fillTheBlanksLibrary:twoStar";
+        $key = "de_education:fillTheBlanksLibrary:twoStar";
         $redis->sAddArray($key, $list["two"]);
     }
     if (count($list["three"]) != 0) {
-        $key = "zimi_education:fillTheBlanksLibrary:threeStar";
+        $key = "de_education:fillTheBlanksLibrary:threeStar";
         $redis->sAddArray($key, $list["three"]);
     }
     if (count($list["four"]) != 0) {
-        $key = "zimi_education:fillTheBlanksLibrary:fourStar";
+        $key = "de_education:fillTheBlanksLibrary:fourStar";
         $redis->sAddArray($key, $list["four"]);
     }
     if (count($list["five"]) != 0) {
-        $key = "zimi_education:fillTheBlanksLibrary:fiveStar";
+        $key = "de_education:fillTheBlanksLibrary:fiveStar";
         $redis->sAddArray($key, $list["five"]);
     }if (count($list["six"]) != 0) {
-        $key = "zimi_education:fillTheBlanksLibrary:sixStar";
+        $key = "de_education:fillTheBlanksLibrary:sixStar";
         $redis->sAddArray($key, $list["six"]);
     }
 }
@@ -83,22 +83,22 @@ function addFillTheBlanks($fillTheBlanksUuid, $difficultyLevel, Redis $redis) {
     $key = "";
     switch ($difficultyLevel) {
         case 1:
-            $key = "zimi_education:fillTheBlanksLibrary:oneStar";
+            $key = "de_education:fillTheBlanksLibrary:oneStar";
             break;
         case 2:
-            $key = "zimi_education:fillTheBlanksLibrary:twoStar";
+            $key = "de_education:fillTheBlanksLibrary:twoStar";
             break;
         case 3:
-            $key = "zimi_education:fillTheBlanksLibrary:threeStar";
+            $key = "de_education:fillTheBlanksLibrary:threeStar";
             break;
         case 4:
-            $key = "zimi_education:fillTheBlanksLibrary:fourStar";
+            $key = "de_education:fillTheBlanksLibrary:fourStar";
             break;
         case 5:
-            $key = "zimi_education:fillTheBlanksLibrary:fiveStar";
+            $key = "de_education:fillTheBlanksLibrary:fiveStar";
             break;
         case 6:
-            $key = "zimi_education:fillTheBlanksLibrary:sixStar";
+            $key = "de_education:fillTheBlanksLibrary:sixStar";
             break;
     }
     if ($key) {
@@ -111,22 +111,22 @@ function removeFillTheBlanks($fillTheBlanksUuid, $difficultyLevel, Redis $redis)
     $key = "";
     switch ($difficultyLevel) {
         case 1:
-            $key = "zimi_education:fillTheBlanksLibrary:oneStar";
+            $key = "de_education:fillTheBlanksLibrary:oneStar";
             break;
         case 2:
-            $key = "zimi_education:fillTheBlanksLibrary:twoStar";
+            $key = "de_education:fillTheBlanksLibrary:twoStar";
             break;
         case 3:
-            $key = "zimi_education:fillTheBlanksLibrary:threeStar";
+            $key = "de_education:fillTheBlanksLibrary:threeStar";
             break;
         case 4:
-            $key = "zimi_education:fillTheBlanksLibrary:fourStar";
+            $key = "de_education:fillTheBlanksLibrary:fourStar";
             break;
         case 5:
-            $key = "zimi_education:fillTheBlanksLibrary:fiveStar";
+            $key = "de_education:fillTheBlanksLibrary:fiveStar";
             break;
         case 6:
-            $key = "zimi_education:fillTheBlanksLibrary:sixStar";
+            $key = "de_education:fillTheBlanksLibrary:sixStar";
             break;
     }
     if ($key) {
@@ -170,26 +170,26 @@ function addSingleChoiceArray(array $singleChoiceList, Redis $redis) {
         }
     }
     if (count($list["one"]) != 0) {
-        $key = "zimi_education:singleChoiceLibrary:oneStar";
+        $key = "de_education:singleChoiceLibrary:oneStar";
         $redis->sAddArray($key, $list["one"]);
     }
     if (count($list["two"]) != 0) {
-        $key = "zimi_education:singleChoiceLibrary:twoStar";
+        $key = "de_education:singleChoiceLibrary:twoStar";
         $redis->sAddArray($key, $list["two"]);
     }
     if (count($list["three"]) != 0) {
-        $key = "zimi_education:singleChoiceLibrary:threeStar";
+        $key = "de_education:singleChoiceLibrary:threeStar";
         $redis->sAddArray($key, $list["three"]);
     }
     if (count($list["four"]) != 0) {
-        $key = "zimi_education:singleChoiceLibrary:fourStar";
+        $key = "de_education:singleChoiceLibrary:fourStar";
         $redis->sAddArray($key, $list["four"]);
     }
     if (count($list["five"]) != 0) {
-        $key = "zimi_education:singleChoiceLibrary:fiveStar";
+        $key = "de_education:singleChoiceLibrary:fiveStar";
         $redis->sAddArray($key, $list["five"]);
     }if (count($list["six"]) != 0) {
-        $key = "zimi_education:singleChoiceLibrary:sixStar";
+        $key = "de_education:singleChoiceLibrary:sixStar";
         $redis->sAddArray($key, $list["six"]);
     }
 }
@@ -199,22 +199,22 @@ function addSingleChoice($singleChoiceUuid, $difficultyLevel, Redis $redis) {
     $key = "";
     switch ($difficultyLevel) {
         case 1:
-            $key = "zimi_education:singleChoiceLibrary:oneStar";
+            $key = "de_education:singleChoiceLibrary:oneStar";
             break;
         case 2:
-            $key = "zimi_education:singleChoiceLibrary:twoStar";
+            $key = "de_education:singleChoiceLibrary:twoStar";
             break;
         case 3:
-            $key = "zimi_education:singleChoiceLibrary:threeStar";
+            $key = "de_education:singleChoiceLibrary:threeStar";
             break;
         case 4:
-            $key = "zimi_education:singleChoiceLibrary:fourStar";
+            $key = "de_education:singleChoiceLibrary:fourStar";
             break;
         case 5:
-            $key = "zimi_education:singleChoiceLibrary:fiveStar";
+            $key = "de_education:singleChoiceLibrary:fiveStar";
             break;
         case 6:
-            $key = "zimi_education:singleChoiceLibrary:sixStar";
+            $key = "de_education:singleChoiceLibrary:sixStar";
             break;
     }
     if ($key) {
@@ -227,22 +227,22 @@ function removeSingleChoice($singleChoiceUuid, $difficultyLevel, Redis $redis) {
     $key = "";
     switch ($difficultyLevel) {
         case 1:
-            $key = "zimi_education:singleChoiceLibrary:oneStar";
+            $key = "de_education:singleChoiceLibrary:oneStar";
             break;
         case 2:
-            $key = "zimi_education:singleChoiceLibrary:twoStar";
+            $key = "de_education:singleChoiceLibrary:twoStar";
             break;
         case 3:
-            $key = "zimi_education:singleChoiceLibrary:threeStar";
+            $key = "de_education:singleChoiceLibrary:threeStar";
             break;
         case 4:
-            $key = "zimi_education:singleChoiceLibrary:fourStar";
+            $key = "de_education:singleChoiceLibrary:fourStar";
             break;
         case 5:
-            $key = "zimi_education:singleChoiceLibrary:fiveStar";
+            $key = "de_education:singleChoiceLibrary:fiveStar";
             break;
         case 6:
-            $key = "zimi_education:singleChoiceLibrary:sixStar";
+            $key = "de_education:singleChoiceLibrary:sixStar";
             break;
     }
     if ($key) {
@@ -255,22 +255,22 @@ function addWriting($writingUuid, $difficultyLevel, Redis $redis) {
     $key = "";
     switch ($difficultyLevel) {
         case 1:
-            $key = "zimi_education:writingLibrary:oneStar";
+            $key = "de_education:writingLibrary:oneStar";
             break;
         case 2:
-            $key = "zimi_education:writingLibrary:twoStar";
+            $key = "de_education:writingLibrary:twoStar";
             break;
         case 3:
-            $key = "zimi_education:writingLibrary:threeStar";
+            $key = "de_education:writingLibrary:threeStar";
             break;
         case 4:
-            $key = "zimi_education:writingLibrary:fourStar";
+            $key = "de_education:writingLibrary:fourStar";
             break;
         case 5:
-            $key = "zimi_education:writingLibrary:fiveStar";
+            $key = "de_education:writingLibrary:fiveStar";
             break;
         case 6:
-            $key = "zimi_education:writingLibrary:sixStar";
+            $key = "de_education:writingLibrary:sixStar";
             break;
     }
     if ($key) {
@@ -283,22 +283,22 @@ function removeWriting($writingUuid, $difficultyLevel, Redis $redis) {
     $key = "";
     switch ($difficultyLevel) {
         case 1:
-            $key = "zimi_education:writingLibrary:oneStar";
+            $key = "de_education:writingLibrary:oneStar";
             break;
         case 2:
-            $key = "zimi_education:writingLibrary:twoStar";
+            $key = "de_education:writingLibrary:twoStar";
             break;
         case 3:
-            $key = "zimi_education:writingLibrary:threeStar";
+            $key = "de_education:writingLibrary:threeStar";
             break;
         case 4:
-            $key = "zimi_education:writingLibrary:fourStar";
+            $key = "de_education:writingLibrary:fourStar";
             break;
         case 5:
-            $key = "zimi_education:writingLibrary:fiveStar";
+            $key = "de_education:writingLibrary:fiveStar";
             break;
         case 6:
-            $key = "zimi_education:writingLibrary:sixStar";
+            $key = "de_education:writingLibrary:sixStar";
             break;
     }
     if ($key) {
@@ -342,26 +342,26 @@ function addTrueFalseQuestionArray(array $trueFalseQuestionList, Redis $redis) {
         }
     }
     if (count($list["one"]) != 0) {
-        $key = "zimi_education:trueFalseQuestionLibrary:oneStar";
+        $key = "de_education:trueFalseQuestionLibrary:oneStar";
         $redis->sAddArray($key, $list["one"]);
     }
     if (count($list["two"]) != 0) {
-        $key = "zimi_education:trueFalseQuestionLibrary:twoStar";
+        $key = "de_education:trueFalseQuestionLibrary:twoStar";
         $redis->sAddArray($key, $list["two"]);
     }
     if (count($list["three"]) != 0) {
-        $key = "zimi_education:trueFalseQuestionLibrary:threeStar";
+        $key = "de_education:trueFalseQuestionLibrary:threeStar";
         $redis->sAddArray($key, $list["three"]);
     }
     if (count($list["four"]) != 0) {
-        $key = "zimi_education:trueFalseQuestionLibrary:fourStar";
+        $key = "de_education:trueFalseQuestionLibrary:fourStar";
         $redis->sAddArray($key, $list["four"]);
     }
     if (count($list["five"]) != 0) {
-        $key = "zimi_education:trueFalseQuestionLibrary:fiveStar";
+        $key = "de_education:trueFalseQuestionLibrary:fiveStar";
         $redis->sAddArray($key, $list["five"]);
     }if (count($list["six"]) != 0) {
-        $key = "zimi_education:trueFalseQuestionLibrary:sixStar";
+        $key = "de_education:trueFalseQuestionLibrary:sixStar";
         $redis->sAddArray($key, $list["six"]);
     }
 }
@@ -371,22 +371,22 @@ function addTrueFalseQuestion($trueFalseQuestionUuid, $difficultyLevel, Redis $r
     $key = "";
     switch ($difficultyLevel) {
         case 1:
-            $key = "zimi_education:trueFalseQuestionLibrary:oneStar";
+            $key = "de_education:trueFalseQuestionLibrary:oneStar";
             break;
         case 2:
-            $key = "zimi_education:trueFalseQuestionLibrary:twoStar";
+            $key = "de_education:trueFalseQuestionLibrary:twoStar";
             break;
         case 3:
-            $key = "zimi_education:trueFalseQuestionLibrary:threeStar";
+            $key = "de_education:trueFalseQuestionLibrary:threeStar";
             break;
         case 4:
-            $key = "zimi_education:trueFalseQuestionLibrary:fourStar";
+            $key = "de_education:trueFalseQuestionLibrary:fourStar";
             break;
         case 5:
-            $key = "zimi_education:trueFalseQuestionLibrary:fiveStar";
+            $key = "de_education:trueFalseQuestionLibrary:fiveStar";
             break;
         case 6:
-            $key = "zimi_education:trueFalseQuestionLibrary:sixStar";
+            $key = "de_education:trueFalseQuestionLibrary:sixStar";
             break;
     }
     if ($key) {
@@ -399,25 +399,65 @@ function removeTrueFalseQuestion($trueFalseQuestionUuid, $difficultyLevel, Redis
     $key = "";
     switch ($difficultyLevel) {
         case 1:
-            $key = "zimi_education:trueFalseQuestionLibrary:oneStar";
+            $key = "de_education:trueFalseQuestionLibrary:oneStar";
             break;
         case 2:
-            $key = "zimi_education:trueFalseQuestionLibrary:twoStar";
+            $key = "de_education:trueFalseQuestionLibrary:twoStar";
             break;
         case 3:
-            $key = "zimi_education:trueFalseQuestionLibrary:threeStar";
+            $key = "de_education:trueFalseQuestionLibrary:threeStar";
             break;
         case 4:
-            $key = "zimi_education:trueFalseQuestionLibrary:fourStar";
+            $key = "de_education:trueFalseQuestionLibrary:fourStar";
             break;
         case 5:
-            $key = "zimi_education:trueFalseQuestionLibrary:fiveStar";
+            $key = "de_education:trueFalseQuestionLibrary:fiveStar";
             break;
         case 6:
-            $key = "zimi_education:trueFalseQuestionLibrary:sixStar";
+            $key = "de_education:trueFalseQuestionLibrary:sixStar";
             break;
     }
     if ($key) {
         $redis->sRem($key, $trueFalseQuestionUuid);
     }
+}
+
+//用户今日通过分享获取书币次数+1
+function addUserGetCoinByShareTimes($userUuid, Redis $redis) {
+    $todayDate = date("Y-m-d");
+    $key = "de_education:getCoinByShareTimes:$userUuid:$todayDate";
+
+    $times = $redis->incr($key);
+    if ($times == 1) {
+        $redis->expire($key, 86400);
+    }
+}
+
+//用户今日通过分享获取书币次数
+function userGetCoinByShareTimes($userUuid, Redis $redis) {
+    $todayDate = date("Y-m-d");
+    $key = "de_education:getCoinByShareTimes:$userUuid:$todayDate";
+    return (int) $redis->get($key);
+}
+
+//将用户领取书币的操作放到redis队列
+function pushAddTaskList($userUuid, $addType, Redis $redis) {
+    $key = "de_education:addCoinListByFinishTask";
+
+    $value = [
+        "uuid" => $userUuid,
+        "add_type" => $addType,
+    ];
+
+    $redis->rPush($key, json_encode($value));
+}
+
+//弹出待领取的奖励
+function getAddCoinList(\Redis $redis)
+{
+    $key = "de_education:addCoinListByFinishTask";
+
+    $data = $redis->blPop([$key], 10);
+
+    return $data;
 }

@@ -18,7 +18,7 @@ class UserCoinAddTypeEnum
     use EnumTrait;
 
     const USER_INFO = 1;
-    const USER_INFO_DSC = "已绑定";
+    const USER_INFO_DSC = "完善个人资料";
 
     const PARENT_INVITE_CODE = 2;
     const PARENT_INVITE_CODE_DESC = "填写学员邀请码";

@@ -10,10 +10,5 @@
 // +----------------------------------------------------------------------
 
 return [
-    'app\api\command\SignRemind',
-    'app\api\command\TimeoutServer',
-    'app\api\command\AsyncTask',
-    'app\api\command\Timer',
-    'app\api\command\OpenLoopLottery',
-    'app\api\command\Temp',
+    'app\command\AddCoinByFinishTask',
 ];

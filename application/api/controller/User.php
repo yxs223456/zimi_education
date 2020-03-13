@@ -186,5 +186,4 @@ class User extends Base
 
         return $this->jsonResponse($returnData);
     }
-
 }
