@@ -23,9 +23,6 @@ use think\facade\Log;
 
 class AddCoinByFinishTask extends Command
 {
-
-    protected $appleApiHeader = [];
-
     protected function configure()
     {
         // setName 设置命令行名称
@@ -90,7 +87,7 @@ class AddCoinByFinishTask extends Command
 
         //判断用户是否完成任务
         $userService = new UserService();
-        if (!$userService->checkUserInfoComplete($user)) {
+        if ($userService->checkUserInfoComplete($user) == false) {
             Log::write("add coin user uuid $userUuid 完善用户资料任务未完成");
             return;
         }
