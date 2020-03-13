@@ -43,6 +43,7 @@ class AddCoinByFinishTask extends Command
             $redis->close();
             return;
         }
+        Log::write("add coin info: " . $addCoinInfo[1]);
         $addCoinTaskInfo  = json_decode($addCoinInfo[1], true);
         if (empty($addCoinInfo["uuid"]) || empty($addCoinTaskInfo["add_type"])) {
             return;
