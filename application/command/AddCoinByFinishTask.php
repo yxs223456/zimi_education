@@ -9,6 +9,7 @@
 
 namespace app\command;
 
+use app\api\service\UserService;
 use app\common\Constant;
 use app\common\enum\UserCoinAddTypeEnum;
 use app\common\helper\Redis;
@@ -87,12 +88,20 @@ class AddCoinByFinishTask extends Command
         }
         $oldUser = $user->toArray();
 
+        //判断用户是否完成任务
+        $userService = new UserService();
+        if (!$userService->checkUserInfoComplete($user)) {
+            Log::write("add coin user uuid $userUuid 完善用户资料任务未完成");
+            return;
+        }
+
         Db::startTrans();
         try {
             //增加用户书币数
-            $user->inc("coin", Constant::TASK_COIN_NUM["user_info"])
+            $userModel->where("uuid", $userUuid)
+                ->inc("coin", Constant::TASK_COIN_NUM["user_info"])
                 ->update(["update_time"=>time()]);
-            $newUser = $user->toArray();
+            $newUser = $userModel->findByUuid($userUuid)->toArray();
 
             //纪录书币流水
             $userCoinLogModel->recordAddLog(
@@ -107,7 +116,7 @@ class AddCoinByFinishTask extends Command
             
             //缓存用户信息
             cacheUserInfoByToken($newUser, $redis);
-        } catch (\PDOException $e) {
+        } catch (\Throwable $e) {
             Db::rollback();
             Log::write("add coin error: " . $e->getMessage(), "error");
         }
@@ -132,12 +141,19 @@ class AddCoinByFinishTask extends Command
         }
         $oldUser = $user->toArray();
 
+        //判断用户是否完成任务
+        if (empty($user["parent_invite_code"])) {
+            Log::write("add coin user uuid $userUuid 填写邀请码任务未完成");
+            return;
+        }
+
         Db::startTrans();
         try {
             //增加用户书币数
-            $user->inc("coin", Constant::TASK_COIN_NUM["parent_invite_code"])
+            $userModel->where("uuid", $userUuid)
+                ->inc("coin", Constant::TASK_COIN_NUM["parent_invite_code"])
                 ->update(["update_time"=>time()]);
-            $newUser = $user->toArray();
+            $newUser = $userModel->findByUuid($userUuid)->toArray();
 
             //纪录书币流水
             $userCoinLogModel->recordAddLog(
@@ -152,7 +168,7 @@ class AddCoinByFinishTask extends Command
 
             //缓存用户信息
             cacheUserInfoByToken($newUser, $redis);
-        } catch (\PDOException $e) {
+        } catch (\Throwable $e) {
             Db::rollback();
             Log::write("add coin error: " . $e->getMessage(), "error");
         }
@@ -177,12 +193,19 @@ class AddCoinByFinishTask extends Command
         }
         $oldUser = $user->toArray();
 
+        //判断用户是否完成任务
+        if (empty($user["mobile_openid"])) {
+            Log::write("add coin user uuid $userUuid 绑定微信任务未完成");
+            return;
+        }
+
         Db::startTrans();
         try {
             //增加用户书币数
-            $user->inc("coin", Constant::TASK_COIN_NUM["bind_we_chat"])
+            $userModel->where("uuid", $userUuid)
+                ->inc("coin", Constant::TASK_COIN_NUM["bind_we_chat"])
                 ->update(["update_time"=>time()]);
-            $newUser = $user->toArray();
+            $newUser = $userModel->findByUuid($userUuid)->toArray();
 
             //纪录书币流水
             $userCoinLogModel->recordAddLog(
@@ -197,7 +220,7 @@ class AddCoinByFinishTask extends Command
 
             //缓存用户信息
             cacheUserInfoByToken($newUser, $redis);
-        } catch (\PDOException $e) {
+        } catch (\Throwable $e) {
             Db::rollback();
             Log::write("add coin error: " . $e->getMessage(), "error");
         }
@@ -226,7 +249,6 @@ class AddCoinByFinishTask extends Command
         Db::startTrans();
         try {
             //增加用户书币数
-
             $userModel->where("uuid", $userUuid)
                 ->inc("coin", Constant::TASK_COIN_NUM["share"])
                 ->update(["update_time"=>time()]);
