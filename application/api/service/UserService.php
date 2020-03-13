@@ -430,8 +430,8 @@ class UserService extends Base
     //判断用户信息是否完整
     public function checkUserInfoComplete($user)
     {
-        if (empty($user["head_image_url"] || empty($user["nickname"]) ||
-            empty($user["province"]) || empty($user["city"]) || empty($user["sign"])) ) {
+        if (empty($user["head_image_url"]) || empty($user["nickname"]) ||
+            empty($user["province"]) || empty($user["city"]) || empty($user["sign"]) ) {
             return false;
         }
 
