@@ -45,6 +45,8 @@ Route::rule('user/modifyUserInfo', 'api/user/modifyUserInfo', 'post');
 
 //任务中心首页
 Route::rule('task/index', 'api/task/index', 'post');
+//任务完成领取书币奖励
+Route::rule('task/receiveCoin', 'api/task/receiveCoin', 'post');
 
 return [
 
