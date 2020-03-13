@@ -217,7 +217,7 @@ class AddCoinByFinishTask extends Command
 
         //用户原信息
         $user = $userModel->findByUuid($userUuid);
-        Log::write("user " . json_encode($user));
+
         if (empty($user)) {
             return;
         }
@@ -240,7 +240,7 @@ class AddCoinByFinishTask extends Command
                 UserCoinAddTypeEnum::SHARE_DESC);
 
             Db::commit();
-
+            Log::write("1111111111");
             //缓存用户信息
             cacheUserInfoByToken($newUser, $redis);
             //用户今日分享领书币次数+1
