@@ -514,7 +514,7 @@ class UserService extends Base
         return [
             "token" => $userInfo["token"],
             "nickname" => $userInfo["nickname"],
-            "head_image_url" => $userInfo["head_image_url"],
+            "head_image_url" => $this->getHeadImageUrl($userInfo["head_image_url"]),
             "sex" => (int) $userInfo["sex"],
             "level" => (int) $userInfo["level"],
             "coin" => (int) $userInfo["coin"],
@@ -526,6 +526,11 @@ class UserService extends Base
             "city" => $userInfo["city"],
             "bind_wechat" => empty($userInfo["mobile_openid"]) ? UserIsBindWeChatEnum::NO : UserIsBindWeChatEnum::YES,
         ];
+    }
+
+    public function getHeadImageUrl($headImageUrl)
+    {
+        return str_replace("/static/api", config("web.self_domain") . "/static/api", $headImageUrl);
     }
 
     //验证密码是否符合要求。密码长度8~32位，需包含数字、字母、符号至少2种或以上元素
