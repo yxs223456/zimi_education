@@ -51,6 +51,8 @@ Route::rule('task/receiveCoin', 'api/task/receiveCoin', 'post');
 
 //app检查更新
 Route::rule('app/checkUpdate', 'api/app/checkUpdate', 'post');
+//意见反馈
+Route::rule('app/feedback', 'api/app/feedback', 'post');
 
 return [
 

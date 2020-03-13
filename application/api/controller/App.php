@@ -16,7 +16,7 @@ class App extends Base
 {
     protected $beforeActionList = [
         'checkAuth' => [
-            'except' => 'checkUpdate',
+            'except' => 'checkUpdate,feedback',
         ],
     ];
 
@@ -69,5 +69,10 @@ class App extends Base
         $returnData["current_version"] = $currentVersion;
 
         return $this->jsonResponse($returnData);
+    }
+
+    public function feedback()
+    {
+        return $this->jsonResponse(new \stdClass());
     }
 }
