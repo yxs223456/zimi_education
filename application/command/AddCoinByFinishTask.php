@@ -217,6 +217,7 @@ class AddCoinByFinishTask extends Command
 
         //用户原信息
         $user = $userModel->findByUuid($userUuid);
+        Log::write("user " . json_encode($user));
         if (empty($user)) {
             return;
         }
