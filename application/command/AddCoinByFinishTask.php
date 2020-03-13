@@ -242,6 +242,8 @@ class AddCoinByFinishTask extends Command
 
             //缓存用户信息
             cacheUserInfoByToken($newUser, $redis);
+            //用户今日分享领书币次数+1
+            addUserGetCoinByShareTimes($userUuid, $redis);
         } catch (\PDOException $e) {
             Db::rollback();
             Log::write("add coin error: " . $e->getMessage(), "error");
