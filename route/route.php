@@ -48,6 +48,10 @@ Route::rule('task/index', 'api/task/index', 'post');
 //任务完成领取书币奖励
 Route::rule('task/receiveCoin', 'api/task/receiveCoin', 'post');
 
+
+//app检查更新
+Route::rule('app/checkUpdate', 'api/app/checkUpdate', 'post');
+
 return [
 
 ];

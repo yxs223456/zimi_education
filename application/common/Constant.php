@@ -24,11 +24,26 @@ class Constant
     //分享有礼每天允许完成次数
     const TASK_SHARE_DAILY_TIMES = 5;
 
-    //app信息
+    //app版本信息
     const PACKAGE_INFO = [
         "ios" => [
+            "current_version" => "v1.0.0",
+            "history_version" => [
 
+                [
+                    "version" => "v1.0.0",
+                    "forced" => false
+                ],
+            ],
         ],
-        "android"
+        "android" => [
+            "current_version" => "v1.0.0",
+            "history_version" => [
+                [
+                    "version" => "v1.0.0",
+                    "forced" => false
+                ],
+            ]
+        ],
     ];
 }
