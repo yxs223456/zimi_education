@@ -202,7 +202,7 @@ class AddCoinByFinishTask extends Command
         }
     }
 
-    //完成绑定微信
+    //完成微信分享
     private function finishShare($userUuid, $redis)
     {
         $userCoinLogModel = new UserCoinLogModel();

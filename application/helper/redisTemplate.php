@@ -457,7 +457,7 @@ function getAddCoinList(\Redis $redis)
 {
     $key = "de_education:addCoinListByFinishTask";
 
-    $data = $redis->blPop([$key], 10);
+    $data = $redis->blPop([$key], 60);
 
     return $data;
 }
