@@ -43,25 +43,25 @@ class AddCoinByFinishTask extends Command
             $redis->close();
             return;
         }
-        Log::write("add coin info: " . $addCoinInfo[1]);
-        $addCoinTaskInfo  = json_decode($addCoinInfo[1], true);
-        if (empty($addCoinInfo["uuid"]) || empty($addCoinTaskInfo["add_type"])) {
+
+        $addCoinTaskInfo = json_decode($addCoinInfo[1], true);
+        if (empty($addCoinTaskInfo["uuid"]) || empty($addCoinTaskInfo["add_type"])) {
             return;
         }
 
         //书币增加方式
         switch ($addCoinTaskInfo["add_type"]) {
             case UserCoinAddTypeEnum::USER_INFO:
-                $this->finishUserInfo($addCoinInfo["uuid"], $redis);
+                $this->finishUserInfo($addCoinTaskInfo["uuid"], $redis);
                 break;
             case UserCoinAddTypeEnum::PARENT_INVITE_CODE:
-                $this->fillInInviteCode($addCoinInfo["uuid"], $redis);
+                $this->fillInInviteCode($addCoinTaskInfo["uuid"], $redis);
                 break;
             case UserCoinAddTypeEnum::BIND_WE_CHAT:
-                $this->finishBindWeChat($addCoinInfo["uuid"], $redis);
+                $this->finishBindWeChat($addCoinTaskInfo["uuid"], $redis);
                 break;
             case UserCoinAddTypeEnum::SHARE:
-                $this->finishShare($addCoinInfo["uuid"], $redis);
+                $this->finishShare($addCoinTaskInfo["uuid"], $redis);
                 break;
         }
 
