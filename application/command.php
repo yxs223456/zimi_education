@@ -11,4 +11,5 @@
 
 return [
     'app\command\AddCoinByFinishTask',
+    'app\command\ReceiveContinuousSignReward',
 ];
