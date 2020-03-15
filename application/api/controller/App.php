@@ -39,7 +39,7 @@ class App extends Base
         }
 
         //上传package
-        $tempFile = $_FILES['file']['tmp_name'];
+        $tempFile = $_FILES['package']['tmp_name'];
         $fileName = md5(uniqid(mt_rand(), true)).".".strtolower(pathinfo($_FILES['file']['name'])["extension"]);
         $fileUrl = "static/api/" . $fileName;
         $filePath = "public/" . $fileUrl;
