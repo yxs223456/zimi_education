@@ -40,7 +40,7 @@ class App extends Base
 
         //上传package
         $tempFile = $_FILES['package']['tmp_name'];
-        $fileName = md5(uniqid(mt_rand(), true)).".".strtolower(pathinfo($_FILES['file']['name'])["extension"]);
+        $fileName = md5(uniqid(mt_rand(), true)).".".strtolower(pathinfo($_FILES['package']['name'])["extension"]);
         $fileUrl = "static/api/" . $fileName;
         $filePath = "public/" . $fileUrl;
         move_uploaded_file($tempFile, Env::get("root_path") . $filePath);
