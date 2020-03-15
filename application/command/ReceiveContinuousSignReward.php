@@ -89,7 +89,12 @@ class ReceiveContinuousSignReward extends Command
                $userModel = new UserBaseModel;
                $userCoinLogModel = new UserCoinLogModel();
 
-               //todo 判断是否领取了奖励
+               //本月领取过奖励不予处理
+               $receiveCoinLog = $userCoinLogModel->getLastGetCoinFromContinuousSign($user["uuid"], $addCoinType);
+               if ($receiveCoinLog &&
+                   substr($receiveCoinLog["create_date"], 0, 7) == date("Y-m")) {
+                   return;
+               }
 
                Db::startTrans();
                try {

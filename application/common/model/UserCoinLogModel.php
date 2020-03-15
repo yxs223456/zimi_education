@@ -96,4 +96,13 @@ class UserCoinLogModel extends Base
         }
         return false;
     }
+
+    //最后一次通过连续签到或得奖励的信息
+    public function getLastGetCoinFromContinuousSign($userUuid, $addType)
+    {
+        return $this->where("user_uuid", $userUuid)
+            ->where("add_type", $addType)
+            ->order("id desc")
+            ->find();
+    }
 }
