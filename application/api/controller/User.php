@@ -208,4 +208,16 @@ class User extends Base
 
         return $this->jsonResponse($returnData);
     }
+
+    //领取连续签到奖励
+    public function receiveContinuousSignReward()
+    {
+        $condition = input("condition");
+        $user = $this->query["user"];
+
+        $userService = new UserService();
+        $returnData = $userService->receiveContinuousSignReward($user, $condition);
+
+        return $this->jsonResponse($returnData);
+    }
 }

@@ -584,6 +584,14 @@ class UserService extends Base
         }
     }
 
+    public function receiveContinuousSignReward($user, $condition)
+    {
+        //使用队列处理连续签到
+        $redis = Redis::factory();
+        pushReceiveContinuousSignRewardList($user, $condition,  $redis);
+
+        return new \stdClass();
+    }
 
     private function recordUserWeChatInfo(Model $user, $userWeChatInfo)
     {

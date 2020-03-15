@@ -32,4 +32,15 @@ class UserCoinAddTypeEnum
     const CUMULATIVE_SIGN = 5;
     const CUMULATIVE_SIGN_DESC = "累计签到";
 
+    const CONTINUOUS_SIGN_3_DAY = 6;
+    const CONTINUOUS_SIGN_3_DAY_DESC = "连续签到3天";
+
+    const CONTINUOUS_SIGN_7_DAY = 7;
+    const CONTINUOUS_SIGN_7_DAY_DESC = "连续签到7天";
+
+    const CONTINUOUS_SIGN_15_DAY = 8;
+    const CONTINUOUS_SIGN_15_DAY_DESC = "连续签到15天";
+
+    const CONTINUOUS_SIGN_30_DAY = 9;
+    const CONTINUOUS_SIGN_30_DAY_DESC = "连续签到30天";
 }

@@ -6,7 +6,6 @@
  * Time: 21:57
  */
 
-
 namespace app\command;
 
 use app\api\service\UserService;

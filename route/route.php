@@ -45,6 +45,8 @@ Route::rule('user/modifyUserInfo', 'api/user/modifyUserInfo', 'post');
 Route::rule('user/signInfo', 'api/user/signInfo', 'post');
 //用户签到
 Route::rule('user/sign', 'api/user/sign', 'post');
+//用户领取连续签到奖励
+Route::rule('user/receiveContinuousSignReward', 'api/user/receiveContinuousSignReward', 'post');
 
 
 

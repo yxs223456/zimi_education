@@ -11,14 +11,57 @@ namespace app\api\controller;
 use app\common\AppException;
 use app\common\Constant;
 use app\common\enum\OperatingSystemEnum;
+use app\common\model\PackageConfigModel;
 
 class App extends Base
 {
     protected $beforeActionList = [
         'checkAuth' => [
-            'except' => 'checkUpdate,feedback',
+            'except' => 'submitPackage,checkUpdate,feedback',
         ],
     ];
+
+    public function submitPackage()
+    {
+        $os = input("os", "");
+        $version = input("version", "");
+        $forced = (int) input("forced");
+        $packageLink = input("package_link", "");
+        $changeLog = input("change_log", "");
+
+        if (!in_array($os, [OperatingSystemEnum::ANDROID, OperatingSystemEnum::IOS]) ||
+            empty($version) ||
+            !in_array($forced, [0, 1]) ||
+            empty($packageLink) ||
+            empty($changeLog)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $packageModel = new PackageConfigModel();
+        $package = $packageModel->findByOsAndVersion($os, $version);
+        if ($package) {
+            //版本存在更新版本信息
+            $package->forced = $forced;
+            $package->package_link = $packageLink;
+            $package->change_log = $changeLog;
+            $package->update_time = time();
+            $package->save();
+        } else {
+            //版本不存在添加版本信息
+            $data = [
+                "os" => $os,
+                "version" => $version,
+                "forced" => $forced,
+                "package_link" => $packageLink,
+                "change_log" => $changeLog,
+                "create_time" => time(),
+                "update_time" => time(),
+            ];
+            $packageModel->insert($data);
+        }
+
+        return $this->jsonResponse(new \stdClass());
+    }
 
     //检查更新
     public function checkUpdate()

@@ -462,6 +462,14 @@ function getAddCoinList(\Redis $redis) {
 }
 
 //用户当月领取的连续签到奖励
+function cacheMonthContinuousSignReward($userUuid, array $rewardList, \Redis $redis) {
+    $month = date("Y-m");
+    $key = "de_education:monthContinuousSignReward:$userUuid:$month";
+
+
+}
+
+//用户当月领取的连续签到奖励
 function currentMonthContinuousSignReward($userUuid, \Redis $redis) {
     $month = date("Y-m");
     $key = "de_education:monthContinuousSignReward:$userUuid:$month";
@@ -472,4 +480,25 @@ function currentMonthContinuousSignReward($userUuid, \Redis $redis) {
     } else {
         return json_decode($data, true);
     }
+}
+
+//将用户领取书币的操作放到redis队列
+function pushReceiveContinuousSignRewardList($user, $condition, Redis $redis) {
+    $key = "de_education:receiveContinuousSignRewardLis";
+
+    $value = [
+        "user" => $user,
+        "condition" => $condition
+    ];
+
+    $redis->rPush($key, json_encode($value));
+}
+
+//弹出待领取的奖励
+function getReceiveContinuousSignRewardList(\Redis $redis) {
+    $key = "de_education:receiveContinuousSignRewardLis";
+
+    $data = $redis->blPop([$key], 10);
+
+    return $data;
 }
