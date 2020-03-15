@@ -453,11 +453,23 @@ function pushAddTaskList($userUuid, $addType, Redis $redis) {
 }
 
 //弹出待领取的奖励
-function getAddCoinList(\Redis $redis)
-{
+function getAddCoinList(\Redis $redis) {
     $key = "de_education:addCoinListByFinishTask";
 
     $data = $redis->blPop([$key], 10);
 
     return $data;
+}
+
+//用户当月领取的连续签到奖励
+function currentMonthContinuousSignReward($userUuid, \Redis $redis) {
+    $month = date("Y-m");
+    $key = "de_education:monthContinuousSignReward:$userUuid:$month";
+
+    $data = $redis->get($key);
+    if (empty($data)) {
+        return [];
+    } else {
+        return json_decode($data, true);
+    }
 }

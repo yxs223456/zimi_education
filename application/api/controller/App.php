@@ -23,10 +23,10 @@ class App extends Base
     //检查更新
     public function checkUpdate()
     {
-        $version = input("v");
-        $os = input("os");
+        $version = $this->query["v"];
+        $os = $this->query["os"];
         if (empty($version)) {
-            throw AppException::factory(AppException::COM_PARAMS_ERR);
+            throw AppException::factory(AppException::COM_INVALID);
         }
 
         //初始化返回数据

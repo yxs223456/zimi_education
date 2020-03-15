@@ -20,8 +20,9 @@ class Base extends Controller
     ];
 
     public $query = [
-        'isLogin' => false,
         'user' => [],
+        "v" => "",
+        "os" => "",
     ];
 
     protected function initialize()
@@ -30,6 +31,9 @@ class Base extends Controller
         header("Access-Control-Allow-Origin:$host");
         header('Access-Control-Allow-Credentials: true');
         header("Access-Control-Allow-Headers:token");
+        $this->query["v"] = $this->request->header('v');
+        $this->query["os"] = $this->request->header('os');
+
         parent::initialize();
         static::checkToken();
     }
@@ -70,16 +74,13 @@ class Base extends Controller
                 $user = $cacheUser;
             }
         }
-        $GLOBALS['query'] = [
-            'isLogin' => $isLogin,
-            'user' => $user,
-        ];
-        $this->query = $GLOBALS['query'];
+        $GLOBALS['isLogin'] = $isLogin;
+        $this->query["user"] = $user;
     }
 
     protected function checkAuth()
     {
-        if ($GLOBALS['query']['isLogin']) {
+        if ($GLOBALS['isLogin']) {
             return true;
         }
         throw AppException::factory(AppException::USER_NOT_LOGIN);

@@ -14,6 +14,7 @@ class AppException extends \Exception
     const COM_DATE_ERR = [3, "日期格式错误"];
     const COM_MOBILE_ERR = [4, "手机号格式错误"];
     const COM_ADDRESS_ERR = [5, "地址信息不全"];
+    const COM_INVALID = [6, "非法请求"];
 
     const USER_NOT_LOGIN = [1000, "您还未登录"];
     const USER_TOKEN_ERR = [1001, "登录信息已过期,请重新登录"];
@@ -27,6 +28,7 @@ class AppException extends \Exception
     const USER_PARENT_NOT_ALLOW_MODIFY = [1009, "邀请人不允许修改"];
     const USER_MODIFY_ERROR = [1010, "信息修改失败"];
     const USER_INFO_NOT_MODIFY = [1011, "没有修改任何个人信息"];
+    const USER_SIGN_ALREADY = [1012, "今日已签到"];
 
     const WE_CHAT_GET_ACCESS_TOKEN_ERROR = [2000, "获取用户微信信息失败"];
     const WE_CHAT_NOT_BIND_USER = [2001, "当前微信号还没有绑定任何账号,请先使用手机号注册"];

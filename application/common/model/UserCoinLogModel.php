@@ -79,4 +79,21 @@ class UserCoinLogModel extends Base
         ];
         $this->insert($logData);
     }
+
+    //用户当月是否领取累计签到奖励
+    public function checkReceiveCumulativeSignReward($userUuid)
+    {
+        $data = $this->where("user_uuid", $userUuid)
+            ->where("add_type", UserCoinAddTypeEnum::CUMULATIVE_SIGN)
+            ->order("id desc")
+            ->find();
+
+        if (!$data) {
+            return false;
+        }
+        if (substr($data["created_date"], 0, 7) == date("Y-m")) {
+            return true;
+        }
+        return false;
+    }
 }

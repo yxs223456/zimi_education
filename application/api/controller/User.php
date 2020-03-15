@@ -186,4 +186,26 @@ class User extends Base
 
         return $this->jsonResponse($returnData);
     }
+
+    //用户签到信息
+    public function signInfo()
+    {
+        $user = $this->query["user"];
+
+        $userService = new UserService();
+        $returnData = $userService->signInfo($user);
+
+        return $this->jsonResponse($returnData);
+    }
+
+    //用户签到
+    public function sign()
+    {
+        $user = $this->query["user"];
+
+        $userService = new UserService();
+        $returnData = $userService->sign($user);
+
+        return $this->jsonResponse($returnData);
+    }
 }

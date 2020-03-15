@@ -19,6 +19,7 @@ use app\common\helper\Redis;
 use app\common\model\PhoneVerificationCodeModel;
 use app\common\model\UserBaseModel;
 use app\common\model\UserCoinLogModel;
+use app\common\model\UserSignLogModel;
 use think\Db;
 use think\facade\Log;
 use think\Model;
@@ -166,7 +167,7 @@ class UserService extends Base
     private function createUserByPhone($phone, $password, $parentUuid, $parentInviteCode)
     {
         $encryptPassword = Pbkdf2::create_hash($password);
-        $inviteCode = createInviteCode(8);
+        $inviteCode = createInviteCode(6);
         $token = getRandomString(32);
         $uuid = getRandomString(32);
         $time = time();
@@ -438,16 +439,148 @@ class UserService extends Base
         return true;
     }
 
-    //判断用户是否通过完成用户信息领取了积分
-    public function checkGetCoinByCompleteUserInfo($user)
+    //签到首页信息
+    public function signInfo($user)
     {
-        $userCoinLogModel = new UserCoinLogModel();
-        $data = $userCoinLogModel->getByUserUuidAndAddType($user["uuid"], UserCoinAddTypeEnum::USER_INFO);
+        //初始化返回数据
+        $returnData = [
+            "is_sign" => 0,
+            "continuous_sign_times" => 0,
+            "cumulative_sign_times" => 0,
+            "reward_list" => Constant::CONTINUOUS_SIGN_REWARD,
+        ];
 
-        if ($data) {
-            return true;
-        } else {
-            return false;
+        $now = time();
+        $today = date("Y-m-d", $now);
+        $yesterday = date("Y-m-d", $now-86400);
+        $month = date("Y-m", $now);
+
+        //计算今日是否签到
+        $returnData["is_sign"] = (int) ($user["last_sign_date"] == $today);
+
+        //计算连续签到次数
+        $returnData["continuous_sign_times"] =
+            ($user["last_sign_date"] == $today || $user["last_sign_date"] == $yesterday)?$user["continuous_sign_times"]:0;
+
+        //计算累计签到次数
+        $returnData["cumulative_sign_times"] =
+            substr($user["last_sign_date"], 0, 7) == $month?$user["cumulative_sign_times"]:0;
+
+        //当月连续签到奖励领取情况
+        $redis = Redis::factory();
+        $continuousSignReward = currentMonthContinuousSignReward($user["uuid"], $redis);
+        $continuousSignReward = array_column($continuousSignReward, "coin", "condition");
+        foreach ($returnData["reward_list"] as $key => $rewardList) {
+            if (isset($continuousSignReward[$rewardList["condition"]])) {
+                $returnData["reward_list"][$key] = [
+                    "condition" => $rewardList["condition"],
+                    "coin" => $continuousSignReward[$rewardList["condition"]],
+                    "is_receive" => 1,
+                ];
+            } else {
+                $returnData["reward_list"][$key]["is_receive"] = 0;
+            }
+        }
+
+        return $returnData;
+    }
+
+    public function sign($user)
+    {
+        $now = time();
+        $today = date("Y-m-d", $now);
+        $yesterday = date("Y-m-d", $now - 86400);
+        $currentMonth = date("Y-m", $now);
+        $userModel = new UserBaseModel();
+
+        //使用数据库事务，控制并发请求，保证用户一日只签到一次
+        Db::startTrans();
+        $userUuid = $user["uuid"];
+        $userSql = "select * from user_base where uuid = '$userUuid' for update";
+        $userQuery = Db::query($userSql);
+        if (!isset($userQuery[0])) {
+            throw AppException::factory(AppException::USER_NOT_EXISTS);
+        }
+        $userInfo = $userQuery[0];
+
+        //今日已签到
+        if ($userInfo["last_sign_date"] == $today) {
+            Db::rollback();
+            throw AppException::factory(AppException::USER_SIGN_ALREADY);
+        }
+
+        try {
+            //添加签到纪录
+            $signLogData = [
+                "uuid" => getRandomString(),
+                "user_uuid" => $userUuid,
+                "create_month" => $currentMonth,
+                "create_date" => $today,
+                "create_time" => $now,
+                "update_time" => $now,
+            ];
+            (new UserSignLogModel())->insert($signLogData);
+
+            //修改用户签到统计
+            $lastSignMonth = substr($userInfo["last_sign_date"], 0, 7);
+            $userExec = $userModel->where("uuid", $userUuid);
+            if ($lastSignMonth == $currentMonth) {
+                if ($userInfo["last_sign_date"] == $yesterday) {
+                    //最后一次签到是本月，且最后一次签到是昨日
+                    $userExec->inc("continuous_sign_times", 1)
+                        ->inc("cumulative_sign_times", 1)
+                        ->update(["last_sign_date"=>$today,"update_time"=>$now]);
+                } else {
+                    //最后一次签到是本月，但最后一次签到不是昨日
+                    $userExec->inc("cumulative_sign_times", 1)
+                        ->update(["last_sign_date"=>$today,"continuous_sign_times"=>1,"update_time"=>$now]);
+                }
+            } else {
+                //最后一次签到不是本月
+                $userExec->update(["last_sign_date"=>$today,"continuous_sign_times"=>1,
+                    "cumulative_sign_times"=>1,"update_time"=>$now]);
+            }
+
+            //用户累计签到达标，且未发放累计签到奖励，发放累计签到奖励
+            $userNew = $userModel->findByUuid($userUuid);
+            $userInfo = $userNew->toArray();
+            if ($userNew["cumulative_sign_times"] == Constant::CUMULATIVE_SIGN_DAYS) {
+                $userCoinLogModel = new UserCoinLogModel();
+                $addCoinLog = $userCoinLogModel->checkReceiveCumulativeSignReward($userUuid);
+                if ($addCoinLog == false) {
+                    //增加用户书币数
+                    $userModel->where("uuid", $userUuid)
+                        ->inc("coin", Constant::CUMULATIVE_SIGN_COIN)
+                        ->update(["update_time"=>$now]);
+
+                    //纪录书币流水
+                    $userCoinLogModel->recordAddLog(
+                        $userUuid,
+                        UserCoinAddTypeEnum::CUMULATIVE_SIGN,
+                        Constant::CUMULATIVE_SIGN_COIN,
+                        $userNew["coin"],
+                        $userNew["coin"] + Constant::CUMULATIVE_SIGN_COIN,
+                        UserCoinAddTypeEnum::CUMULATIVE_SIGN_DESC);
+
+                    $userInfo["coin"] += Constant::CUMULATIVE_SIGN_COIN;
+                }
+            }
+
+            Db::commit();
+
+            //缓存用户信息
+            $redis = Redis::factory();
+            cacheUserInfoByToken($userInfo, $redis);
+
+            $returnData = [
+                "continuous_sign_times" => $userInfo["continuous_sign_times"],
+                "cumulative_sign_times" => $userInfo["cumulative_sign_times"],
+            ];
+            return $returnData;
+
+        } catch (\Throwable $e) {
+            Db::rollback();
+            throw $e;
         }
     }
 

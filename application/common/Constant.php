@@ -46,4 +46,30 @@ class Constant
             ]
         ],
     ];
+
+    //连续签到奖励
+    const CONTINUOUS_SIGN_REWARD = [
+        [
+            "condition" => 3,
+            "coin" => 5,
+        ],
+        [
+            "condition" => 7,
+            "coin" => 10,
+        ],
+        [
+            "condition" => 15,
+            "coin" => 20,
+        ],
+        [
+            "condition" => 30,
+            "coin" => 100,
+        ],
+    ];
+
+    //每月可以获取累计签到奖励的天数
+    const CUMULATIVE_SIGN_DAYS = 2;
+
+    //累计签到达标书币奖励数量
+    const CUMULATIVE_SIGN_COIN = 40;
 }

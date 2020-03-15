@@ -41,6 +41,11 @@ Route::rule('user/weChatSignIn', 'api/user/weChatSignIn', 'post');
 Route::rule('user/userInfo', 'api/user/userInfo', 'post');
 //修改用户信息
 Route::rule('user/modifyUserInfo', 'api/user/modifyUserInfo', 'post');
+//签到页面
+Route::rule('user/signInfo', 'api/user/signInfo', 'post');
+//用户签到
+Route::rule('user/sign', 'api/user/sign', 'post');
+
 
 
 //任务中心首页

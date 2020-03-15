@@ -29,4 +29,7 @@ class UserCoinAddTypeEnum
     const SHARE = 4;
     const SHARE_DESC = "分享有礼";
 
+    const CUMULATIVE_SIGN = 5;
+    const CUMULATIVE_SIGN_DESC = "累计签到";
+
 }
