@@ -95,7 +95,7 @@ class App extends Base
             "current_version" => $currentVersion,
             "is_update" => 0,
             "forced" => 0,
-            "package_link" => config("web.self_domain") . $currentPackage["package_link"],
+            "package_link" => config("web.self_domain") . "/".$currentPackage["package_link"],
             "change_log" => $currentPackage["change_log"],
         ];
 
