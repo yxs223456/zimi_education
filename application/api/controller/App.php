@@ -11,6 +11,7 @@ namespace app\api\controller;
 use app\common\AppException;
 use app\common\enum\OperatingSystemEnum;
 use app\common\model\PackageConfigModel;
+use think\facade\Env;
 
 class App extends Base
 {
@@ -25,16 +26,25 @@ class App extends Base
         $os = input("os", "");
         $version = input("version", "");
         $forced = (int) input("forced");
-        $packageLink = input("package_link", "");
         $changeLog = input("change_log", "");
 
         if (!in_array($os, [OperatingSystemEnum::ANDROID, OperatingSystemEnum::IOS]) ||
             empty($version) ||
             !in_array($forced, [0, 1]) ||
-            empty($packageLink) ||
             empty($changeLog)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
+        if (empty($_FILES['package'])) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        //上传package
+        $tempFile = $_FILES['file']['tmp_name'];
+        $fileName = md5(uniqid(mt_rand(), true)).".".strtolower(pathinfo($_FILES['file']['name'])["extension"]);
+        $fileUrl = "static/api/" . $fileName;
+        $filePath = "public/" . $fileUrl;
+        move_uploaded_file($tempFile, Env::get("root_path") . $filePath);
+        $packageLink = $fileUrl;
 
         $packageModel = new PackageConfigModel();
         $package = $packageModel->findByOsAndVersion($os, $version);
