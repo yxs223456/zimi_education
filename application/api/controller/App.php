@@ -96,7 +96,7 @@ class App extends Base
             "is_update" => 0,
             "forced" => 0,
             "package_link" => config("web.self_domain") . $currentPackage["package_link"],
-            "change_log" => "",
+            "change_log" => $currentPackage["change_log"],
         ];
 
         //比较当前版本是否一致
