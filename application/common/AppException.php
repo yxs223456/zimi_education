@@ -15,6 +15,7 @@ class AppException extends \Exception
     const COM_MOBILE_ERR = [4, "手机号格式错误"];
     const COM_ADDRESS_ERR = [5, "地址信息不全"];
     const COM_INVALID = [6, "非法请求"];
+    const COM_APP_NOT_ONLINE = [7, "产品未上架"];
 
     const USER_NOT_LOGIN = [1000, "您还未登录"];
     const USER_TOKEN_ERR = [1001, "登录信息已过期,请重新登录"];

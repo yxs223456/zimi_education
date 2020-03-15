@@ -18,4 +18,20 @@ class PackageConfigModel extends Base
             ->where("version", $version)
             ->find();
     }
+
+    //对应操作系统下的最新版本
+    public function findCurrentPackageByOs($os)
+    {
+        return $this->where("os", $os)
+            ->order("version desc")
+            ->find();
+    }
+
+    //对应操作系统所有版本，按版本从高到低
+    public function getAllPackageOrderByVersion($os)
+    {
+        return $this->where("os", $os)
+            ->order("version desc")
+            ->select();
+    }
 }
