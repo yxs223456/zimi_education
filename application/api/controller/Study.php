@@ -28,6 +28,6 @@ class Study extends Base
         $user = $this->query["user"];
 
         $questionService = new QuestionService();
-        $this->jsonResponse($questionService->getStudyFillTheBlanks($user, $difficultyLevel));
+        return $this->jsonResponse($questionService->getStudyFillTheBlanks($user, $difficultyLevel));
     }
 }
