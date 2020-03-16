@@ -40,12 +40,12 @@ class AddCoinByFinishTask extends Command
 
             if ($addCoinInfo == null || empty($addCoinInfo[1])) {
                 $redis->close();
-                return;
+                continue;
             }
 
             $addCoinTaskInfo = json_decode($addCoinInfo[1], true);
             if (empty($addCoinTaskInfo["uuid"]) || empty($addCoinTaskInfo["add_type"])) {
-                return;
+                continue;
             }
 
             //书币增加方式

@@ -38,12 +38,12 @@ class CacheQuestionLibrary extends Command
 
             if ($cacheQuestionLibraryInfo == null || empty($cacheQuestionLibraryInfo[1])) {
                 $redis->close();
-                return;
+                continue;
             }
 
             $cacheInfo = json_decode($cacheQuestionLibraryInfo[1], true);
             if (empty($cacheInfo["question_type"]) || empty($cacheInfo["difficulty_level"])) {
-                return;
+                continue;
             }
 
             $this->doWork($cacheInfo["question_type"], $cacheInfo["difficulty_level"], $redis);

@@ -39,12 +39,12 @@ class ReceiveContinuousSignReward extends Command
 
             if ($receiveContinuousSignRewardInfo == null || empty($receiveContinuousSignRewardInfo[1])) {
                 $redis->close();
-                return;
+                continue;
             }
 
             $receiveInfo = json_decode($receiveContinuousSignRewardInfo[1], true);
             if (empty($receiveInfo["user"]) || empty($receiveInfo["condition"])) {
-                return;
+                continue;
             }
 
             $this->doWork($receiveInfo["user"], $receiveInfo["condition"], $redis);
