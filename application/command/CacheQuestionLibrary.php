@@ -9,10 +9,15 @@
 namespace app\command;
 
 use app\common\Constant;
+use app\common\enum\QuestionTypeEnum;
 use app\common\enum\UserCoinAddTypeEnum;
 use app\common\helper\Redis;
+use app\common\model\FillTheBlanksModel;
+use app\common\model\SingleChoiceModel;
+use app\common\model\TrueFalseQuestionModel;
 use app\common\model\UserBaseModel;
 use app\common\model\UserCoinLogModel;
+use app\common\model\WritingModel;
 use think\console\Command;
 use think\console\Input;
 use think\console\Output;
@@ -51,6 +56,47 @@ class CacheQuestionLibrary extends Command
 
     protected function doWork($questionType, $difficultyLevel, $redis)
     {
+        switch ($questionType) {
+            case QuestionTypeEnum::FILL_THE_BLANKS:
+                $this->cacheFillTheBlanksLibrary($difficultyLevel, $redis);
+                break;
+            case QuestionTypeEnum::SINGLE_CHOICE:
+                $this->cacheSingleChoiceLibrary($difficultyLevel, $redis);
+                break;
+            case QuestionTypeEnum::TRUE_FALSE_QUESTION:
+                $this->cacheTrueFalseQuestionLibrary($difficultyLevel, $redis);
+                break;
+            case QuestionTypeEnum::WRITING:
+                $this->cacheWritingLibrary($difficultyLevel, $redis);
+                break;
+        }
+    }
 
+    protected function cacheFillTheBlanksLibrary($difficultyLevel, $redis)
+    {
+        $model = new FillTheBlanksModel();
+        $allUuids = $model->getAllUuid($difficultyLevel);
+        addAllFillTheBlanks($allUuids, $difficultyLevel, $redis);
+    }
+
+    protected function cacheSingleChoiceLibrary($difficultyLevel, $redis)
+    {
+        $model = new SingleChoiceModel();
+        $allUuids = $model->getAllUuid($difficultyLevel);
+        addAllSingleChoice($allUuids, $difficultyLevel, $redis);
+    }
+
+    protected function cacheTrueFalseQuestionLibrary($difficultyLevel, $redis)
+    {
+        $model = new TrueFalseQuestionModel();
+        $allUuids = $model->getAllUuid($difficultyLevel);
+        addAllTrueFalseQuestion($allUuids, $difficultyLevel, $redis);
+    }
+
+    protected function cacheWritingLibrary($difficultyLevel, $redis)
+    {
+        $model = new WritingModel();
+        $allUuids = $model->getAllUuid($difficultyLevel);
+        addAllWriting($allUuids, $difficultyLevel, $redis);
     }
 }

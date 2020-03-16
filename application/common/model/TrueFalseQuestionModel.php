@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: yangxiushan
  * Date: 2020-03-16
- * Time: 15:18
+ * Time: 16:49
  */
 
 namespace app\common\model;
@@ -11,11 +11,11 @@ namespace app\common\model;
 use app\common\enum\DbIsDeleteEnum;
 use app\common\enum\QuestionIsUseEnum;
 
-class SingleChoiceModel extends Base
+class TrueFalseQuestionModel extends Base
 {
-    protected $table = 'single_choice';
+    protected $table = 'true_false_question';
 
-    public function getRandomSingleChoiceUuid($difficultyLevel, $count)
+    public function getRandomUuid($difficultyLevel, $count)
     {
         return $this->where("difficulty_level", $difficultyLevel)
             ->where("is_use", QuestionIsUseEnum::YES)

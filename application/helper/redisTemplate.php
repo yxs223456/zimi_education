@@ -79,6 +79,34 @@ function addFillTheBlanksArray(array $fillTheBlanksList, Redis $redis) {
 }
 
 //将单选题放入题库缓存
+function addAllFillTheBlanks(array $fillTheBlanksUuids, $difficultyLevel, Redis $redis) {
+    $key = "";
+    switch ($difficultyLevel) {
+        case 1:
+            $key = "de_education:fillTheBlanksLibrary:oneStar";
+            break;
+        case 2:
+            $key = "de_education:fillTheBlanksLibrary:twoStar";
+            break;
+        case 3:
+            $key = "de_education:fillTheBlanksLibrary:threeStar";
+            break;
+        case 4:
+            $key = "de_education:fillTheBlanksLibrary:fourStar";
+            break;
+        case 5:
+            $key = "de_education:fillTheBlanksLibrary:fiveStar";
+            break;
+        case 6:
+            $key = "de_education:fillTheBlanksLibrary:sixStar";
+            break;
+    }
+    if ($key) {
+        $redis->sAddArray($key, $fillTheBlanksUuids);
+    }
+}
+
+//将单选题放入题库缓存
 function addFillTheBlanks($fillTheBlanksUuid, $difficultyLevel, Redis $redis) {
     $key = "";
     switch ($difficultyLevel) {
@@ -225,6 +253,34 @@ function addSingleChoiceArray(array $singleChoiceList, Redis $redis) {
 }
 
 //将单选题放入题库缓存
+function addAllSingleChoice(array $singleChoiceUuids, $difficultyLevel, Redis $redis) {
+    $key = "";
+    switch ($difficultyLevel) {
+        case 1:
+            $key = "de_education:singleChoiceLibrary:oneStar";
+            break;
+        case 2:
+            $key = "de_education:singleChoiceLibrary:twoStar";
+            break;
+        case 3:
+            $key = "de_education:singleChoiceLibrary:threeStar";
+            break;
+        case 4:
+            $key = "de_education:singleChoiceLibrary:fourStar";
+            break;
+        case 5:
+            $key = "de_education:singleChoiceLibrary:fiveStar";
+            break;
+        case 6:
+            $key = "de_education:singleChoiceLibrary:sixStar";
+            break;
+    }
+    if ($key) {
+        $redis->sAddArray($key, $singleChoiceUuids);
+    }
+}
+
+//将单选题放入题库缓存
 function addSingleChoice($singleChoiceUuid, $difficultyLevel, Redis $redis) {
     $key = "";
     switch ($difficultyLevel) {
@@ -335,6 +391,35 @@ function addWriting($writingUuid, $difficultyLevel, Redis $redis) {
     }
     if ($key) {
         $redis->sadd($key, $writingUuid);
+    }
+}
+
+
+//将作文题放入题库缓存
+function addAllWriting(array $writingUuids, $difficultyLevel, Redis $redis) {
+    $key = "";
+    switch ($difficultyLevel) {
+        case 1:
+            $key = "de_education:writingLibrary:oneStar";
+            break;
+        case 2:
+            $key = "de_education:writingLibrary:twoStar";
+            break;
+        case 3:
+            $key = "de_education:writingLibrary:threeStar";
+            break;
+        case 4:
+            $key = "de_education:writingLibrary:fourStar";
+            break;
+        case 5:
+            $key = "de_education:writingLibrary:fiveStar";
+            break;
+        case 6:
+            $key = "de_education:writingLibrary:sixStar";
+            break;
+    }
+    if ($key) {
+        $redis->sAddArray($key, $writingUuids);
     }
 }
 
@@ -453,6 +538,34 @@ function addTrueFalseQuestionArray(array $trueFalseQuestionList, Redis $redis) {
     }if (count($list["six"]) != 0) {
         $key = "de_education:trueFalseQuestionLibrary:sixStar";
         $redis->sAddArray($key, $list["six"]);
+    }
+}
+
+//将判断题放入题库缓存
+function addAllTrueFalseQuestion(array $trueFalseQuestionUuids, $difficultyLevel, Redis $redis) {
+    $key = "";
+    switch ($difficultyLevel) {
+        case 1:
+            $key = "de_education:trueFalseQuestionLibrary:oneStar";
+            break;
+        case 2:
+            $key = "de_education:trueFalseQuestionLibrary:twoStar";
+            break;
+        case 3:
+            $key = "de_education:trueFalseQuestionLibrary:threeStar";
+            break;
+        case 4:
+            $key = "de_education:trueFalseQuestionLibrary:fourStar";
+            break;
+        case 5:
+            $key = "de_education:trueFalseQuestionLibrary:fiveStar";
+            break;
+        case 6:
+            $key = "de_education:trueFalseQuestionLibrary:sixStar";
+            break;
+    }
+    if ($key) {
+        $redis->sAddArray($key, $trueFalseQuestionUuids);
     }
 }
 
