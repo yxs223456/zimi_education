@@ -64,6 +64,8 @@ Route::rule('app/feedback', 'api/app/feedback', 'post');
 
 //获取新手测试题
 Route::rule('novice/getQuestions', 'api/novice/getQuestions', 'post');
+//提交新手测试成绩
+Route::rule('novice/submitResult', 'api/novice/submitResult', 'post');
 
 return [
 
