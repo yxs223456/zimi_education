@@ -30,22 +30,25 @@ class CacheQuestionLibrary extends Command
 
     protected function execute(Input $input, Output $output)
     {
-        $redis = Redis::factory();
+        $startTime = 60;
+        while (time() - $startTime < 60) {
+            $redis = Redis::factory();
 
-        $cacheQuestionLibraryInfo = getCacheQuestionLibraryList($redis);
+            $cacheQuestionLibraryInfo = getCacheQuestionLibraryList($redis);
 
-        if ($cacheQuestionLibraryInfo == null || empty($cacheQuestionLibraryInfo[1])) {
+            if ($cacheQuestionLibraryInfo == null || empty($cacheQuestionLibraryInfo[1])) {
+                $redis->close();
+                return;
+            }
+
+            $cacheInfo = json_decode($cacheQuestionLibraryInfo[1], true);
+            if (empty($cacheInfo["question_type"]) || empty($cacheInfo["difficulty_level"])) {
+                return;
+            }
+
+            $this->doWork($cacheInfo["question_type"], $cacheInfo["difficulty_level"], $redis);
             $redis->close();
-            return;
         }
-
-        $cacheInfo = json_decode($cacheQuestionLibraryInfo[1], true);
-        if (empty($cacheInfo["question_type"]) || empty($cacheInfo["difficulty_level"])) {
-            return;
-        }
-
-        $this->doWork($cacheInfo["question_type"], $cacheInfo["difficulty_level"], $redis);
-        $redis->close();
     }
 
     protected function doWork($questionType, $difficultyLevel, $redis)

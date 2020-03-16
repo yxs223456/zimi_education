@@ -31,22 +31,25 @@ class ReceiveContinuousSignReward extends Command
 
     protected function execute(Input $input, Output $output)
     {
-        $redis = Redis::factory();
+        $startTime = time();
+        while (time() - $startTime < 60) {
+            $redis = Redis::factory();
 
-        $receiveContinuousSignRewardInfo = getReceiveContinuousSignRewardList($redis);
+            $receiveContinuousSignRewardInfo = getReceiveContinuousSignRewardList($redis);
 
-        if ($receiveContinuousSignRewardInfo == null || empty($receiveContinuousSignRewardInfo[1])) {
+            if ($receiveContinuousSignRewardInfo == null || empty($receiveContinuousSignRewardInfo[1])) {
+                $redis->close();
+                return;
+            }
+
+            $receiveInfo = json_decode($receiveContinuousSignRewardInfo[1], true);
+            if (empty($receiveInfo["user"]) || empty($receiveInfo["condition"])) {
+                return;
+            }
+
+            $this->doWork($receiveInfo["user"], $receiveInfo["condition"], $redis);
             $redis->close();
-            return;
         }
-
-        $receiveInfo = json_decode($receiveContinuousSignRewardInfo[1], true);
-        if (empty($receiveInfo["user"]) || empty($receiveInfo["condition"])) {
-            return;
-        }
-
-        $this->doWork($receiveInfo["user"], $receiveInfo["condition"], $redis);
-        $redis->close();
     }
 
    protected function doWork($user, $condition, $redis)

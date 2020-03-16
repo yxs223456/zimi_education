@@ -32,37 +32,40 @@ class AddCoinByFinishTask extends Command
 
     protected function execute(Input $input, Output $output)
     {
-        $redis = Redis::factory();
+        $startTime = time();
+        while (time() - $startTime < 60) {
+            $redis = Redis::factory();
 
-        $addCoinInfo = getAddCoinList($redis);
+            $addCoinInfo = getAddCoinList($redis);
 
-        if ($addCoinInfo == null || empty($addCoinInfo[1])) {
+            if ($addCoinInfo == null || empty($addCoinInfo[1])) {
+                $redis->close();
+                return;
+            }
+
+            $addCoinTaskInfo = json_decode($addCoinInfo[1], true);
+            if (empty($addCoinTaskInfo["uuid"]) || empty($addCoinTaskInfo["add_type"])) {
+                return;
+            }
+
+            //书币增加方式
+            switch ($addCoinTaskInfo["add_type"]) {
+                case UserCoinAddTypeEnum::USER_INFO:
+                    $this->finishUserInfo($addCoinTaskInfo["uuid"], $redis);
+                    break;
+                case UserCoinAddTypeEnum::PARENT_INVITE_CODE:
+                    $this->fillInInviteCode($addCoinTaskInfo["uuid"], $redis);
+                    break;
+                case UserCoinAddTypeEnum::BIND_WE_CHAT:
+                    $this->finishBindWeChat($addCoinTaskInfo["uuid"], $redis);
+                    break;
+                case UserCoinAddTypeEnum::SHARE:
+                    $this->finishShare($addCoinTaskInfo["uuid"], $redis);
+                    break;
+            }
+
             $redis->close();
-            return;
         }
-
-        $addCoinTaskInfo = json_decode($addCoinInfo[1], true);
-        if (empty($addCoinTaskInfo["uuid"]) || empty($addCoinTaskInfo["add_type"])) {
-            return;
-        }
-
-        //书币增加方式
-        switch ($addCoinTaskInfo["add_type"]) {
-            case UserCoinAddTypeEnum::USER_INFO:
-                $this->finishUserInfo($addCoinTaskInfo["uuid"], $redis);
-                break;
-            case UserCoinAddTypeEnum::PARENT_INVITE_CODE:
-                $this->fillInInviteCode($addCoinTaskInfo["uuid"], $redis);
-                break;
-            case UserCoinAddTypeEnum::BIND_WE_CHAT:
-                $this->finishBindWeChat($addCoinTaskInfo["uuid"], $redis);
-                break;
-            case UserCoinAddTypeEnum::SHARE:
-                $this->finishShare($addCoinTaskInfo["uuid"], $redis);
-                break;
-        }
-
-        $redis->close();
     }
 
     //完善用户信息
