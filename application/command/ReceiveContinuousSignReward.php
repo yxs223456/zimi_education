@@ -53,7 +53,7 @@ class ReceiveContinuousSignReward extends Command
    {
        //连续签到奖励配置
        $rewardConfigList = Constant::CONTINUOUS_SIGN_REWARD;
-
+        Log::write("1111");
        //用户本月连续签到奖励领取情况
        $continuousSignReward = currentMonthContinuousSignReward($user["uuid"], $redis);
 
@@ -86,6 +86,8 @@ class ReceiveContinuousSignReward extends Command
                        return;
                }
 
+               Log::write($coinLogDetailNote);
+
                $userModel = new UserBaseModel;
                $userCoinLogModel = new UserCoinLogModel();
 
@@ -95,6 +97,8 @@ class ReceiveContinuousSignReward extends Command
                    substr($receiveCoinLog["create_date"], 0, 7) == date("Y-m")) {
                    return;
                }
+
+               Log::write(22222222);
 
                Db::startTrans();
                try {
