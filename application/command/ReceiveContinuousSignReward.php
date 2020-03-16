@@ -53,11 +53,12 @@ class ReceiveContinuousSignReward extends Command
    {
        //连续签到奖励配置
        $rewardConfigList = Constant::CONTINUOUS_SIGN_REWARD;
-        Log::write("1111");
+
        //用户本月连续签到奖励领取情况
        $continuousSignReward = currentMonthContinuousSignReward($user["uuid"], $redis);
 
        foreach ($rewardConfigList as $rewardConfig) {
+           Log::write($rewardConfig["condition"] .":". $condition);
            //用户当前连续签到天数 >= 配置中可以领取奖励的连续签到天数
            if ($user["continuous_sign_times"] >= $condition && $rewardConfig["condition"] == $condition) {
                switch ($condition) {
