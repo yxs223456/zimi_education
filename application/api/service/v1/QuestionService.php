@@ -120,7 +120,11 @@ class QuestionService extends Base
         //每套题暂定30题，开始答题后必须答完当前这套题才可以答下一套题
         $uuids = getStudyFillTheBlanksCache($user["uuid"], $difficultyLevel, $redis);
         if (empty($uuids)) {
-            $uuids = $fillTheBlanksModel->getRandomUuid($difficultyLevel, Constant::STUDY_FILL_THE_BLANKS_COUNT);
+            $uuids = getRandomFillTheBlanks($difficultyLevel, Constant::STUDY_FILL_THE_BLANKS_COUNT, $redis);
+            if (empty($uuids)) {
+                $uuids = $fillTheBlanksModel->getRandomUuid($difficultyLevel, Constant::STUDY_FILL_THE_BLANKS_COUNT);
+                pushCacheQuestionLibraryList(QuestionTypeEnum::FILL_THE_BLANKS, $difficultyLevel, $redis);
+            }
             cacheStudyFillTheBlanks($user["uuid"], $difficultyLevel, $uuids, $redis);
         }
         $questions = $fillTheBlanksModel->getByUuids($uuids);
