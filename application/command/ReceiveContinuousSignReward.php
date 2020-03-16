@@ -58,27 +58,31 @@ class ReceiveContinuousSignReward extends Command
        $continuousSignReward = currentMonthContinuousSignReward($user["uuid"], $redis);
 
        foreach ($rewardConfigList as $rewardConfig) {
-           Log::write($rewardConfig["condition"] .":". $condition);
            //用户当前连续签到天数 >= 配置中可以领取奖励的连续签到天数
            if ($user["continuous_sign_times"] >= $condition && $rewardConfig["condition"] == $condition) {
+               Log::write("aaaa");
+               Log::write(Constant::CONTINUOUS_SIGN_REWARD[0]["condition"]);
+               Log::write(Constant::CONTINUOUS_SIGN_REWARD[1]["condition"]);
+               Log::write(Constant::CONTINUOUS_SIGN_REWARD[2]["condition"]);
+               Log::write(Constant::CONTINUOUS_SIGN_REWARD[3]["condition"]);
                switch ($condition) {
                    //计算书币增加类型、奖励书币数、奖励书币纪录描述
-                   case Constant::CONTINUOUS_SIGN_REWARD[0]["continue"]:
+                   case Constant::CONTINUOUS_SIGN_REWARD[0]["condition"]:
                        $addCoinType = UserCoinAddTypeEnum::CONTINUOUS_SIGN_3_DAY;
                        $coinNum = Constant::CONTINUOUS_SIGN_REWARD[0]["coin"];
                        $coinLogDetailNote = UserCoinAddTypeEnum::CONTINUOUS_SIGN_3_DAY_DESC;
                        break;
-                   case Constant::CONTINUOUS_SIGN_REWARD[1]["continue"]:
+                   case Constant::CONTINUOUS_SIGN_REWARD[1]["condition"]:
                        $addCoinType = UserCoinAddTypeEnum::CONTINUOUS_SIGN_7_DAY;
                        $coinNum = Constant::CONTINUOUS_SIGN_REWARD[1]["coin"];
                        $coinLogDetailNote = UserCoinAddTypeEnum::CONTINUOUS_SIGN_7_DAY_DESC;
                        break;
-                   case Constant::CONTINUOUS_SIGN_REWARD[2]["continue"]:
+                   case Constant::CONTINUOUS_SIGN_REWARD[2]["condition"]:
                        $addCoinType = UserCoinAddTypeEnum::CONTINUOUS_SIGN_15_DAY;
                        $coinNum = Constant::CONTINUOUS_SIGN_REWARD[2]["coin"];
                        $coinLogDetailNote = UserCoinAddTypeEnum::CONTINUOUS_SIGN_15_DAY_DESC;
                        break;
-                   case Constant::CONTINUOUS_SIGN_REWARD[3]["continue"]:
+                   case Constant::CONTINUOUS_SIGN_REWARD[3]["condition"]:
                        $addCoinType = UserCoinAddTypeEnum::CONTINUOUS_SIGN_30_DAY;
                        $coinNum = Constant::CONTINUOUS_SIGN_REWARD[3]["coin"];
                        $coinLogDetailNote = UserCoinAddTypeEnum::CONTINUOUS_SIGN_30_DAY_DESC;
