@@ -60,11 +60,6 @@ class ReceiveContinuousSignReward extends Command
        foreach ($rewardConfigList as $rewardConfig) {
            //用户当前连续签到天数 >= 配置中可以领取奖励的连续签到天数
            if ($user["continuous_sign_times"] >= $condition && $rewardConfig["condition"] == $condition) {
-               Log::write("aaaa");
-               Log::write(Constant::CONTINUOUS_SIGN_REWARD[0]["condition"]);
-               Log::write(Constant::CONTINUOUS_SIGN_REWARD[1]["condition"]);
-               Log::write(Constant::CONTINUOUS_SIGN_REWARD[2]["condition"]);
-               Log::write(Constant::CONTINUOUS_SIGN_REWARD[3]["condition"]);
                switch ($condition) {
                    //计算书币增加类型、奖励书币数、奖励书币纪录描述
                    case Constant::CONTINUOUS_SIGN_REWARD[0]["condition"]:
@@ -91,8 +86,6 @@ class ReceiveContinuousSignReward extends Command
                        return;
                }
 
-               Log::write($coinLogDetailNote);
-
                $userModel = new UserBaseModel;
                $userCoinLogModel = new UserCoinLogModel();
 
@@ -102,8 +95,6 @@ class ReceiveContinuousSignReward extends Command
                    substr($receiveCoinLog["create_date"], 0, 7) == date("Y-m")) {
                    return;
                }
-
-               Log::write(22222222);
 
                Db::startTrans();
                try {

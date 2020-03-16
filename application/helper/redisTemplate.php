@@ -466,7 +466,7 @@ function cacheMonthContinuousSignReward($userUuid, array $rewardList, \Redis $re
     $month = date("Y-m");
     $key = "de_education:monthContinuousSignReward:$userUuid:$month";
 
-
+    $redis->setex($key, 86400*31, json_encode($rewardList));
 }
 
 //用户当月领取的连续签到奖励
