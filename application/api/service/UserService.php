@@ -460,11 +460,11 @@ class UserService extends Base
 
         //计算连续签到次数
         $returnData["continuous_sign_times"] =
-            ($user["last_sign_date"] == $today || $user["last_sign_date"] == $yesterday)?$user["continuous_sign_times"]:0;
+            (int)($user["last_sign_date"] == $today || $user["last_sign_date"] == $yesterday)?$user["continuous_sign_times"]:0;
 
         //计算累计签到次数
         $returnData["cumulative_sign_times"] =
-            substr($user["last_sign_date"], 0, 7) == $month?$user["cumulative_sign_times"]:0;
+            (int)(substr($user["last_sign_date"], 0, 7) == $month?$user["cumulative_sign_times"]:0);
 
         //当月连续签到奖励领取情况
         $redis = Redis::factory();
