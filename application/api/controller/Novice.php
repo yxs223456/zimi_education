@@ -30,7 +30,7 @@ class Novice extends Base
     public function submitResult()
     {
         $noviceLevel = input("novice_level");
-        if (!in_array($noviceLevel, [0,1,2,3,4,5,6])) {
+        if ($noviceLevel === null || !in_array($noviceLevel, [0,1,2,3,4,5,6])) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
