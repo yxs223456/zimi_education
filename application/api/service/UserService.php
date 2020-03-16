@@ -671,7 +671,7 @@ class UserService extends Base
 
     public function getHeadImageUrl($headImageUrl)
     {
-        return str_replace("/static/api", config("web.self_domain") . "/static/api", $headImageUrl);
+        return str_replace("static/api", config("web.self_domain") . "/static/api", $headImageUrl);
     }
 
     //验证密码是否符合要求。密码长度8~32位，需包含数字、字母、符号至少2种或以上元素

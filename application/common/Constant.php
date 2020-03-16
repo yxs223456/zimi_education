@@ -68,7 +68,7 @@ class Constant
     ];
 
     //每月可以获取累计签到奖励的天数
-    const CUMULATIVE_SIGN_DAYS = 2;
+    const CUMULATIVE_SIGN_DAYS = 20;
 
     //累计签到达标书币奖励数量
     const CUMULATIVE_SIGN_COIN = 40;
