@@ -8,21 +8,15 @@
 
 namespace app\command;
 
-use app\common\Constant;
 use app\common\enum\QuestionTypeEnum;
-use app\common\enum\UserCoinAddTypeEnum;
 use app\common\helper\Redis;
 use app\common\model\FillTheBlanksModel;
 use app\common\model\SingleChoiceModel;
 use app\common\model\TrueFalseQuestionModel;
-use app\common\model\UserBaseModel;
-use app\common\model\UserCoinLogModel;
 use app\common\model\WritingModel;
 use think\console\Command;
 use think\console\Input;
 use think\console\Output;
-use think\Db;
-use think\facade\Log;
 
 class CacheQuestionLibrary extends Command
 {
