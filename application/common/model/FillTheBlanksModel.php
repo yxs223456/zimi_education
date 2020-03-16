@@ -32,6 +32,12 @@ class FillTheBlanksModel extends Base
             ->column("uuid");
     }
 
+    public function getByUuids(array $uuids)
+    {
+        return $this->whereIn("uuid", $uuids)
+            ->select();
+    }
+
     public function getByUuidsAndOrderByDifficultyLevel(array $uuids)
     {
         return $this->whereIn("uuid", $uuids)

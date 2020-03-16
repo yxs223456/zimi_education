@@ -36,7 +36,7 @@ class Novice extends Base
 
         $user = $this->query["user"];
         $questionService = new QuestionService();
-        $returnData = $questionService->submitResult($user, $noviceLevel);
+        $returnData = $questionService->submitNoviceResult($user, $noviceLevel);
 
         return $this->jsonResponse($returnData);
     }

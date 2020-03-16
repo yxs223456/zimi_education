@@ -756,3 +756,21 @@ function getReceiveContinuousSignRewardList(\Redis $redis) {
 
     return $data;
 }
+
+//用户学习模块填空题缓存
+function getStudyFillTheBlanksCache($userUuid, $difficultyLevel, \Redis $redis) {
+    $key = "de_education:studyFillTheBlanks:$difficultyLevel:$userUuid";
+    $data = $redis->get($key);
+
+    if ($data) {
+        return json_decode($data, true);
+    } else {
+        return [];
+    }
+}
+
+//缓存用户学习模块填空题
+function cacheStudyFillTheBlanks($userUuid, $difficultyLevel, array $questionUuids, \Redis $redis) {
+    $key = "de_education:studyFillTheBlanks:$difficultyLevel:$userUuid";
+    $redis->set($key, json_encode($questionUuids));
+}

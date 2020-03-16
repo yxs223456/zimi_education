@@ -10,10 +10,12 @@ namespace app\api\service\v1;
 
 use app\api\service\Base;
 use app\common\AppException;
+use app\common\Constant;
 use app\common\enum\NoviceTestIsShowEnum;
 use app\common\enum\QuestionDifficultyLevelEnum;
 use app\common\enum\QuestionTypeEnum;
 use app\common\helper\Redis;
+use app\common\model\FillTheBlanksModel;
 use app\common\model\SingleChoiceModel;
 use app\common\model\UserBaseModel;
 
@@ -86,7 +88,7 @@ class QuestionService extends Base
         return array_values($returnData);
     }
 
-    public function submitResult($userInfo, $noviceLevel)
+    public function submitNoviceResult($userInfo, $noviceLevel)
     {
         $userModel = new UserBaseModel();
         $user = $userModel->findByUuid($userInfo["uuid"]);
@@ -108,5 +110,31 @@ class QuestionService extends Base
 
         cacheUserInfoByToken($user->toArray(), Redis::factory());
         return new \stdClass();
+    }
+
+    public function getStudyFillTheBlanks($user, $difficultyLevel)
+    {
+        $fillTheBlanksModel = new FillTheBlanksModel();
+        $redis = Redis::factory();
+
+        //每套题暂定30题，开始答题后必须答完当前这套题才可以答下一套题
+        $uuids = getStudyFillTheBlanksCache($user["uuid"], $difficultyLevel, $redis);
+        if (empty($uuids)) {
+            $uuids = $fillTheBlanksModel->getRandomUuid($difficultyLevel, Constant::STUDY_FILL_THE_BLANKS_COUNT);
+            cacheStudyFillTheBlanks($user["uuid"], $difficultyLevel, $uuids, $redis);
+        }
+        $questions = $fillTheBlanksModel->getByUuids($uuids);
+
+        //格式化数据
+        $returnData = [];
+        foreach ($questions as $question) {
+            $returnData[] = [
+                "uuid" => $question["uuid"],
+                "question" => $question["question"],
+                "answer" => $question["answer"],
+            ];
+        }
+
+        return $returnData;
     }
 }

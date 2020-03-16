@@ -67,6 +67,10 @@ Route::rule('novice/getQuestions', 'api/novice/getQuestions', 'post');
 //提交新手测试成绩
 Route::rule('novice/submitResult', 'api/novice/submitResult', 'post');
 
+
+//学习模块，获取填空练习题
+Route::rule('study/getFillTheBlanks', 'api/study/getFillTheBlanks', 'post');
+
 return [
 
 ];
