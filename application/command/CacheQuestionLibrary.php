@@ -30,7 +30,7 @@ class CacheQuestionLibrary extends Command
 
     protected function execute(Input $input, Output $output)
     {
-        $startTime = 60;
+        $startTime = time();
         while (time() - $startTime < 60) {
             $redis = Redis::factory();
 
