@@ -30,6 +30,7 @@ class AppException extends \Exception
     const USER_MODIFY_ERROR = [1010, "信息修改失败"];
     const USER_INFO_NOT_MODIFY = [1011, "没有修改任何个人信息"];
     const USER_SIGN_ALREADY = [1012, "今日已签到"];
+    const USER_NOVICE_TEST_ALREADY = [1013, "你已经做过新手测试啦"];
 
     const WE_CHAT_GET_ACCESS_TOKEN_ERROR = [2000, "获取用户微信信息失败"];
     const WE_CHAT_NOT_BIND_USER = [2001, "当前微信号还没有绑定任何账号,请先使用手机号注册"];

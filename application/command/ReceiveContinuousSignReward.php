@@ -45,11 +45,11 @@ class ReceiveContinuousSignReward extends Command
             return;
         }
 
-        $this->doWord($receiveInfo["user"], $receiveInfo["condition"], $redis);
+        $this->doWork($receiveInfo["user"], $receiveInfo["condition"], $redis);
         $redis->close();
     }
 
-   protected function doWord($user, $condition, $redis)
+   protected function doWork($user, $condition, $redis)
    {
        //连续签到奖励配置
        $rewardConfigList = Constant::CONTINUOUS_SIGN_REWARD;

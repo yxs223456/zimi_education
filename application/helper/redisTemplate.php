@@ -106,6 +106,36 @@ function addFillTheBlanks($fillTheBlanksUuid, $difficultyLevel, Redis $redis) {
     }
 }
 
+//随机获取填空题
+function getRandomFillTheBlanks($difficultyLevel, $count, Redis $redis) {
+    $key = "";
+    switch ($difficultyLevel) {
+        case 1:
+            $key = "de_education:fillTheBlanksLibrary:oneStar";
+            break;
+        case 2:
+            $key = "de_education:fillTheBlanksLibrary:twoStar";
+            break;
+        case 3:
+            $key = "de_education:fillTheBlanksLibrary:threeStar";
+            break;
+        case 4:
+            $key = "de_education:fillTheBlanksLibrary:fourStar";
+            break;
+        case 5:
+            $key = "de_education:fillTheBlanksLibrary:fiveStar";
+            break;
+        case 6:
+            $key = "de_education:fillTheBlanksLibrary:sixStar";
+            break;
+    }
+    if ($key) {
+        return $redis->sRandMember($key, $count);
+    } else {
+        return [];
+    }
+}
+
 //将单选题移出题库缓存
 function removeFillTheBlanks($fillTheBlanksUuid, $difficultyLevel, Redis $redis) {
     $key = "";
@@ -222,6 +252,36 @@ function addSingleChoice($singleChoiceUuid, $difficultyLevel, Redis $redis) {
     }
 }
 
+//随机获取选择题
+function getRandomSingleChoice($difficultyLevel, $count, Redis $redis) {
+    $key = "";
+    switch ($difficultyLevel) {
+        case 1:
+            $key = "de_education:singleChoiceLibrary:oneStar";
+            break;
+        case 2:
+            $key = "de_education:singleChoiceLibrary:twoStar";
+            break;
+        case 3:
+            $key = "de_education:singleChoiceLibrary:threeStar";
+            break;
+        case 4:
+            $key = "de_education:singleChoiceLibrary:fourStar";
+            break;
+        case 5:
+            $key = "de_education:singleChoiceLibrary:fiveStar";
+            break;
+        case 6:
+            $key = "de_education:singleChoiceLibrary:sixStar";
+            break;
+    }
+    if ($key) {
+        return $redis->sRandMember($key, $count);
+    } else {
+        return [];
+    }
+}
+
 //将单选题移出题库缓存
 function removeSingleChoice($singleChoiceUuid, $difficultyLevel, Redis $redis) {
     $key = "";
@@ -275,6 +335,36 @@ function addWriting($writingUuid, $difficultyLevel, Redis $redis) {
     }
     if ($key) {
         $redis->sadd($key, $writingUuid);
+    }
+}
+
+//随机获取作文题
+function getRandomWriting($difficultyLevel, $count, Redis $redis) {
+    $key = "";
+    switch ($difficultyLevel) {
+        case 1:
+            $key = "de_education:writingLibrary:oneStar";
+            break;
+        case 2:
+            $key = "de_education:writingLibrary:twoStar";
+            break;
+        case 3:
+            $key = "de_education:writingLibrary:threeStar";
+            break;
+        case 4:
+            $key = "de_education:writingLibrary:fourStar";
+            break;
+        case 5:
+            $key = "de_education:writingLibrary:fiveStar";
+            break;
+        case 6:
+            $key = "de_education:writingLibrary:sixStar";
+            break;
+    }
+    if ($key) {
+        return $redis->sRandMember($key, $count);
+    } else {
+        return [];
     }
 }
 
@@ -394,6 +484,36 @@ function addTrueFalseQuestion($trueFalseQuestionUuid, $difficultyLevel, Redis $r
     }
 }
 
+//随机获取判断题
+function getTrueFalseQuestion($difficultyLevel, $count, Redis $redis) {
+    $key = "";
+    switch ($difficultyLevel) {
+        case 1:
+            $key = "de_education:trueFalseQuestionLibrary:oneStar";
+            break;
+        case 2:
+            $key = "de_education:trueFalseQuestionLibrary:twoStar";
+            break;
+        case 3:
+            $key = "de_education:trueFalseQuestionLibrary:threeStar";
+            break;
+        case 4:
+            $key = "de_education:trueFalseQuestionLibrary:fourStar";
+            break;
+        case 5:
+            $key = "de_education:trueFalseQuestionLibrary:fiveStar";
+            break;
+        case 6:
+            $key = "de_education:trueFalseQuestionLibrary:sixStar";
+            break;
+    }
+    if ($key) {
+        return $redis->sRandMember($key, $count);
+    } else {
+        return [];
+    }
+}
+
 //将判断题移出题库缓存
 function removeTrueFalseQuestion($trueFalseQuestionUuid, $difficultyLevel, Redis $redis) {
     $key = "";
@@ -420,6 +540,27 @@ function removeTrueFalseQuestion($trueFalseQuestionUuid, $difficultyLevel, Redis
     if ($key) {
         $redis->sRem($key, $trueFalseQuestionUuid);
     }
+}
+
+//缓存题库任务放到redis队列
+function pushCacheQuestionLibraryList($questionType, $difficultyLevel, Redis $redis) {
+    $key = "de_education:cacheQuestionLibraryList";
+
+    $value = [
+        "question_type" => $questionType,
+        "difficulty_level" => $difficultyLevel
+    ];
+
+    $redis->rPush($key, json_encode($value));
+}
+
+//弹出缓存题库任务
+function getCacheQuestionLibraryList(\Redis $redis) {
+    $key = "de_education:cacheQuestionLibraryList";
+
+    $data = $redis->blPop([$key], 10);
+
+    return $data;
 }
 
 //用户今日通过分享获取书币次数+1
@@ -484,7 +625,7 @@ function currentMonthContinuousSignReward($userUuid, \Redis $redis) {
 
 //将用户领取书币的操作放到redis队列
 function pushReceiveContinuousSignRewardList($user, $condition, Redis $redis) {
-    $key = "de_education:receiveContinuousSignRewardLis";
+    $key = "de_education:receiveContinuousSignRewardList";
 
     $value = [
         "user" => $user,
@@ -496,7 +637,7 @@ function pushReceiveContinuousSignRewardList($user, $condition, Redis $redis) {
 
 //弹出待领取的奖励
 function getReceiveContinuousSignRewardList(\Redis $redis) {
-    $key = "de_education:receiveContinuousSignRewardLis";
+    $key = "de_education:receiveContinuousSignRewardList";
 
     $data = $redis->blPop([$key], 10);
 

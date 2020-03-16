@@ -42,4 +42,15 @@ class UserBaseModel extends Base
     {
         $this->where("uuid", $uuid)->setInc("invite_count", 1);
     }
+
+    public function updateNoviceTestStatusAndGetUser($uuid, $isShow = 0)
+    {
+        //修改新手测试显示状态
+        $user = $this->findByUuid($uuid);
+        $user->novice_test_is_show = $isShow;
+        $user->update_time = time();
+        $user->save();
+
+        return $user;
+    }
 }

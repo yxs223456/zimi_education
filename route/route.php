@@ -61,6 +61,10 @@ Route::rule('app/checkUpdate', 'api/app/checkUpdate', 'post');
 //意见反馈
 Route::rule('app/feedback', 'api/app/feedback', 'post');
 
+
+//获取新手测试题
+Route::rule('novice/getQuestions', 'api/novice/getQuestions', 'post');
+
 return [
 
 ];
