@@ -22,4 +22,19 @@ class WritingModel extends Base
             ->where("is_delete", DbIsDeleteEnum::NO)
             ->column("uuid");
     }
+
+    public function getRandomUuid($difficultyLevel)
+    {
+        return $this->where("difficulty_level", $difficultyLevel)
+            ->where("is_use", QuestionIsUseEnum::YES)
+            ->where("is_delete", DbIsDeleteEnum::NO)
+            ->field("uuid")
+            ->find();
+    }
+
+    public function getByUuid($uuid)
+    {
+        return $this->where("uuid", $uuid)
+            ->find();
+    }
 }

@@ -17,7 +17,9 @@ use app\common\enum\QuestionTypeEnum;
 use app\common\helper\Redis;
 use app\common\model\FillTheBlanksModel;
 use app\common\model\SingleChoiceModel;
+use app\common\model\TrueFalseQuestionModel;
 use app\common\model\UserBaseModel;
+use app\common\model\WritingModel;
 
 class QuestionService extends Base
 {
@@ -169,6 +171,66 @@ class QuestionService extends Base
                 "answer" => $question["answer"],
             ];
         }
+
+        return $returnData;
+    }
+
+    public function getStudyTrueFalseQuestion($user, $difficultyLevel)
+    {
+        $trueFalseQuestionModel = new TrueFalseQuestionModel();
+        $redis = Redis::factory();
+
+        //每套题暂定30题，开始答题后必须答完当前这套题才可以答下一套题
+        $uuids = getStudyTrueFalseQuestionCache($user["uuid"], $difficultyLevel, $redis);
+        if (empty($uuids)) {
+            $uuids = getRandomTrueFalseQuestion($difficultyLevel, Constant::STUDY_TRUE_FALSE_QUESTION_COUNT, $redis);
+            if (empty($uuids)) {
+                $uuids = $trueFalseQuestionModel->getRandomUuid($difficultyLevel, Constant::STUDY_TRUE_FALSE_QUESTION_COUNT);
+                pushCacheQuestionLibraryList(QuestionTypeEnum::TRUE_FALSE_QUESTION, $difficultyLevel, $redis);
+            }
+            cacheStudyTrueFalseQuestion($user["uuid"], $difficultyLevel, $uuids, $redis);
+        }
+        $questions = $trueFalseQuestionModel->getByUuids($uuids);
+
+        //格式化数据
+        $returnData = [];
+        foreach ($questions as $question) {
+            $returnData[] = [
+                "uuid" => $question["uuid"],
+                "question" => $question["question"],
+                "answer" => $question["answer"],
+            ];
+        }
+
+        return $returnData;
+    }
+
+    public function getStudyWriting($user, $difficultyLevel)
+    {
+        $writingModel = new WritingModel();
+        $redis = Redis::factory();
+
+        //开始答题后必须答完当前这套题才可以答下一套题
+        $uuid = getStudyWritingCache($user["uuid"], $difficultyLevel, $redis);
+        if (empty($uuid)) {
+            $uuidArray = getRandomWriting($difficultyLevel, 1, $redis);
+            if (empty($uuidArray)) {
+                $uuidInfo = $writingModel->getRandomUuid($difficultyLevel);
+                $uuid = $uuidInfo["uuid"];
+                pushCacheQuestionLibraryList(QuestionTypeEnum::WRITING, $difficultyLevel, $redis);
+            } else {
+                $uuid = $uuidArray[0];
+            }
+            cacheStudyWriting($user["uuid"], $difficultyLevel, $uuid, $redis);
+        }
+        $question = $writingModel->getByUuid($uuid);
+
+        //格式化数据
+        $returnData = [
+            "uuid" => $question["uuid"],
+            "topic" => $question["topic"],
+            "requirements" => json_decode($question["requirements"], true),
+        ];
 
         return $returnData;
     }

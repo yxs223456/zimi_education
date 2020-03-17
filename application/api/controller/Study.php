@@ -42,4 +42,28 @@ class Study extends Base
         $questionService = new QuestionService();
         return $this->jsonResponse($questionService->getStudySingleChoice($user, $difficultyLevel));
     }
+
+    public function getTrueFalseQuestion()
+    {
+        $difficultyLevel = input("difficulty_level");
+        if ($difficultyLevel === null || !in_array($difficultyLevel, [1,2,3,4,5,6])) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+        $user = $this->query["user"];
+
+        $questionService = new QuestionService();
+        return $this->jsonResponse($questionService->getStudyTrueFalseQuestion($user, $difficultyLevel));
+    }
+
+    public function getWriting()
+    {
+        $difficultyLevel = input("difficulty_level");
+        if ($difficultyLevel === null || !in_array($difficultyLevel, [1,2,3,4,5,6])) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+        $user = $this->query["user"];
+
+        $questionService = new QuestionService();
+        return $this->jsonResponse($questionService->getStudyWriting($user, $difficultyLevel));
+    }
 }

@@ -598,7 +598,7 @@ function addTrueFalseQuestion($trueFalseQuestionUuid, $difficultyLevel, Redis $r
 }
 
 //随机获取判断题
-function getTrueFalseQuestion($difficultyLevel, $count, Redis $redis) {
+function getRandomTrueFalseQuestion($difficultyLevel, $count, Redis $redis) {
     $key = "";
     switch ($difficultyLevel) {
         case 1:
@@ -791,4 +791,40 @@ function getStudySingleChoiceCache($userUuid, $difficultyLevel, \Redis $redis) {
 function cacheStudySingleChoice($userUuid, $difficultyLevel, array $questionUuids, \Redis $redis) {
     $key = "de_education:studySingleChoice:$difficultyLevel:$userUuid";
     $redis->set($key, json_encode($questionUuids));
+}
+
+//用户学习模块单选题缓存
+function getStudyTrueFalseQuestionCache($userUuid, $difficultyLevel, \Redis $redis) {
+    $key = "de_education:studyTrueFalseQuestion:$difficultyLevel:$userUuid";
+    $data = $redis->get($key);
+
+    if ($data) {
+        return json_decode($data, true);
+    } else {
+        return [];
+    }
+}
+
+//缓存用户学习模块单选题
+function cacheStudyTrueFalseQuestion($userUuid, $difficultyLevel, array $questionUuids, \Redis $redis) {
+    $key = "de_education:studyTrueFalseQuestion:$difficultyLevel:$userUuid";
+    $redis->set($key, json_encode($questionUuids));
+}
+
+//用户学习模块单选题缓存
+function getStudyWritingCache($userUuid, $difficultyLevel, \Redis $redis) {
+    $key = "de_education:studyWriting:$difficultyLevel:$userUuid";
+    $data = $redis->get($key);
+
+    if ($data) {
+        return $data;
+    } else {
+        return "";
+    }
+}
+
+//缓存用户学习模块单选题
+function cacheStudyWriting($userUuid, $difficultyLevel, $questionUuid, \Redis $redis) {
+    $key = "de_education:studyWriting:$difficultyLevel:$userUuid";
+    $redis->set($key, $questionUuid);
 }
