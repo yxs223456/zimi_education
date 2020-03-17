@@ -774,3 +774,21 @@ function cacheStudyFillTheBlanks($userUuid, $difficultyLevel, array $questionUui
     $key = "de_education:studyFillTheBlanks:$difficultyLevel:$userUuid";
     $redis->set($key, json_encode($questionUuids));
 }
+
+//用户学习模块单选题缓存
+function getStudySingleChoiceCache($userUuid, $difficultyLevel, \Redis $redis) {
+    $key = "de_education:studySingleChoice:$difficultyLevel:$userUuid";
+    $data = $redis->get($key);
+
+    if ($data) {
+        return json_decode($data, true);
+    } else {
+        return [];
+    }
+}
+
+//缓存用户学习模块单选题
+function cacheStudySingleChoice($userUuid, $difficultyLevel, array $questionUuids, \Redis $redis) {
+    $key = "de_education:studySingleChoice:$difficultyLevel:$userUuid";
+    $redis->set($key, json_encode($questionUuids));
+}

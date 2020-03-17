@@ -24,6 +24,12 @@ class TrueFalseQuestionModel extends Base
             ->column("uuid");
     }
 
+    public function getByUuids(array $uuids)
+    {
+        return $this->whereIn("uuid", $uuids)
+            ->select();
+    }
+
     public function getAllUuid($difficultyLevel)
     {
         return $this->where("difficulty_level", $difficultyLevel)

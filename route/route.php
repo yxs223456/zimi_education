@@ -70,6 +70,10 @@ Route::rule('novice/submitResult', 'api/novice/submitResult', 'post');
 
 //学习模块，获取填空练习题
 Route::rule('study/getFillTheBlanks', 'api/study/getFillTheBlanks', 'post');
+//学习模块，获取单选练习题
+Route::rule('study/getSingleChoice', 'api/study/getSingleChoice', 'post');
+
+
 
 return [
 

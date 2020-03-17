@@ -141,4 +141,35 @@ class QuestionService extends Base
 
         return $returnData;
     }
+
+    public function getStudySingleChoice($user, $difficultyLevel)
+    {
+        $singleChoiceModel = new SingleChoiceModel();
+        $redis = Redis::factory();
+
+        //每套题暂定30题，开始答题后必须答完当前这套题才可以答下一套题
+        $uuids = getStudySingleChoiceCache($user["uuid"], $difficultyLevel, $redis);
+        if (empty($uuids)) {
+            $uuids = getRandomSingleChoice($difficultyLevel, Constant::STUDY_SINGLE_CHOICE_COUNT, $redis);
+            if (empty($uuids)) {
+                $uuids = $singleChoiceModel->getRandomUuid($difficultyLevel, Constant::STUDY_SINGLE_CHOICE_COUNT);
+                pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, $difficultyLevel, $redis);
+            }
+            cacheStudySingleChoice($user["uuid"], $difficultyLevel, $uuids, $redis);
+        }
+        $questions = $singleChoiceModel->getByUuids($uuids);
+
+        //格式化数据
+        $returnData = [];
+        foreach ($questions as $question) {
+            $returnData[] = [
+                "uuid" => $question["uuid"],
+                "question" => $question["question"],
+                "possible_answers" => json_decode($question["possible_answers"], true),
+                "answer" => $question["answer"],
+            ];
+        }
+
+        return $returnData;
+    }
 }
