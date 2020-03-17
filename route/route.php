@@ -74,8 +74,10 @@ Route::rule('study/getFillTheBlanks', 'api/study/getFillTheBlanks', 'post');
 Route::rule('study/getSingleChoice', 'api/study/getSingleChoice', 'post');
 //学习模块，获取判断练习题
 Route::rule('study/getTrueFalseQuestion', 'api/study/getTrueFalseQuestion', 'post');
-//学习模块，获取判断练习题
+//学习模块，获取作文练习题
 Route::rule('study/getWriting', 'api/study/getWriting', 'post');
+//学习模块，提交作文练习题
+Route::rule('study/submitWriting', 'api/study/submitWriting', 'post');
 
 
 return [

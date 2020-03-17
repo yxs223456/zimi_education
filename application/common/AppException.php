@@ -36,6 +36,8 @@ class AppException extends \Exception
     const WE_CHAT_NOT_BIND_USER = [2001, "当前微信号还没有绑定任何账号,请先使用手机号注册"];
     const WE_CHAT_BIND_ALREADY = [2002, "当前微信号已绑定其他手机账号"];
 
+    const QUESTION_WRITING_NOT_EXISTS = [3000, "作文题目不存在"];
+
     public static function factory($errConst)
     {
         $e = new self($errConst[1], $errConst[0]);

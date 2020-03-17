@@ -828,3 +828,10 @@ function cacheStudyWriting($userUuid, $difficultyLevel, $questionUuid, \Redis $r
     $key = "de_education:studyWriting:$difficultyLevel:$userUuid";
     $redis->set($key, $questionUuid);
 }
+
+//删除用户学习模块单选题缓存
+function removeStudyWritingCache($userUuid, $difficultyLevel, \Redis $redis)
+{
+    $key = "de_education:studyWriting:$difficultyLevel:$userUuid";
+    $redis->del($key);
+}

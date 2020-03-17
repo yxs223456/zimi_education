@@ -14,12 +14,16 @@ use app\common\Constant;
 use app\common\enum\NoviceTestIsShowEnum;
 use app\common\enum\QuestionDifficultyLevelEnum;
 use app\common\enum\QuestionTypeEnum;
+use app\common\enum\UserWritingSourceTypeEnum;
 use app\common\helper\Redis;
 use app\common\model\FillTheBlanksModel;
 use app\common\model\SingleChoiceModel;
 use app\common\model\TrueFalseQuestionModel;
 use app\common\model\UserBaseModel;
+use app\common\model\UserStudyWritingModel;
+use app\common\model\UserWritingModel;
 use app\common\model\WritingModel;
+use think\Db;
 
 class QuestionService extends Base
 {
@@ -233,5 +237,58 @@ class QuestionService extends Base
         ];
 
         return $returnData;
+    }
+
+    public function submitStudyWriting($user, $writingUuid, $content, $difficultyLevel)
+    {
+        $writingModel = new WritingModel();
+
+        //作文题信息
+        $writing = $writingModel->findByUuid($writingUuid);
+        if ($writing == null) {
+            throw AppException::factory(AppException::QUESTION_WRITING_NOT_EXISTS);
+        }
+
+        $userStudyWritingModel = new UserStudyWritingModel();
+        $userWritingModel = new UserWritingModel();
+
+        //纪录作文提交信息
+        Db::startTrans();
+        try {
+            $userStudyWritingData = [
+                "uuid" => getRandomString(),
+                "user_uuid" => $user["uuid"],
+                "writing_uuid" => $writingUuid,
+                "difficulty_level" => $writing["difficulty_level"],
+                "requirements" => $writing["requirements"],
+                "topic" => $writing["topic"],
+                "create_time" => time(),
+                "update_time" => time(),
+            ];
+            $userStudyWritingModel->insert($userStudyWritingData);
+
+            $userWritingData = [
+                "user_uuid" => $user["uuid"],
+                "source_type" => UserWritingSourceTypeEnum::STUDY,
+                "source_uuid" => $userStudyWritingData["uuid"],
+                "difficulty_level" => $writing["difficulty_level"],
+                "requirements" => $writing["requirements"],
+                "topic" => $writing["topic"],
+                "content" => json_encode($content, JSON_UNESCAPED_UNICODE),
+                "create_time" => time(),
+                "update_time" => time(),
+            ];
+            $userWritingModel->insert($userWritingData);
+
+            Db::commit();
+        } catch (\Throwable $e) {
+            Db::rollback();
+            throw $e;
+        }
+
+        //开始答题后必须答完当前这套题才可以答下一套题，所以用户提交后删除原题缓存
+        $redis = Redis::factory();
+        removeStudyWritingCache($user["uuid"], $difficultyLevel, $redis);
+        return new \stdClass();
     }
 }

@@ -66,4 +66,31 @@ class Study extends Base
         $questionService = new QuestionService();
         return $this->jsonResponse($questionService->getStudyWriting($user, $difficultyLevel));
     }
+
+    public function submitWriting()
+    {
+        $param = $this->request->getContent();
+        $param = json_decode($param, true);
+
+        if (empty($param["difficulty_level"]) || !in_array($param["difficulty_level"], [1,2,3,4,5,6])) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+        if (empty($param["uuid"]) || empty($param["content"])) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+        if (empty($param["content"]["text"]) && empty($param["content"]["images"])) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+
+        $questionService = new QuestionService();
+        $returnData = $questionService->submitStudyWriting(
+            $user,
+            $param["uuid"],
+            $param["content"],
+            $param["difficulty_level"]
+        );
+        return $this->jsonResponse($returnData);
+    }
 }
