@@ -34,7 +34,7 @@ class UserCoinLogModel extends Base
     {
         return $this->where("user_uuid", $userUuid)
             ->where("add_type", UserCoinAddTypeEnum::SHARE)
-            ->where("created_date", date("Y-m-d"))
+            ->where("create_date", date("Y-m-d"))
             ->count();
     }
 
@@ -52,7 +52,7 @@ class UserCoinLogModel extends Base
             "before_num" => $beforeNum,
             "after_num" => $afterNum,
             "detail_note" => $detailNode,
-            "created_date" => date("Y-m-d", $now),
+            "create_date" => date("Y-m-d", $now),
             "create_time" => $now,
             "update_time" => $now,
         ];
@@ -73,7 +73,7 @@ class UserCoinLogModel extends Base
             "before_num" => $beforeNum,
             "after_num" => $afterNum,
             "detail_note" => $detailNode,
-            "created_date" => date("Y-m-d", $now),
+            "create_date" => date("Y-m-d", $now),
             "create_time" => $now,
             "update_time" => $now,
         ];
@@ -91,7 +91,7 @@ class UserCoinLogModel extends Base
         if (!$data) {
             return false;
         }
-        if (substr($data["created_date"], 0, 7) == date("Y-m")) {
+        if (substr($data["create_date"], 0, 7) == date("Y-m")) {
             return true;
         }
         return false;
