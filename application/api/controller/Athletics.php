@@ -30,4 +30,14 @@ class Athletics extends Base
         $questionService = new QuestionService();
         return $this->jsonResponse($questionService->getSynthesize($user, $difficultyLevel));
     }
+
+    public function submitSynthesizeDraft()
+    {
+
+    }
+
+    public function submitSynthesize()
+    {
+
+    }
 }

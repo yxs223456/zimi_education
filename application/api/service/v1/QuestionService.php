@@ -391,6 +391,7 @@ class QuestionService extends Base
                 "update_time" => time(),
             ];
             $userSynthesizeModel->insert($insertData);
+            $synthesizeUuid = $insertData["uuid"];
         } else {
             $questions = json_decode($synthesizeData["questions"], true);
             foreach ($questions as $item) {
@@ -409,6 +410,7 @@ class QuestionService extends Base
 
                 }
             }
+            $synthesizeUuid = $synthesizeData["uuid"];
         }
 
         //格式化返回数据
@@ -431,22 +433,23 @@ class QuestionService extends Base
                 }
             }
         }
-        $returnData = [];
+        $returnData["uuid"] = $synthesizeUuid;
+        $returnData["exercises"] = [];
         foreach ($randomFillTheBlanks as $fillTheBlanks) {
-            if (!isset($returnData["fillTheBlanks"])) {
-                $returnData["fillTheBlanks"]["type"] = QuestionTypeEnum::FILL_THE_BLANKS;
+            if (!isset($returnData["exercises"]["fillTheBlanks"])) {
+                $returnData["exercises"]["fillTheBlanks"]["type"] = QuestionTypeEnum::FILL_THE_BLANKS;
             }
-            $returnData["fillTheBlanks"]["list"][] = [
+            $returnData["exercises"]["fillTheBlanks"]["list"][] = [
                 "uuid" => $fillTheBlanks["uuid"],
                 "question" => $fillTheBlanks["question"],
                 "user_answer" => isset($fillTheBlanksAnswers[$fillTheBlanks["uuid"]])?$fillTheBlanksAnswers[$fillTheBlanks["uuid"]]:"",
             ];
         }
         foreach ($randomSingleChoice as $singleChoice) {
-            if (!isset($returnData["singleChoice"])) {
-                $returnData["singleChoice"]["type"] = QuestionTypeEnum::SINGLE_CHOICE;
+            if (!isset($returnData["exercises"]["singleChoice"])) {
+                $returnData["exercises"]["singleChoice"]["type"] = QuestionTypeEnum::SINGLE_CHOICE;
             }
-            $returnData["singleChoice"]["list"][] = [
+            $returnData["exercises"]["singleChoice"]["list"][] = [
                 "uuid" => $singleChoice["uuid"],
                 "question" => $singleChoice["question"],
                 "possible_answers" => json_decode($singleChoice["possible_answers"], true),
@@ -454,16 +457,16 @@ class QuestionService extends Base
             ];
         }
         foreach ($randomTrueFalseQuestion as $trueFalseQuestion) {
-            if (!isset($returnData["trueFalseQuestion"])) {
-                $returnData["trueFalseQuestion"]["type"] = QuestionTypeEnum::TRUE_FALSE_QUESTION;
+            if (!isset($returnData["exercises"]["trueFalseQuestion"])) {
+                $returnData["exercises"]["trueFalseQuestion"]["type"] = QuestionTypeEnum::TRUE_FALSE_QUESTION;
             }
-            $returnData["trueFalseQuestion"]["list"][] = [
+            $returnData["exercises"]["trueFalseQuestion"]["list"][] = [
                 "uuid" => $trueFalseQuestion["uuid"],
                 "question" => $trueFalseQuestion["question"],
                 "user_answer" => isset($trueFalseQuestionAnswers[$trueFalseQuestion["uuid"]])?$trueFalseQuestionAnswers[$trueFalseQuestion["uuid"]]:null,
             ];
         }
-        $returnData["writing"] = [
+        $returnData["exercises"]["writing"] = [
             "type" => QuestionTypeEnum::WRITING,
             "list" => [
                 [
@@ -475,7 +478,8 @@ class QuestionService extends Base
             ],
         ];
 
-        return array_values($returnData);
+        $returnData["exercises"] = array_values($returnData["exercises"]);
+        return $returnData;
     }
 
     private function questionOrderByUuid($uuids, $questions)
