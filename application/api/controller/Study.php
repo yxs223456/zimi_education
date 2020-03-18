@@ -67,6 +67,51 @@ class Study extends Base
         return $this->jsonResponse($questionService->getStudyWriting($user, $difficultyLevel));
     }
 
+    public function submitFillTheBlanks()
+    {
+        $param = $this->request->getContent();
+        $param = json_decode($param, true);
+        if (empty($param["difficulty_level"]) || !in_array($param["difficulty_level"], [1,2,3,4,5,6])) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $questionService = new QuestionService();
+        $returnData = $questionService->submitStudyFillTheBlanks($user, $param["difficulty_level"]);
+
+        return $this->jsonResponse($returnData);
+    }
+
+    public function submitSingleChoice()
+    {
+        $param = $this->request->getContent();
+        $param = json_decode($param, true);
+        if (empty($param["difficulty_level"]) || !in_array($param["difficulty_level"], [1,2,3,4,5,6])) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $questionService = new QuestionService();
+        $returnData = $questionService->submitStudySingleChoice($user, $param["difficulty_level"]);
+
+        return $this->jsonResponse($returnData);
+    }
+
+    public function submitTrueFalseQuestion()
+    {
+        $param = $this->request->getContent();
+        $param = json_decode($param, true);
+        if (empty($param["difficulty_level"]) || !in_array($param["difficulty_level"], [1,2,3,4,5,6])) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $questionService = new QuestionService();
+        $returnData = $questionService->submitStudyTrueFalseQuestion($user, $param["difficulty_level"]);
+
+        return $this->jsonResponse($returnData);
+    }
+
     public function submitWriting()
     {
         $param = $this->request->getContent();

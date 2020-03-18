@@ -239,6 +239,30 @@ class QuestionService extends Base
         return $returnData;
     }
 
+    public function submitStudyFillTheBlanks($user, $difficultyLevel)
+    {
+        //开始答题后必须答完当前这套题才可以答下一套题，所以用户提交后删除原题缓存
+        $redis = Redis::factory();
+        removeStudyFillTheBlanksCache($user["uuid"], $difficultyLevel, $redis);
+        return new \stdClass();
+    }
+
+    public function submitStudySingleChoice($user, $difficultyLevel)
+    {
+        //开始答题后必须答完当前这套题才可以答下一套题，所以用户提交后删除原题缓存
+        $redis = Redis::factory();
+        removeStudySingleChoiceCache($user["uuid"], $difficultyLevel, $redis);
+        return new \stdClass();
+    }
+
+    public function submitStudyTrueFalseQuestion($user, $difficultyLevel)
+    {
+        //开始答题后必须答完当前这套题才可以答下一套题，所以用户提交后删除原题缓存
+        $redis = Redis::factory();
+        removeStudyTrueFalseQuestionCache($user["uuid"], $difficultyLevel, $redis);
+        return new \stdClass();
+    }
+
     public function submitStudyWriting($user, $writingUuid, $content, $difficultyLevel)
     {
         $writingModel = new WritingModel();

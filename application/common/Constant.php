@@ -74,11 +74,11 @@ class Constant
     const CUMULATIVE_SIGN_COIN = 40;
 
     //自主学习模块填空题数目
-    const STUDY_FILL_THE_BLANKS_COUNT = 30;
+    const STUDY_FILL_THE_BLANKS_COUNT = 3;
 
     //自主学习模块单选题数目
-    const STUDY_SINGLE_CHOICE_COUNT = 30;
+    const STUDY_SINGLE_CHOICE_COUNT = 3;
 
     //自主学习模块判断题数目
-    const STUDY_TRUE_FALSE_QUESTION_COUNT = 30;
+    const STUDY_TRUE_FALSE_QUESTION_COUNT = 3;
 }

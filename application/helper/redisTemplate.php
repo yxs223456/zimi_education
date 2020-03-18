@@ -775,6 +775,12 @@ function cacheStudyFillTheBlanks($userUuid, $difficultyLevel, array $questionUui
     $redis->set($key, json_encode($questionUuids));
 }
 
+//删除用户学习模块填空题缓存
+function removeStudyFillTheBlanksCache($userUuid, $difficultyLevel, \Redis $redis) {
+    $key = "de_education:studyFillTheBlanks:$difficultyLevel:$userUuid";
+    $redis->del($key);
+}
+
 //用户学习模块单选题缓存
 function getStudySingleChoiceCache($userUuid, $difficultyLevel, \Redis $redis) {
     $key = "de_education:studySingleChoice:$difficultyLevel:$userUuid";
@@ -793,7 +799,13 @@ function cacheStudySingleChoice($userUuid, $difficultyLevel, array $questionUuid
     $redis->set($key, json_encode($questionUuids));
 }
 
-//用户学习模块单选题缓存
+//删除用户学习模块单选题缓存
+function removeStudySingleChoiceCache($userUuid, $difficultyLevel, \Redis $redis) {
+    $key = "de_education:studySingleChoice:$difficultyLevel:$userUuid";
+    $redis->del($key);
+}
+
+//用户学习模块判断题缓存
 function getStudyTrueFalseQuestionCache($userUuid, $difficultyLevel, \Redis $redis) {
     $key = "de_education:studyTrueFalseQuestion:$difficultyLevel:$userUuid";
     $data = $redis->get($key);
@@ -805,13 +817,19 @@ function getStudyTrueFalseQuestionCache($userUuid, $difficultyLevel, \Redis $red
     }
 }
 
-//缓存用户学习模块单选题
+//缓存用户学习模块判断题
 function cacheStudyTrueFalseQuestion($userUuid, $difficultyLevel, array $questionUuids, \Redis $redis) {
     $key = "de_education:studyTrueFalseQuestion:$difficultyLevel:$userUuid";
     $redis->set($key, json_encode($questionUuids));
 }
 
-//用户学习模块单选题缓存
+//删除用户学习模块判断题缓存
+function removeStudyTrueFalseQuestionCache($userUuid, $difficultyLevel, \Redis $redis) {
+    $key = "de_education:studyTrueFalseQuestion:$difficultyLevel:$userUuid";
+    $redis->del($key);
+}
+
+//用户学习模块作文题缓存
 function getStudyWritingCache($userUuid, $difficultyLevel, \Redis $redis) {
     $key = "de_education:studyWriting:$difficultyLevel:$userUuid";
     $data = $redis->get($key);
@@ -823,13 +841,13 @@ function getStudyWritingCache($userUuid, $difficultyLevel, \Redis $redis) {
     }
 }
 
-//缓存用户学习模块单选题
+//缓存用户学习模块作文题
 function cacheStudyWriting($userUuid, $difficultyLevel, $questionUuid, \Redis $redis) {
     $key = "de_education:studyWriting:$difficultyLevel:$userUuid";
     $redis->set($key, $questionUuid);
 }
 
-//删除用户学习模块单选题缓存
+//删除用户学习模块作文题缓存
 function removeStudyWritingCache($userUuid, $difficultyLevel, \Redis $redis)
 {
     $key = "de_education:studyWriting:$difficultyLevel:$userUuid";
