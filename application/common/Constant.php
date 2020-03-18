@@ -74,11 +74,20 @@ class Constant
     const CUMULATIVE_SIGN_COIN = 40;
 
     //自主学习模块填空题数目
-    const STUDY_FILL_THE_BLANKS_COUNT = 3;
+    const STUDY_FILL_THE_BLANKS_COUNT = 30;
 
     //自主学习模块单选题数目
-    const STUDY_SINGLE_CHOICE_COUNT = 3;
+    const STUDY_SINGLE_CHOICE_COUNT = 30;
 
     //自主学习模块判断题数目
-    const STUDY_TRUE_FALSE_QUESTION_COUNT = 3;
+    const STUDY_TRUE_FALSE_QUESTION_COUNT = 30;
+
+    //综合测试模块填空题数目
+    const SYNTHESIZE_FILL_THE_BLANKS_COUNT = 15;
+
+    //综合测试模块单选题数目
+    const SYNTHESIZE_SINGLE_CHOICE_COUNT = 15;
+
+    //综合测试模块判断题数目
+    const SYNTHESIZE_TRUE_FALSE_QUESTION_COUNT = 15;
 }

@@ -21,6 +21,7 @@ use app\common\model\SingleChoiceModel;
 use app\common\model\TrueFalseQuestionModel;
 use app\common\model\UserBaseModel;
 use app\common\model\UserStudyWritingModel;
+use app\common\model\UserSynthesizeModel;
 use app\common\model\UserWritingModel;
 use app\common\model\WritingModel;
 use think\Db;
@@ -43,27 +44,27 @@ class QuestionService extends Base
 
         //redis缓存失效从数据库获取uuid，并重新生成缓存
         if (!$oneStarQuestions) {
-            $oneStarQuestions = $singleChoiceModel->getRandomSingleChoiceUuid(QuestionDifficultyLevelEnum::ONE, 2);
+            $oneStarQuestions = $singleChoiceModel->getRandomUuid(QuestionDifficultyLevelEnum::ONE, 2);
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, QuestionDifficultyLevelEnum::ONE, $redis);
         }
         if (!$twoStarQuestions) {
-            $twoStarQuestions = $singleChoiceModel->getRandomSingleChoiceUuid(QuestionDifficultyLevelEnum::TWO, 2);
+            $twoStarQuestions = $singleChoiceModel->getRandomUuid(QuestionDifficultyLevelEnum::TWO, 2);
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, QuestionDifficultyLevelEnum::TWO, $redis);
         }
         if (!$threeStarQuestions) {
-            $threeStarQuestions = $singleChoiceModel->getRandomSingleChoiceUuid(QuestionDifficultyLevelEnum::THREE, 2);
+            $threeStarQuestions = $singleChoiceModel->getRandomUuid(QuestionDifficultyLevelEnum::THREE, 2);
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, QuestionDifficultyLevelEnum::THREE, $redis);
         }
         if (!$fourStarQuestions) {
-            $fourStarQuestions = $singleChoiceModel->getRandomSingleChoiceUuid(QuestionDifficultyLevelEnum::FOUR, 2);
+            $fourStarQuestions = $singleChoiceModel->getRandomUuid(QuestionDifficultyLevelEnum::FOUR, 2);
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, QuestionDifficultyLevelEnum::FOUR, $redis);
         }
         if (!$fiveStarQuestions) {
-            $fiveStarQuestions = $singleChoiceModel->getRandomSingleChoiceUuid(QuestionDifficultyLevelEnum::FIVE, 2);
+            $fiveStarQuestions = $singleChoiceModel->getRandomUuid(QuestionDifficultyLevelEnum::FIVE, 2);
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, QuestionDifficultyLevelEnum::FIVE, $redis);
         }
         if (!$sixStarQuestions) {
-            $sixStarQuestions = $singleChoiceModel->getRandomSingleChoiceUuid(QuestionDifficultyLevelEnum::SIX, 2);
+            $sixStarQuestions = $singleChoiceModel->getRandomUuid(QuestionDifficultyLevelEnum::SIX, 2);
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, QuestionDifficultyLevelEnum::SIX, $redis);
         }
 
@@ -314,5 +315,26 @@ class QuestionService extends Base
         $redis = Redis::factory();
         removeStudyWritingCache($user["uuid"], $difficultyLevel, $redis);
         return new \stdClass();
+    }
+
+    //综合测试
+    //每种类型的题全部为同等难度的星级。
+    //测试依次秩序选择题-填空题-判断题-作文题。测试不限时间，当前测试没有完成不会下发新的测试题，下次进入从上次答题开始。
+    public function getSynthesize($user, $difficultyLevel)
+    {
+        //用户最后一套未答完的综合测试
+        $userSynthesizeModel = new UserSynthesizeModel();
+        $synthesizeData = $userSynthesizeModel->getLastUnFinish($user["uuid"], $difficultyLevel);
+
+        //没有未答完的综合测试题，生成一套新的题
+        if ($synthesizeData == null) {
+            $redis = Redis::factory();
+            $randomFillTheBlanks = getRandomFillTheBlanks($difficultyLevel, Constant::SYNTHESIZE_FILL_THE_BLANKS_COUNT, $redis);
+            if (count($randomFillTheBlanks) < Constant::SYNTHESIZE_FILL_THE_BLANKS_COUNT) {
+
+            }
+        }
+
+
     }
 }
