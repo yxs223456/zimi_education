@@ -88,6 +88,10 @@ Route::rule('study/submitWriting', 'api/study/submitWriting', 'post');
 
 //综合练习模块，获取练习题
 Route::rule('athletics/getSynthesize', 'api/athletics/getSynthesize', 'post');
+//综合练习模块，提交练习题答案草稿
+Route::rule('athletics/submitSynthesizeDraft', 'api/athletics/submitSynthesizeDraft', 'post');
+//综合练习模块，获取练习题答案
+Route::rule('athletics/submitSynthesize', 'api/athletics/submitSynthesize', 'post');
 
 return [
 

@@ -14,6 +14,7 @@ use app\common\Constant;
 use app\common\enum\NoviceTestIsShowEnum;
 use app\common\enum\QuestionDifficultyLevelEnum;
 use app\common\enum\QuestionTypeEnum;
+use app\common\enum\UserSynthesizeIsFinishEnum;
 use app\common\enum\UserWritingSourceTypeEnum;
 use app\common\helper\Redis;
 use app\common\model\FillTheBlanksModel;
@@ -480,6 +481,33 @@ class QuestionService extends Base
 
         $returnData["exercises"] = array_values($returnData["exercises"]);
         return $returnData;
+    }
+
+    public function submitSynthesizeDraft($user, $uuid, $answers)
+    {
+        $userSynthesizeModel = new UserSynthesizeModel();
+
+        $data = [
+            "answers" => json_encode($answers, JSON_UNESCAPED_UNICODE),
+            "update_time" => time(),
+        ];
+
+        $userSynthesizeModel->where("user_uuid", $user["uuid"])->where("uuid", $uuid)->update($data);
+        return new \stdClass();
+    }
+
+    public function submitSynthesize($user, $uuid, $answers)
+    {
+        $userSynthesizeModel = new UserSynthesizeModel();
+
+        $data = [
+            "answers" => json_encode($answers, JSON_UNESCAPED_UNICODE),
+            "is_finish" => UserSynthesizeIsFinishEnum::YES,
+            "update_time" => time(),
+        ];
+
+        $userSynthesizeModel->where("user_uuid", $user["uuid"])->where("uuid", $uuid)->update($data);
+        return new \stdClass();
     }
 
     private function questionOrderByUuid($uuids, $questions)

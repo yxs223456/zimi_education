@@ -33,11 +33,41 @@ class Athletics extends Base
 
     public function submitSynthesizeDraft()
     {
+        $param = $this->request->getContent();
+        $param = json_decode($param, true);
 
+        if (empty($param["uuid"]) || empty($param["answers"])) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+
+        $questionService = new QuestionService();
+        $returnData = $questionService->submitSynthesizeDraft(
+            $user,
+            $param["uuid"],
+            $param["answers"]
+        );
+        return $this->jsonResponse($returnData);
     }
 
     public function submitSynthesize()
     {
+        $param = $this->request->getContent();
+        $param = json_decode($param, true);
 
+        if (empty($param["uuid"]) || empty($param["answers"])) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+
+        $questionService = new QuestionService();
+        $returnData = $questionService->submitSynthesize(
+            $user,
+            $param["uuid"],
+            $param["answers"]
+        );
+        return $this->jsonResponse($returnData);
     }
 }
