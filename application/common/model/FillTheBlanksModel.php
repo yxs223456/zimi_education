@@ -24,6 +24,15 @@ class FillTheBlanksModel extends Base
             ->column("uuid");
     }
 
+    public function getRandom($difficultyLevel, $count)
+    {
+        return $this->where("difficulty_level", $difficultyLevel)
+            ->where("is_use", QuestionIsUseEnum::YES)
+            ->where("is_delete", DbIsDeleteEnum::NO)
+            ->limit($count)
+            ->select();
+    }
+
     public function getAllUuid($difficultyLevel)
     {
         return $this->where("difficulty_level", $difficultyLevel)

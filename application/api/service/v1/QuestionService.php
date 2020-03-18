@@ -43,27 +43,27 @@ class QuestionService extends Base
         $sixStarQuestions = getRandomSingleChoice(QuestionDifficultyLevelEnum::SIX, 2, $redis);
 
         //redis缓存失效从数据库获取uuid，并重新生成缓存
-        if (!$oneStarQuestions) {
+        if (count($oneStarQuestions) < 2) {
             $oneStarQuestions = $singleChoiceModel->getRandomUuid(QuestionDifficultyLevelEnum::ONE, 2);
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, QuestionDifficultyLevelEnum::ONE, $redis);
         }
-        if (!$twoStarQuestions) {
+        if (count($twoStarQuestions) < 2) {
             $twoStarQuestions = $singleChoiceModel->getRandomUuid(QuestionDifficultyLevelEnum::TWO, 2);
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, QuestionDifficultyLevelEnum::TWO, $redis);
         }
-        if (!$threeStarQuestions) {
+        if (count($threeStarQuestions) < 2) {
             $threeStarQuestions = $singleChoiceModel->getRandomUuid(QuestionDifficultyLevelEnum::THREE, 2);
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, QuestionDifficultyLevelEnum::THREE, $redis);
         }
-        if (!$fourStarQuestions) {
+        if (count($fourStarQuestions) < 2) {
             $fourStarQuestions = $singleChoiceModel->getRandomUuid(QuestionDifficultyLevelEnum::FOUR, 2);
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, QuestionDifficultyLevelEnum::FOUR, $redis);
         }
-        if (!$fiveStarQuestions) {
+        if (count($fiveStarQuestions) < 2) {
             $fiveStarQuestions = $singleChoiceModel->getRandomUuid(QuestionDifficultyLevelEnum::FIVE, 2);
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, QuestionDifficultyLevelEnum::FIVE, $redis);
         }
-        if (!$sixStarQuestions) {
+        if (count($sixStarQuestions) < 2) {
             $sixStarQuestions = $singleChoiceModel->getRandomUuid(QuestionDifficultyLevelEnum::SIX, 2);
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, QuestionDifficultyLevelEnum::SIX, $redis);
         }
@@ -322,19 +322,150 @@ class QuestionService extends Base
     //测试依次秩序选择题-填空题-判断题-作文题。测试不限时间，当前测试没有完成不会下发新的测试题，下次进入从上次答题开始。
     public function getSynthesize($user, $difficultyLevel)
     {
-        //用户最后一套未答完的综合测试
+        $fillTheBlanksModel = new FillTheBlanksModel();
+        $singleChoiceModel = new SingleChoiceModel();
+        $trueFalseQuestionModel = new TrueFalseQuestionModel();
+        $writingModel = new WritingModel();
         $userSynthesizeModel = new UserSynthesizeModel();
+
+        //用户最后一套未答完的综合测试
         $synthesizeData = $userSynthesizeModel->getLastUnFinish($user["uuid"], $difficultyLevel);
 
         //没有未答完的综合测试题，生成一套新的题
         if ($synthesizeData == null) {
             $redis = Redis::factory();
-            $randomFillTheBlanks = getRandomFillTheBlanks($difficultyLevel, Constant::SYNTHESIZE_FILL_THE_BLANKS_COUNT, $redis);
-            if (count($randomFillTheBlanks) < Constant::SYNTHESIZE_FILL_THE_BLANKS_COUNT) {
+            //填空题
+            $randomFillTheBlanksUuid = getRandomFillTheBlanks($difficultyLevel, Constant::SYNTHESIZE_FILL_THE_BLANKS_COUNT, $redis);
+            if (count($randomFillTheBlanksUuid) < Constant::SYNTHESIZE_FILL_THE_BLANKS_COUNT) {
+                $randomFillTheBlanks = $fillTheBlanksModel->getRandom($difficultyLevel, Constant::SYNTHESIZE_FILL_THE_BLANKS_COUNT)->toArray();
+                $randomFillTheBlanksUuid = array_column($randomFillTheBlanks, "uuid");
+                pushCacheQuestionLibraryList(QuestionTypeEnum::FILL_THE_BLANKS, $difficultyLevel, $redis);
+            } else {
+                $randomFillTheBlanks = $fillTheBlanksModel->getByUuids($randomFillTheBlanksUuid)->toArray();
+                $randomFillTheBlanks = $this->questionOrderByUuid($randomFillTheBlanksUuid, $randomFillTheBlanks);
 
+            }
+
+            //单选题
+            $randomSingleChoiceUuid = getRandomSingleChoice($difficultyLevel, Constant::SYNTHESIZE_SINGLE_CHOICE_COUNT, $redis);
+            if (count($randomSingleChoiceUuid) < Constant::SYNTHESIZE_SINGLE_CHOICE_COUNT) {
+                $randomSingleChoice = $singleChoiceModel->getRandom($difficultyLevel, Constant::SYNTHESIZE_SINGLE_CHOICE_COUNT)->toArray();
+                $randomSingleChoiceUuid = array_column($randomSingleChoice, "uuid");
+                pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, $difficultyLevel, $redis);
+            } else {
+                $randomSingleChoice = $singleChoiceModel->getByUuids($randomSingleChoiceUuid)->toArray();
+                $randomSingleChoice = $this->questionOrderByUuid($randomSingleChoiceUuid, $randomSingleChoice);
+            }
+
+            //判断题
+            $randomTrueFalseQuestionUuid = getRandomTrueFalseQuestion($difficultyLevel, Constant::SYNTHESIZE_TRUE_FALSE_QUESTION_COUNT, $redis);
+            if (count($randomTrueFalseQuestionUuid) < Constant::SYNTHESIZE_TRUE_FALSE_QUESTION_COUNT) {
+                $randomTrueFalseQuestion = $trueFalseQuestionModel->getRandom($difficultyLevel, Constant::SYNTHESIZE_TRUE_FALSE_QUESTION_COUNT)->toArray();
+                $randomTrueFalseQuestionUuid = array_column($randomTrueFalseQuestion, "uuid");
+                pushCacheQuestionLibraryList(QuestionTypeEnum::TRUE_FALSE_QUESTION, $difficultyLevel, $redis);
+            } else {
+                $randomTrueFalseQuestion = $trueFalseQuestionModel->getByUuids($randomTrueFalseQuestionUuid)->toArray();
+                $randomTrueFalseQuestion = $this->questionOrderByUuid($randomTrueFalseQuestionUuid, $randomTrueFalseQuestion);
+            }
+
+            //作文题
+            $randomWritingUuid = getRandomWriting($difficultyLevel, 1, $redis);
+            if (!$randomWritingUuid) {
+                $randomWriting = $writingModel->getRandom($difficultyLevel);
+            } else {
+                $randomWriting = $writingModel->getByUuid($randomWritingUuid[0]);
+            }
+
+            //数据库纪录随机生成的问题
+            $insertData = [
+                "uuid" => getRandomString(),
+                "user_uuid" => $user["uuid"],
+                "difficulty_level" => $difficultyLevel,
+                "questions" => json_encode([
+                    ["type" => QuestionTypeEnum::FILL_THE_BLANKS,"uuids" => $randomFillTheBlanksUuid,],
+                    ["type" => QuestionTypeEnum::SINGLE_CHOICE,"uuids" => $randomSingleChoiceUuid,],
+                    ["type" => QuestionTypeEnum::TRUE_FALSE_QUESTION,"uuids" => $randomTrueFalseQuestionUuid,],
+                    ["type" => QuestionTypeEnum::WRITING,"uuids" => $randomWritingUuid,],
+                ]),
+                "create_time" => time(),
+                "update_time" => time(),
+            ];
+            $userSynthesizeModel->insert($insertData);
+        } else {
+            $questions = json_decode($synthesizeData["questions"], true);
+            foreach ($questions as $item) {
+                switch($item["type"]) {
+                    case QuestionTypeEnum::FILL_THE_BLANKS:
+                        $randomFillTheBlanks = $fillTheBlanksModel->getByUuids($item["uuids"]);
+                        break;
+                    case QuestionTypeEnum::SINGLE_CHOICE:
+                        $randomSingleChoice = $singleChoiceModel->getByUuids($item["uuids"]);
+                        break;
+                    case QuestionTypeEnum::TRUE_FALSE_QUESTION:
+                        $randomTrueFalseQuestion = $trueFalseQuestionModel->getByUuids($item["uuids"]);
+                        break;
+                    case QuestionTypeEnum::WRITING:
+                        $randomWriting = $writingModel->getByUuid($item["uuids"][0]);
+
+                }
             }
         }
 
+        //格式化返回数据
+        $returnData = [];
+        foreach ($randomFillTheBlanks as $fillTheBlanks) {
+            if (!isset($returnData["fillTheBlanks"])) {
+                $returnData["fillTheBlanks"]["type"] = QuestionTypeEnum::FILL_THE_BLANKS;
+            }
+            $returnData["fillTheBlanks"]["list"][] = [
+                "uuid" => $fillTheBlanks["uuid"],
+                "question" => $fillTheBlanks["question"],
+                "user_answer" => "",
+            ];
+        }
+        foreach ($randomSingleChoice as $singleChoice) {
+            if (!isset($returnData["singleChoice"])) {
+                $returnData["singleChoice"]["type"] = QuestionTypeEnum::SINGLE_CHOICE;
+            }
+            $returnData["singleChoice"]["list"][] = [
+                "uuid" => $singleChoice["uuid"],
+                "question" => $singleChoice["question"],
+                "possible_answers" => json_decode($singleChoice["possible_answers"], true),
+                "user_answer" => "",
+            ];
+        }
+        foreach ($randomTrueFalseQuestion as $trueFalseQuestion) {
+            if (!isset($returnData["trueFalseQuestion"])) {
+                $returnData["trueFalseQuestion"]["type"] = QuestionTypeEnum::TRUE_FALSE_QUESTION;
+            }
+            $returnData["trueFalseQuestion"]["list"][] = [
+                "uuid" => $trueFalseQuestion["uuid"],
+                "question" => $trueFalseQuestion["question"],
+                "user_answer" => null,
+            ];
+        }
+        $returnData["writing"] = [
+            "type" => QuestionTypeEnum::WRITING,
+            "list" => [
+                [
+                    "uuid" => $randomWriting["uuid"],
+                    "topic"=> $randomWriting["topic"],
+                    "requirements" => json_decode($randomWriting["requirements"], true),
+                    "user_answer" => ["text"=>"","images"=>[]],
+                ]
+            ],
+        ];
 
+        return $returnData;
+    }
+
+    private function questionOrderByUuid($uuids, $questions)
+    {
+        $questions = array_column($questions, null, "uuid");
+        $returnData = [];
+        foreach ($uuids as $uuid) {
+            $returnData[] = $questions[$uuid];
+        }
+        return $returnData;
     }
 }

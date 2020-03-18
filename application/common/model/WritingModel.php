@@ -32,6 +32,14 @@ class WritingModel extends Base
             ->find();
     }
 
+    public function getRandom($difficultyLevel)
+    {
+        return $this->where("difficulty_level", $difficultyLevel)
+            ->where("is_use", QuestionIsUseEnum::YES)
+            ->where("is_delete", DbIsDeleteEnum::NO)
+            ->find();
+    }
+
     public function getByUuid($uuid)
     {
         return $this->where("uuid", $uuid)

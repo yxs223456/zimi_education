@@ -86,6 +86,9 @@ Route::rule('study/submitTrueFalseQuestion', 'api/study/submitTrueFalseQuestion'
 Route::rule('study/submitWriting', 'api/study/submitWriting', 'post');
 
 
+//综合练习模块，获取练习题
+Route::rule('athletics/getSynthesize', 'api/athletics/getSynthesize', 'post');
+
 return [
 
 ];
