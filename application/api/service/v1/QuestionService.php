@@ -475,7 +475,7 @@ class QuestionService extends Base
             ],
         ];
 
-        return $returnData;
+        return array_values($returnData);
     }
 
     private function questionOrderByUuid($uuids, $questions)
