@@ -82,10 +82,8 @@ class QuestionService extends Base
         //格式化返回数据
         $returnData = [];
         foreach ($questions as $item) {
-            if (!isset($returnData[$item["difficulty_level"]])) {
-                $returnData[$item["difficulty_level"]]["difficulty_level"] = $item["difficulty_level"];
-            }
-            $returnData[$item["difficulty_level"]]["list"][] = [
+            $returnData[] = [
+                "difficulty_level" => $item["difficulty_level"],
                 "uuid" => $item["uuid"],
                 "question" => $item["question"],
                 "possible_answers" => json_decode($item["possible_answers"], true),
@@ -93,7 +91,7 @@ class QuestionService extends Base
             ];
         }
 
-        return array_values($returnData);
+        return $returnData;
     }
 
     public function submitNoviceResult($userInfo, $noviceLevel)
