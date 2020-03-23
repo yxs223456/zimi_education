@@ -667,6 +667,7 @@ class UserService extends Base
             "city" => $userInfo["city"],
             "bind_wechat" => empty($userInfo["mobile_openid"]) ? UserIsBindWeChatEnum::NO : UserIsBindWeChatEnum::YES,
             "novice_test_is_show" => $userInfo["novice_test_is_show"],
+            "novice_is_test" => $userInfo["novice_test_time"]==0?0:1,
             "novice_level" => $userInfo["novice_level"],
         ];
     }
