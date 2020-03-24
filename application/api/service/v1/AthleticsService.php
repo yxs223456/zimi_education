@@ -36,22 +36,22 @@ class AthleticsService extends Base
             case PkTypeEnum::NOVICE:
                 $payCoin = Constant::PK_NOVICE_INIT_COIN;
                 $questions = $this->getNovicePkQuestions($redis);
-                $pkName = $name . "挑战新秀杯";
+                $pkName = $name . "新秀杯";
                 break;
             case PkTypeEnum::SIMPLE:
                 $payCoin = Constant::PK_SIMPLE_INIT_COIN;
                 $questions = $this->getSimplePkQuestions($redis);
-                $pkName = $name . "挑战入门杯";
+                $pkName = $name . "入门杯";
                 break;
             case PkTypeEnum::DIFFICULTY:
                 $payCoin = Constant::PK_DIFFICULTY_INIT_COIN;
                 $questions = $this->getDifficultyPkQuestions($redis);
-                $pkName = $name . "挑战实力杯";
+                $pkName = $name . "实力杯";
                 break;
             case PkTypeEnum::GOD:
                 $payCoin = Constant::PK_GOD_INIT_COIN;
                 $questions = $this->getGodPkQuestions($redis);
-                $pkName = $name . "挑战大师杯";
+                $pkName = $name . "大师杯";
                 break;
             default:
                 throw AppException::factory(AppException::COM_PARAMS_ERR);
@@ -123,7 +123,9 @@ class AthleticsService extends Base
             throw $e;
         }
 
-        return $pkData;
+        return [
+            "uuid" => $pkData["uuid"],
+        ];
     }
 
     private function getNovicePkQuestions($redis)
