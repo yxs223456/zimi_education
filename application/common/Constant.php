@@ -90,4 +90,27 @@ class Constant
 
     //综合测试模块判断题数目
     const SYNTHESIZE_TRUE_FALSE_QUESTION_COUNT = 15;
+
+    //pk合法参加人数
+    const PK_VALID_PEOPLE_NUM_MIN = 3;
+    const PK_VALID_PEOPLE_NUM_MAX = 10;
+
+    //pk有效截止时间
+    const PK_VALID_DURATION_HOURS_MIN = 24;
+    const PK_VALID_DURATION_HOURS_MAX = 72;
+
+    //发起不同类型挑战消耗书币数
+    const PK_NOVICE_INIT_COIN = 20;
+    const PK_SIMPLE_INIT_COIN = 40;
+    const PK_DIFFICULTY_INIT_COIN = 60;
+    const PK_GOD_INIT_COIN = 100;
+
+    //参与不同类型挑战消耗书笔数
+    const PK_NOVICE_JOIN_COIN = 10;
+    const PK_SIMPLE_JOIN_COIN = 20;
+    const PK_DIFFICULTY_JOIN_COIN = 30;
+    const PK_GOD_JOIN_COIN = 50;
+
+    //pk赛题目数量
+    const PK_QUESTION_COUNT = 30;
 }

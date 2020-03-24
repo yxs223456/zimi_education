@@ -508,7 +508,7 @@ class QuestionService extends Base
         return new \stdClass();
     }
 
-    private function questionOrderByUuid($uuids, $questions)
+    public function questionOrderByUuid($uuids, $questions)
     {
         $questions = array_column($questions, null, "uuid");
         $returnData = [];

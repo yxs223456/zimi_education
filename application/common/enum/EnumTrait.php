@@ -48,4 +48,10 @@ trait EnumTrait
 
         return $desc;
     }
+
+    static public function getAllValues()
+    {
+        $list = self::getAllList();
+        return array_column($list, "value");
+    }
 }

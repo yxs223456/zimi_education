@@ -635,6 +635,7 @@ class UserService extends Base
 
     private function updateUserToken(Model $user, \Redis $redis = null)
     {
+        $oldToken = $user->token;
         //更新用户token
         $user->token = getRandomString(32);
         $user->update_time = time();
@@ -645,7 +646,7 @@ class UserService extends Base
             $redis = Redis::factory();
         }
         $userInfo = $user->toArray();
-        cacheUserInfoByToken($userInfo, $redis);
+        cacheUserInfoByToken($userInfo, $redis, $oldToken);
 
         return $userInfo;
     }
