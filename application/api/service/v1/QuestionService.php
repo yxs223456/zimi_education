@@ -441,7 +441,7 @@ class QuestionService extends Base
             $returnData["exercises"]["fillTheBlanks"]["list"][] = [
                 "uuid" => $fillTheBlanks["uuid"],
                 "question" => $fillTheBlanks["question"],
-                "user_answer" => isset($fillTheBlanksAnswers[$fillTheBlanks["uuid"]])?$fillTheBlanksAnswers[$fillTheBlanks["uuid"]]:"",
+                "answer" => isset($fillTheBlanksAnswers[$fillTheBlanks["uuid"]])?$fillTheBlanksAnswers[$fillTheBlanks["uuid"]]:"",
             ];
         }
         foreach ($randomSingleChoice as $singleChoice) {
@@ -452,7 +452,7 @@ class QuestionService extends Base
                 "uuid" => $singleChoice["uuid"],
                 "question" => $singleChoice["question"],
                 "possible_answers" => json_decode($singleChoice["possible_answers"], true),
-                "user_answer" => isset($singleChoiceAnswers[$singleChoice["uuid"]])?$singleChoiceAnswers[$singleChoice["uuid"]]:"",
+                "answer" => isset($singleChoiceAnswers[$singleChoice["uuid"]])?$singleChoiceAnswers[$singleChoice["uuid"]]:"",
             ];
         }
         foreach ($randomTrueFalseQuestion as $trueFalseQuestion) {
@@ -462,7 +462,7 @@ class QuestionService extends Base
             $returnData["exercises"]["trueFalseQuestion"]["list"][] = [
                 "uuid" => $trueFalseQuestion["uuid"],
                 "question" => $trueFalseQuestion["question"],
-                "user_answer" => isset($trueFalseQuestionAnswers[$trueFalseQuestion["uuid"]])?$trueFalseQuestionAnswers[$trueFalseQuestion["uuid"]]:null,
+                "answer" => isset($trueFalseQuestionAnswers[$trueFalseQuestion["uuid"]])?$trueFalseQuestionAnswers[$trueFalseQuestion["uuid"]]:null,
             ];
         }
         $returnData["exercises"]["writing"] = [
@@ -472,7 +472,7 @@ class QuestionService extends Base
                     "uuid" => $randomWriting["uuid"],
                     "topic"=> $randomWriting["topic"],
                     "requirements" => json_decode($randomWriting["requirements"], true),
-                    "user_answer" => isset($writingAnswers[$randomWriting["uuid"]])?$writingAnswers[$randomWriting["uuid"]]:["text"=>"","images"=>[]],
+                    "answer" => isset($writingAnswers[$randomWriting["uuid"]])?$writingAnswers[$randomWriting["uuid"]]:["text"=>"","images"=>[]],
                 ]
             ],
         ];

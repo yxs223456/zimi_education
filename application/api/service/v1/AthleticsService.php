@@ -18,6 +18,8 @@ use app\common\enum\QuestionDifficultyLevelEnum;
 use app\common\enum\QuestionTypeEnum;
 use app\common\enum\UserCoinReduceTypeEnum;
 use app\common\helper\Redis;
+use app\common\model\PkJoinModel;
+use app\common\model\PkModel;
 use app\common\model\SingleChoiceModel;
 use app\common\model\UserCoinLogModel;
 use think\Db;
@@ -30,26 +32,31 @@ class AthleticsService extends Base
         $userCoinLogModel = new UserCoinLogModel();
 
         //发起pk需要消耗书币计算  判断用户书币数量是否足够
+        //参与pk需要消耗书币计算
         //生成题目
         //pk命名
         switch ($pkType) {
             case PkTypeEnum::NOVICE:
-                $payCoin = Constant::PK_NOVICE_INIT_COIN;
+                $initPayCoin = Constant::PK_NOVICE_INIT_COIN;
+                $joinPayCoin = Constant::PK_NOVICE_JOIN_COIN;
                 $questions = $this->getNovicePkQuestions($redis);
                 $pkName = $name . "新秀杯";
                 break;
             case PkTypeEnum::SIMPLE:
-                $payCoin = Constant::PK_SIMPLE_INIT_COIN;
+                $initPayCoin = Constant::PK_SIMPLE_INIT_COIN;
+                $joinPayCoin = Constant::PK_SIMPLE_JOIN_COIN;
                 $questions = $this->getSimplePkQuestions($redis);
                 $pkName = $name . "入门杯";
                 break;
             case PkTypeEnum::DIFFICULTY:
-                $payCoin = Constant::PK_DIFFICULTY_INIT_COIN;
+                $initPayCoin = Constant::PK_DIFFICULTY_INIT_COIN;
+                $joinPayCoin = Constant::PK_DIFFICULTY_JOIN_COIN;
                 $questions = $this->getDifficultyPkQuestions($redis);
                 $pkName = $name . "实力杯";
                 break;
             case PkTypeEnum::GOD:
-                $payCoin = Constant::PK_GOD_INIT_COIN;
+                $initPayCoin = Constant::PK_GOD_INIT_COIN;
+                $joinPayCoin = Constant::PK_GOD_JOIN_COIN;
                 $questions = $this->getGodPkQuestions($redis);
                 $pkName = $name . "大师杯";
                 break;
@@ -59,6 +66,7 @@ class AthleticsService extends Base
 
         Db::startTrans();
         try {
+            //判断用户书币
             $userSql = "select * from user_base where uuid = '$userUuid' for update";
             $userQuery = Db::query($userSql);
             if (!isset($userQuery[0])) {
@@ -66,7 +74,7 @@ class AthleticsService extends Base
             } else {
                 $user = $userQuery[0];
             }
-            if ($user["coin"] < $payCoin) {
+            if ($user["coin"] < $initPayCoin) {
                 throw AppException::factory(AppException::USER_COIN_NOT_ENOUGH);
             }
 
@@ -82,6 +90,8 @@ class AthleticsService extends Base
                 "current_num" => 1,
                 "need_num" => $totalNum - 1,
                 "duration_hour" => $durationHour,
+                "join_coin" => $joinPayCoin,
+                "total_coin" => $initPayCoin,
                 "create_time" => time(),
                 "update_time" => time(),
             ];
@@ -100,22 +110,22 @@ class AthleticsService extends Base
 
             //减少用户书币
             Db::name("user_base")->where("uuid", $userUuid)
-                ->dec("coin", $payCoin)->update(["update_time"=>time()]);
+                ->dec("coin", $initPayCoin)->update(["update_time"=>time()]);
 
             //纪录书币流水
             $userCoinLogModel->recordReduceLog(
                 $userUuid,
                 UserCoinReduceTypeEnum::INIT_PK,
-                $payCoin,
+                $initPayCoin,
                 $user["coin"],
-                $user["coin"] - $payCoin,
+                $user["coin"] - $initPayCoin,
                 UserCoinReduceTypeEnum::INIT_PK_DSC,
                 $pkData["uuid"]);
 
             Db::commit();
 
             //缓存用户信息
-            $user["coin"] -= $payCoin;
+            $user["coin"] -= $initPayCoin;
             cacheUserInfoByToken($user, $redis);
 
         } catch (\Throwable $e) {
@@ -126,6 +136,180 @@ class AthleticsService extends Base
         return [
             "uuid" => $pkData["uuid"],
         ];
+    }
+
+    public function joinPk($userUuid, $pkUuid)
+    {
+        $redis = Redis::factory();
+        $userCoinLogModel = new UserCoinLogModel();
+        $pkJoinModel = new PkJoinModel();
+
+        //用户是否已参与pk
+        if ($pkJoinModel->findByUserAndPk($userUuid, $pkUuid)) {
+            throw AppException::factory(AppException::PK_JOIN_ALREADY);
+        }
+
+        Db::startTrans();
+        try {
+            $pkSql = "select * from pk where uuid = '$pkUuid' for update";
+            $pkQuery = Db::query($pkSql);
+            if (!isset($pkQuery[0])) {
+                throw AppException::factory(AppException::PK_NOT_EXISTS);
+            } else {
+                $pk = $pkQuery[0];
+            }
+            if ($pk["need_num"] == 0) {
+                //人数已满
+                throw AppException::factory(AppException::PK_PEOPLE_ENOUGH);
+            } else if ($pk["status"] != PkStatusEnum::WAIT_JOIN || $pk["audit_time"] + Constant::PK_WAIT_JOIN_TIME < time()) {
+                //pk不是待加入状态，或已超时
+                throw AppException::factory(AppException::PK_STATUS_NOT_WAIT_JOIN);
+            }
+
+            //判断用户书币
+            $userSql = "select * from user_base where uuid = '$userUuid' for update";
+            $userQuery = Db::query($userSql);
+            if (!isset($userQuery[0])) {
+                throw AppException::factory(AppException::USER_NOT_EXISTS);
+            } else {
+                $user = $userQuery[0];
+            }
+            if ($user["coin"] < $pk["join_coin"]) {
+                throw AppException::factory(AppException::USER_COIN_NOT_ENOUGH);
+            }
+
+            //减少用户书币
+            Db::name("user_base")->where("uuid", $userUuid)
+                ->dec("coin", $pk["join_coin"])->update(["update_time"=>time()]);
+
+            //纪录书币流水
+            $userCoinLogModel->recordReduceLog(
+                $userUuid,
+                UserCoinReduceTypeEnum::JOIN_PK,
+                $pk["join_coin"],
+                $user["coin"],
+                $user["coin"] - $pk["join_coin"],
+                UserCoinReduceTypeEnum::JOIN_PK_DESC,
+                $pkUuid);
+
+            //修改pk状态
+            $pkExec = Db::name("pk")->where("uuid", $pkUuid)
+                ->inc("current_num", 1)
+                ->inc("total_coin", $pk["join_coin"])
+                ->dec("need_num", 1);
+            if ($pk["need_num"] == 1) {
+                //人数已满，pk赛开始
+                $pkUpdateData = [
+                    "status" => PkStatusEnum::UNDERWAY,
+                    "begin_time" => time(),
+                    "deadline" => time() + ($pk["duration_hour"] * 3600),
+                    "update_time" => time(),
+                ];
+            } else {
+                //任务依然不足，等待其他用户加入
+                $pkUpdateData = [
+                    "update_time" => time(),
+                ];
+            }
+            $pkExec->update($pkUpdateData);
+
+            //参与pk
+            $joinPk = [
+                "uuid" => getRandomString(),
+                "pk_uuid" => $pkUuid,
+                "user_uuid" => $userUuid,
+                "is_initiator" => PkIsInitiatorEnum::NO,
+                "create_time" => time(),
+                "update_time" => time(),
+            ];
+            Db::name("pk_join")->insert($joinPk);
+
+            Db::commit();
+
+            //修改用户缓存
+            $user["coin"] -= $pk["join_coin"];
+            cacheUserInfoByToken($user, $redis);
+
+        } catch (\Throwable $e) {
+            Db::rollback();
+            throw $e;
+        }
+
+        return new \stdClass();
+    }
+
+    public function pkList($user, $pkType, $pageNum, $pageSize)
+    {
+        $pkModel = new PkModel();
+
+        $pkList = $pkModel->getListByType($pkType, $pageNum, $pageSize)->toArray();
+
+        $returnData["list"] = [];
+        if ($pkList) {
+            $pkUuids = array_column($pkList, "uuid");
+            $pkJoinModel = new PkJoinModel();
+            $pkListUserInfo = $pkJoinModel->getListUserInfoByPkUuids($pkUuids);
+            $pkUserInfo = [];
+            $pkUserUuids = [];
+            foreach ($pkListUserInfo as $item) {
+                $pkUserInfo[$item["pk_uuid"]][] = [
+                    "nickname" => $item["nickname"],
+                    "head_image_url" => $item["head_image_url"]?config("web.self_domain")."/".$item["head_image_url"]:"",
+                ];
+                $pkUserUuids[$item["pk_uuid"]][] = $item["uuid"];
+            }
+
+            foreach ($pkList as $item) {
+                $returnData["list"][] = [
+                    "uuid" => $item["uuid"],
+                    "name" => $item["name"],
+                    "initiator_nickname" => $pkUserInfo[$item["uuid"]][0]["nickname"],
+                    "join_users" => $pkUserInfo[$item["uuid"]],
+                    "type" => $item["type"],
+                    "status" => $item["status"],
+                    "is_join" => (int) in_array($user["uuid"], $pkUserUuids[$item["uuid"]])
+                ];
+            }
+        }
+
+        return $returnData;
+    }
+
+    public function pkInfo($user, $pkUuid)
+    {
+        //获取pk
+        $pkModel = new PkModel();
+        $pk = $pkModel->findByUuid($pkUuid);
+        if ($pk == null) {
+            throw AppException::factory(AppException::PK_NOT_EXISTS);
+        }
+
+        //获取pk参与信息
+        $pkJoinModel = new PkJoinModel();
+        $pkJoinInfo = $pkJoinModel->getListUserInfoByPkUuid($pkUuid);
+
+        $returnData = [
+            "uuid" => $pk["uuid"],
+            "name" => $pk["name"],
+            "initiator_nickname" => $pkJoinInfo[0]["nickname"],
+            "begin_time" => date("Y-m-d H:i", $pk["begin_time"]),
+            "deadline" => date("Y-m-d H:i", $pk["deadline"]),
+            "status" => $pk["status"],
+            "type" => $pk["type"],
+            "is_initiator" => 0,
+            "is_join" => 0,
+            "is_submit_answer" => 0,
+            "audit_fail_reason" => $pk["audit_fail_reason"],
+            "champion_nickname" => "",
+            "my_performance" => "",
+        ];
+
+        foreach ($pkJoinInfo as $item) {
+            $returnData["users"][] = [
+                "nickname" => $item["nickname"]
+            ];
+        }
+
     }
 
     private function getNovicePkQuestions($redis)

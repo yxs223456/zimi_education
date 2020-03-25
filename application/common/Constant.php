@@ -89,7 +89,7 @@ class Constant
     const SYNTHESIZE_SINGLE_CHOICE_COUNT = 15;
 
     //综合测试模块判断题数目
-    const SYNTHESIZE_TRUE_FALSE_QUESTION_COUNT = 15;
+    const SYNTHESIZE_TRUE_FALSE_QUESTION_COUNT = 5;
 
     //pk合法参加人数
     const PK_VALID_PEOPLE_NUM_MIN = 3;
@@ -113,4 +113,10 @@ class Constant
 
     //pk赛题目数量
     const PK_QUESTION_COUNT = 30;
+
+    //pk审核等待最长时间72小时，审核超时自动流局
+    const PK_AUDIT_WAIT_TIME = 72 * 3600;
+
+    //pk等待加入最长时间72小时， 超过72小时人数不足自动流局
+    const PK_WAIT_JOIN_TIME = 72 * 3600;
 }

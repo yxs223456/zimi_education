@@ -111,4 +111,60 @@ class Athletics extends Base
 
         return $this->jsonResponse($returnData);
     }
+
+    public function joinPk()
+    {
+        $pkUuid = input("uuid");
+        if (empty($pkUuid)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $athleticsService = new AthleticsService();
+        $returnData = $athleticsService->joinPk($user["uuid"], $pkUuid);
+
+        return $this->jsonResponse($returnData);
+    }
+
+    public function pkList()
+    {
+        $pkType = input("type");
+        if ($pkType === null || !in_array($pkType, PkTypeEnum::getAllValues())) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+        $pageNum = input("pageNum");
+        $pageSize = input("pageSize");
+
+        $user = $this->query["user"];
+        $athleticsService = new AthleticsService();
+        $returnData = $athleticsService->pkList($user, $pkType, $pageNum, $pageSize);
+
+        return $this->jsonResponse($returnData);
+    }
+
+    public function pkInfo()
+    {
+        $pkUuid = input("uuid");
+        if (empty($pkUuid)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $athleticsService = new AthleticsService();
+        $returnData = $athleticsService->pkInfo($user, $pkUuid);
+        return $this->jsonResponse($returnData);
+    }
+
+    public function submitPkAnswer()
+    {
+        $pkUuid = input("uuid");
+        if (empty($pkUuid)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $athleticsService = new AthleticsService();
+        $returnData = $athleticsService->joinPk($user["uuid"], $pkUuid);
+        return $this->jsonResponse($returnData);
+    }
 }

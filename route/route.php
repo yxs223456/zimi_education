@@ -92,8 +92,14 @@ Route::rule('athletics/getSynthesize', 'api/athletics/getSynthesize', 'post');
 Route::rule('athletics/submitSynthesizeDraft', 'api/athletics/submitSynthesizeDraft', 'post');
 //综合练习模块，获取练习题答案
 Route::rule('athletics/submitSynthesize', 'api/athletics/submitSynthesize', 'post');
+
+
 //发起pk
 Route::rule('athletics/initPk', 'api/athletics/initPk', 'post');
+//参与pk
+Route::rule('athletics/joinPk', 'api/athletics/joinPk', 'post');
+//pk列表
+Route::rule('athletics/pkList', 'api/athletics/pkList', 'post');
 
 return [
 

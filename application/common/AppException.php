@@ -39,6 +39,11 @@ class AppException extends \Exception
 
     const QUESTION_WRITING_NOT_EXISTS = [3000, "作文题目不存在"];
 
+    const PK_STATUS_NOT_WAIT_JOIN = [4000, "无法加入当前pk"];
+    const PK_NOT_EXISTS = [4001, "pk不存在"];
+    const PK_JOIN_ALREADY = [4002, "你已经加入了当前PK请不要重复申请"];
+    const PK_PEOPLE_ENOUGH = [4003, "PK人数已满请申请其他PK吧"];
+
     public static function factory($errConst)
     {
         $e = new self($errConst[1], $errConst[0]);

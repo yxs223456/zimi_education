@@ -15,7 +15,7 @@ class User extends Base
 {
     protected $beforeActionList = [
         'checkAuth' => [
-            'except' => 'getCodeForSignUp,signUp,getCodeForSignIn,signInByCode,signInByPassword,
+            'except' => 'test,getCodeForSignUp,signUp,getCodeForSignIn,signInByCode,signInByPassword,
             getCodeForResetPassword,resetPassword,weChatSignIn',
         ],
     ];
