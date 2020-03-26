@@ -10,6 +10,7 @@ namespace app\api\controller;
 
 use app\api\service\v1\QuestionService;
 use app\common\AppException;
+use app\common\enum\QuestionDifficultyLevelEnum;
 
 class Study extends Base
 {
@@ -22,7 +23,7 @@ class Study extends Base
     public function getFillTheBlanks()
     {
         $difficultyLevel = input("difficulty_level");
-        if ($difficultyLevel === null || !in_array($difficultyLevel, [1,2,3,4,5,6])) {
+        if ($difficultyLevel === null || !in_array($difficultyLevel, QuestionDifficultyLevelEnum::getAllValues())) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
         $user = $this->query["user"];
@@ -34,7 +35,7 @@ class Study extends Base
     public function getSingleChoice()
     {
         $difficultyLevel = input("difficulty_level");
-        if ($difficultyLevel === null || !in_array($difficultyLevel, [1,2,3,4,5,6])) {
+        if ($difficultyLevel === null || !in_array($difficultyLevel, QuestionDifficultyLevelEnum::getAllValues())) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
         $user = $this->query["user"];
@@ -46,7 +47,7 @@ class Study extends Base
     public function getTrueFalseQuestion()
     {
         $difficultyLevel = input("difficulty_level");
-        if ($difficultyLevel === null || !in_array($difficultyLevel, [1,2,3,4,5,6])) {
+        if ($difficultyLevel === null || !in_array($difficultyLevel, QuestionDifficultyLevelEnum::getAllValues())) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
         $user = $this->query["user"];
@@ -58,7 +59,7 @@ class Study extends Base
     public function getWriting()
     {
         $difficultyLevel = input("difficulty_level");
-        if ($difficultyLevel === null || !in_array($difficultyLevel, [1,2,3,4,5,6])) {
+        if ($difficultyLevel === null || !in_array($difficultyLevel, QuestionDifficultyLevelEnum::getAllValues())) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
         $user = $this->query["user"];
@@ -71,7 +72,7 @@ class Study extends Base
     {
         $param = $this->request->getContent();
         $param = json_decode($param, true);
-        if (empty($param["difficulty_level"]) || !in_array($param["difficulty_level"], [1,2,3,4,5,6])) {
+        if (empty($param["difficulty_level"]) || !in_array($param["difficulty_level"], QuestionDifficultyLevelEnum::getAllValues())) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
@@ -86,7 +87,7 @@ class Study extends Base
     {
         $param = $this->request->getContent();
         $param = json_decode($param, true);
-        if (empty($param["difficulty_level"]) || !in_array($param["difficulty_level"], [1,2,3,4,5,6])) {
+        if (empty($param["difficulty_level"]) || !in_array($param["difficulty_level"], QuestionDifficultyLevelEnum::getAllValues())) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
@@ -101,7 +102,7 @@ class Study extends Base
     {
         $param = $this->request->getContent();
         $param = json_decode($param, true);
-        if (empty($param["difficulty_level"]) || !in_array($param["difficulty_level"], [1,2,3,4,5,6])) {
+        if (empty($param["difficulty_level"]) || !in_array($param["difficulty_level"], QuestionDifficultyLevelEnum::getAllValues())) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
@@ -117,7 +118,7 @@ class Study extends Base
         $param = $this->request->getContent();
         $param = json_decode($param, true);
 
-        if (empty($param["difficulty_level"]) || !in_array($param["difficulty_level"], [1,2,3,4,5,6])) {
+        if (empty($param["difficulty_level"]) || !in_array($param["difficulty_level"], QuestionDifficultyLevelEnum::getAllValues())) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
         if (empty($param["uuid"]) || empty($param["content"])) {

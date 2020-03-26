@@ -13,7 +13,7 @@ use app\api\service\v1\QuestionService;
 use app\common\AppException;
 use app\common\Constant;
 use app\common\enum\PkTypeEnum;
-use app\common\enum\QuestionTypeEnum;
+use app\common\enum\QuestionDifficultyLevelEnum;
 
 class Athletics extends Base
 {
@@ -26,7 +26,7 @@ class Athletics extends Base
     public function getSynthesize()
     {
         $difficultyLevel = input("difficulty_level");
-        if ($difficultyLevel === null || !in_array($difficultyLevel, QuestionTypeEnum::getAllValues())) {
+        if ($difficultyLevel === null || !in_array($difficultyLevel, QuestionDifficultyLevelEnum::getAllValues())) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
         $user = $this->query["user"];

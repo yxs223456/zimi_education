@@ -321,8 +321,8 @@ class QuestionService extends Base
     //测试依次秩序选择题-填空题-判断题-作文题。测试不限时间，当前测试没有完成不会下发新的测试题，下次进入从上次答题开始。
     public function getSynthesize($user, $difficultyLevel)
     {
-        $fillTheBlanksModel = new FillTheBlanksModel();
         $singleChoiceModel = new SingleChoiceModel();
+        $fillTheBlanksModel = new FillTheBlanksModel();
         $trueFalseQuestionModel = new TrueFalseQuestionModel();
         $writingModel = new WritingModel();
         $userSynthesizeModel = new UserSynthesizeModel();
@@ -333,6 +333,17 @@ class QuestionService extends Base
         //没有未答完的综合测试题，生成一套新的题
         if ($synthesizeData == null) {
             $redis = Redis::factory();
+            //单选题
+            $randomSingleChoiceUuid = getRandomSingleChoice($difficultyLevel, Constant::SYNTHESIZE_SINGLE_CHOICE_COUNT, $redis);
+            if (count($randomSingleChoiceUuid) < Constant::SYNTHESIZE_SINGLE_CHOICE_COUNT) {
+                $randomSingleChoice = $singleChoiceModel->getRandom($difficultyLevel, Constant::SYNTHESIZE_SINGLE_CHOICE_COUNT)->toArray();
+                $randomSingleChoiceUuid = array_column($randomSingleChoice, "uuid");
+                pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, $difficultyLevel, $redis);
+            } else {
+                $randomSingleChoice = $singleChoiceModel->getByUuids($randomSingleChoiceUuid)->toArray();
+                $randomSingleChoice = $this->questionOrderByUuid($randomSingleChoiceUuid, $randomSingleChoice);
+            }
+
             //填空题
             $randomFillTheBlanksUuid = getRandomFillTheBlanks($difficultyLevel, Constant::SYNTHESIZE_FILL_THE_BLANKS_COUNT, $redis);
             if (count($randomFillTheBlanksUuid) < Constant::SYNTHESIZE_FILL_THE_BLANKS_COUNT) {
@@ -343,17 +354,6 @@ class QuestionService extends Base
                 $randomFillTheBlanks = $fillTheBlanksModel->getByUuids($randomFillTheBlanksUuid)->toArray();
                 $randomFillTheBlanks = $this->questionOrderByUuid($randomFillTheBlanksUuid, $randomFillTheBlanks);
 
-            }
-
-            //单选题
-            $randomSingleChoiceUuid = getRandomSingleChoice($difficultyLevel, Constant::SYNTHESIZE_SINGLE_CHOICE_COUNT, $redis);
-            if (count($randomSingleChoiceUuid) < Constant::SYNTHESIZE_SINGLE_CHOICE_COUNT) {
-                $randomSingleChoice = $singleChoiceModel->getRandom($difficultyLevel, Constant::SYNTHESIZE_SINGLE_CHOICE_COUNT)->toArray();
-                $randomSingleChoiceUuid = array_column($randomSingleChoice, "uuid");
-                pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, $difficultyLevel, $redis);
-            } else {
-                $randomSingleChoice = $singleChoiceModel->getByUuids($randomSingleChoiceUuid)->toArray();
-                $randomSingleChoice = $this->questionOrderByUuid($randomSingleChoiceUuid, $randomSingleChoice);
             }
 
             //判断题
@@ -381,8 +381,8 @@ class QuestionService extends Base
                 "user_uuid" => $user["uuid"],
                 "difficulty_level" => $difficultyLevel,
                 "questions" => json_encode([
-                    ["type" => QuestionTypeEnum::FILL_THE_BLANKS,"uuids" => $randomFillTheBlanksUuid,],
                     ["type" => QuestionTypeEnum::SINGLE_CHOICE,"uuids" => $randomSingleChoiceUuid,],
+                    ["type" => QuestionTypeEnum::FILL_THE_BLANKS,"uuids" => $randomFillTheBlanksUuid,],
                     ["type" => QuestionTypeEnum::TRUE_FALSE_QUESTION,"uuids" => $randomTrueFalseQuestionUuid,],
                     ["type" => QuestionTypeEnum::WRITING,"uuids" => $randomWritingUuid,],
                 ]),
@@ -395,11 +395,11 @@ class QuestionService extends Base
             $questions = json_decode($synthesizeData["questions"], true);
             foreach ($questions as $item) {
                 switch($item["type"]) {
-                    case QuestionTypeEnum::FILL_THE_BLANKS:
-                        $randomFillTheBlanks = $fillTheBlanksModel->getByUuids($item["uuids"]);
-                        break;
                     case QuestionTypeEnum::SINGLE_CHOICE:
                         $randomSingleChoice = $singleChoiceModel->getByUuids($item["uuids"]);
+                        break;
+                    case QuestionTypeEnum::FILL_THE_BLANKS:
+                        $randomFillTheBlanks = $fillTheBlanksModel->getByUuids($item["uuids"]);
                         break;
                     case QuestionTypeEnum::TRUE_FALSE_QUESTION:
                         $randomTrueFalseQuestion = $trueFalseQuestionModel->getByUuids($item["uuids"]);
@@ -417,11 +417,11 @@ class QuestionService extends Base
             $answers = json_decode($synthesizeData["answers"], true);
             foreach ($answers as $item) {
                 switch ($item["type"]) {
-                    case QuestionTypeEnum::FILL_THE_BLANKS:
-                        $fillTheBlanksAnswers = array_column($item["list"], "answer", "uuid");
-                        break;
                     case QuestionTypeEnum::SINGLE_CHOICE:
                         $singleChoiceAnswers = array_column($item["list"], "answer", "uuid");
+                        break;
+                    case QuestionTypeEnum::FILL_THE_BLANKS:
+                        $fillTheBlanksAnswers = array_column($item["list"], "answer", "uuid");
                         break;
                     case QuestionTypeEnum::TRUE_FALSE_QUESTION:
                         $trueFalseQuestionAnswers = array_column($item["list"], "answer", "uuid");
@@ -434,16 +434,6 @@ class QuestionService extends Base
         }
         $returnData["uuid"] = $synthesizeUuid;
         $returnData["exercises"] = [];
-        foreach ($randomFillTheBlanks as $fillTheBlanks) {
-            if (!isset($returnData["exercises"]["fillTheBlanks"])) {
-                $returnData["exercises"]["fillTheBlanks"]["type"] = QuestionTypeEnum::FILL_THE_BLANKS;
-            }
-            $returnData["exercises"]["fillTheBlanks"]["list"][] = [
-                "uuid" => $fillTheBlanks["uuid"],
-                "question" => $fillTheBlanks["question"],
-                "answer" => isset($fillTheBlanksAnswers[$fillTheBlanks["uuid"]])?$fillTheBlanksAnswers[$fillTheBlanks["uuid"]]:"",
-            ];
-        }
         foreach ($randomSingleChoice as $singleChoice) {
             if (!isset($returnData["exercises"]["singleChoice"])) {
                 $returnData["exercises"]["singleChoice"]["type"] = QuestionTypeEnum::SINGLE_CHOICE;
@@ -453,6 +443,16 @@ class QuestionService extends Base
                 "question" => $singleChoice["question"],
                 "possible_answers" => json_decode($singleChoice["possible_answers"], true),
                 "answer" => isset($singleChoiceAnswers[$singleChoice["uuid"]])?$singleChoiceAnswers[$singleChoice["uuid"]]:"",
+            ];
+        }
+        foreach ($randomFillTheBlanks as $fillTheBlanks) {
+            if (!isset($returnData["exercises"]["fillTheBlanks"])) {
+                $returnData["exercises"]["fillTheBlanks"]["type"] = QuestionTypeEnum::FILL_THE_BLANKS;
+            }
+            $returnData["exercises"]["fillTheBlanks"]["list"][] = [
+                "uuid" => $fillTheBlanks["uuid"],
+                "question" => $fillTheBlanks["question"],
+                "answer" => isset($fillTheBlanksAnswers[$fillTheBlanks["uuid"]])?$fillTheBlanksAnswers[$fillTheBlanks["uuid"]]:"",
             ];
         }
         foreach ($randomTrueFalseQuestion as $trueFalseQuestion) {
