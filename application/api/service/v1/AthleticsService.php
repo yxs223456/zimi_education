@@ -372,7 +372,7 @@ class AthleticsService extends Base
         }
 
         //纪录用户答题情况
-        $pkJoin->answers = $pkAnswers;
+        $pkJoin->answers = json_encode($pkAnswers, JSON_UNESCAPED_UNICODE);
         $pkJoin->submit_answer_time = time();
         $pkJoin->answer_time = $answerTime;
         $pkJoin->score = $score;

@@ -157,10 +157,12 @@ class Athletics extends Base
 
     public function submitPkAnswer()
     {
-        $pkUuid = input("uuid");
-        $answers = input("answer");
-        $answerTime = input("answer_time");
-        if (empty($pkUuid) || !is_array(json_decode($answers, true)) || !checkInt($answerTime, false)) {
+        $param = $this->request->getContent();
+        $param = json_decode($param, true);
+        $pkUuid = $param["uuid"];
+        $answers = $param["answer"];
+        $answerTime = $param["answer_time"];
+        if (empty($pkUuid) || !is_array($answers) || !checkInt($answerTime, false)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
