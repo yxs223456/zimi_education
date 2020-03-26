@@ -168,7 +168,7 @@ class Athletics extends Base
 
         $user = $this->query["user"];
         $athleticsService = new AthleticsService();
-        $returnData = $athleticsService->submitPkAnswer($user["uuid"], $pkUuid, $answers, $answerTime);
+        $returnData = $athleticsService->submitPkAnswer($user, $pkUuid, $answers, $answerTime);
         return $this->jsonResponse($returnData);
     }
 }
