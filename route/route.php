@@ -100,6 +100,10 @@ Route::rule('athletics/initPk', 'api/athletics/initPk', 'post');
 Route::rule('athletics/joinPk', 'api/athletics/joinPk', 'post');
 //pk列表
 Route::rule('athletics/pkList', 'api/athletics/pkList', 'post');
+//pk详情信息
+Route::rule('athletics/pkInfo', 'api/athletics/pkInfo', 'post');
+//提交pk答案
+Route::rule('athletics/submitPkAnswer', 'api/athletics/submitPkAnswer', 'post');
 
 return [
 

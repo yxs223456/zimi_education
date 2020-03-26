@@ -656,7 +656,7 @@ class UserService extends Base
         return [
             "token" => $userInfo["token"],
             "nickname" => $userInfo["nickname"],
-            "head_image_url" => $this->getHeadImageUrl($userInfo["head_image_url"]),
+            "head_image_url" => getImageUrl($userInfo["head_image_url"]),
             "sex" => (int) $userInfo["sex"],
             "level" => (int) $userInfo["level"],
             "coin" => (int) $userInfo["coin"],
@@ -670,11 +670,6 @@ class UserService extends Base
             "novice_test_is_show" => (int) $userInfo["novice_test_is_show"],
             "novice_level" => (int) $userInfo["novice_level"],
         ];
-    }
-
-    public function getHeadImageUrl($headImageUrl)
-    {
-        return str_replace("static/api", config("web.self_domain") . "/static/api", $headImageUrl);
     }
 
     //验证密码是否符合要求。密码长度8~32位，需包含数字、字母、符号至少2种或以上元素

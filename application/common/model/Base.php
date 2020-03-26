@@ -12,6 +12,8 @@ use think\Model;
 
 class Base extends Model
 {
+    protected $autoWriteTimestamp = true;
+
     public function findById($id)
     {
         return $this->where(static::getPk(), $id)->find();

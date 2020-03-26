@@ -254,7 +254,7 @@ class AthleticsService extends Base
             foreach ($pkListUserInfo as $item) {
                 $pkUserInfo[$item["pk_uuid"]][] = [
                     "nickname" => $item["nickname"],
-                    "head_image_url" => $item["head_image_url"]?config("web.self_domain")."/".$item["head_image_url"]:"",
+                    "head_image_url" => getImageUrl($item["head_image_url"])
                 ];
                 $pkUserUuids[$item["pk_uuid"]][] = $item["uuid"];
             }
@@ -288,6 +288,7 @@ class AthleticsService extends Base
         $pkJoinModel = new PkJoinModel();
         $pkJoinInfo = $pkJoinModel->getListUserInfoByPkUuid($pkUuid);
 
+        //初始化返回信息
         $returnData = [
             "uuid" => $pk["uuid"],
             "name" => $pk["name"],
@@ -304,12 +305,90 @@ class AthleticsService extends Base
             "my_performance" => "",
         ];
 
-        foreach ($pkJoinInfo as $item) {
-            $returnData["users"][] = [
-                "nickname" => $item["nickname"]
+        $questions = json_decode($pk["questions"], true);
+        foreach ($questions as $question) {
+            $returnData["questions"][] = [
+                "uuid" => $question["uuid"],
+                "question" => $question["question"],
+                "possible_answers" => $question["possible_answers"],
             ];
         }
 
+        foreach ($pkJoinInfo as $item) {
+            $returnData["users"][] = [
+                "nickname" => $item["nickname"],
+                "head_image_url" => getImageUrl($item["head_image_url"]),
+            ];
+
+            if ($item["user_uuid"] == $user["uuid"]) {
+                $returnData["is_join"] = 1;
+                if ($item["is_initiator"] == PkIsInitiatorEnum::YES) {
+                    $returnData["is_initiator"] = 1;
+                }
+                if ($pk["status"] == PkStatusEnum::FINISH) {
+                    $returnData["my_performance"] = "亲爱的学员 ".$item["nickname"]." 你好 你的成绩为 第".$item["rank"]."名，
+                    请继续努力加油，快去PK榜看看你有没有上榜吧";
+                }
+            }
+            if ($item["rank"] == 1) {
+                $returnData["champion_nickname"] = $item["nickname"];
+            }
+        }
+
+        return $returnData;
+    }
+
+    public function submitPkAnswer($user, $pkUuid, $pkAnswers, $answerTime)
+    {
+        $pkModel = new PkModel();
+        $pkJoinModel = new PkJoinModel();
+
+        //只有pk处于进行中事，才可提交答案
+        $pk = $pkModel->findByUuid($pkUuid);
+        if ($pk == null) {
+            throw AppException::factory(AppException::PK_NOT_EXISTS);
+        }
+        if ($pk["status"] != PkStatusEnum::UNDERWAY || $pk["deadline"] < time()) {
+            throw AppException::factory(AppException::PK_STATUS_NOT_UNDERWAY);
+        }
+
+        //用户参与pk且还没有提交答案时才可提交答案
+        $pkJoin = $pkJoinModel->findByUserAndPk($user["uuid"], $pkUuid);
+        if ($pkJoin == null) {
+            throw AppException::factory(AppException::PK_NOT_JOIN);
+        }
+        if ($pkJoin["answers"] != "") {
+            throw AppException::factory(AppException::PK_SUBMIT_ANSWERS_ALREADY);
+        }
+
+        //计算分数，每题一分
+        $questionsArray = json_decode($pk["questions"], true);
+        $score = 0;
+        $pkAnswersArray = array_column($pkAnswers, "answer", "uuid");
+        foreach ($questionsArray as $item) {
+            if (isset($pkAnswersArray[$item["uuid"]]) && $pkAnswersArray[$item["uuid"]] == $item["answer"]) {
+                $score++;
+            }
+        }
+
+        //纪录用户答题情况
+        $pkJoin->answers = $pkAnswers;
+        $pkJoin->submit_answer_time = time();
+        $pkJoin->answer_time = $answerTime;
+        $pkJoin->score = $score;
+        $pkJoin->save();
+
+        //如果用户都答题完成，结算PK
+        $returnData = new \stdClass();
+        $pkJoins = $pkJoinModel->getJoinInfoByPkUuid($pkUuid);
+        foreach ($pkJoins as $item) {
+            if ($item["answers"] == "") {
+                return $returnData;
+            }
+        }
+        $redis = Redis::factory();
+        pushPkFinishList($pkUuid, $redis);
+        return $returnData;
     }
 
     private function getNovicePkQuestions($redis)

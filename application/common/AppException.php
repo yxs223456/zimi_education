@@ -43,6 +43,9 @@ class AppException extends \Exception
     const PK_NOT_EXISTS = [4001, "pk不存在"];
     const PK_JOIN_ALREADY = [4002, "你已经加入了当前PK请不要重复申请"];
     const PK_PEOPLE_ENOUGH = [4003, "PK人数已满请申请其他PK吧"];
+    const PK_STATUS_NOT_UNDERWAY = [4004, "PK状态不为进行中无法提交答案"];
+    const PK_NOT_JOIN = [4005, "你没有参与当前PK"];
+    const PK_SUBMIT_ANSWERS_ALREADY = [4006, "你已经提交过答案无法重复提交"];
 
     public static function factory($errConst)
     {

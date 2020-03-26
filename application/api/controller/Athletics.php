@@ -158,13 +158,15 @@ class Athletics extends Base
     public function submitPkAnswer()
     {
         $pkUuid = input("uuid");
-        if (empty($pkUuid)) {
+        $answers = input("answer");
+        $answerTime = input("answer_time");
+        if (empty($pkUuid) || !is_array(json_decode($answers, true)) || !checkInt($answerTime, false)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
         $user = $this->query["user"];
         $athleticsService = new AthleticsService();
-        $returnData = $athleticsService->joinPk($user["uuid"], $pkUuid);
+        $returnData = $athleticsService->submitPkAnswer($user["uuid"], $pkUuid, $answers, $answerTime);
         return $this->jsonResponse($returnData);
     }
 }

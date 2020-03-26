@@ -857,3 +857,23 @@ function removeStudyWritingCache($userUuid, $difficultyLevel, \Redis $redis)
     $key = "de_education:studyWriting:$difficultyLevel:$userUuid";
     $redis->del($key);
 }
+
+//PK结算任务放到redis队列
+function pushPkFinishList($pkUuid, Redis $redis) {
+    $key = "de_education:pkFinishList";
+
+    $value = [
+        "uuid" => $pkUuid,
+    ];
+
+    $redis->rPush($key, json_encode($value));
+}
+
+//弹出PK结算任务
+function getPkFinishList(\Redis $redis) {
+    $key = "de_education:pkFinishList";
+
+    $data = $redis->blPop([$key], 10);
+
+    return $data;
+}

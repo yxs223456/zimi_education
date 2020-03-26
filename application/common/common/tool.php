@@ -227,6 +227,11 @@ function createInviteCode($length = 10)
     return $str;
 }
 
+function getImageUrl($headImageUrl)
+{
+    return str_replace("static/api", config("web.self_domain") . "/static/api", $headImageUrl);
+}
+
 function gmt_iso8601($time) {
     $dtStr = date("c", $time);
     $datetime = new DateTime($dtStr);

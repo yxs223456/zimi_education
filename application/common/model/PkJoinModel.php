@@ -36,4 +36,9 @@ class PkJoinModel extends Base
             ->order("pj.id", "asc")
             ->select();
     }
+
+    public function getJoinInfoByPkUuid($pkUuid)
+    {
+        return $this->where("pk_uuid", $pkUuid)->select();
+    }
 }
