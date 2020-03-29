@@ -47,6 +47,11 @@ class AppException extends \Exception
     const PK_NOT_JOIN = [4005, "你没有参与当前PK"];
     const PK_SUBMIT_ANSWERS_ALREADY = [4006, "你已经提交过答案无法重复提交"];
 
+    const INTERNAL_COMPETITION_NOT_EXISTS = [5000, "内部大赛不存在"];
+    const INTERNAL_COMPETITION_JOIN_ALREADY = [5001, "你已经参与该项大赛"];
+    const INTERNAL_COMPETITION_STATUS_NOT_APPLYING = [5002, "大赛已过报名时间，下届记得准时呦~"];
+    const INTERNAL_COMPETITION_USER_LEVEL_LOW = [5003, "你的等级不满足条件，快去答题升级吧"];
+
     public static function factory($errConst)
     {
         $e = new self($errConst[1], $errConst[0]);

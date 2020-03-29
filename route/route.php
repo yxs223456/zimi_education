@@ -49,7 +49,6 @@ Route::rule('user/sign', 'api/user/sign', 'post');
 Route::rule('user/receiveContinuousSignReward', 'api/user/receiveContinuousSignReward', 'post');
 
 
-
 //任务中心首页
 Route::rule('task/index', 'api/task/index', 'post');
 //任务完成领取书币奖励
@@ -104,6 +103,14 @@ Route::rule('athletics/pkList', 'api/athletics/pkList', 'post');
 Route::rule('athletics/pkInfo', 'api/athletics/pkInfo', 'post');
 //提交pk答案
 Route::rule('athletics/submitPkAnswer', 'api/athletics/submitPkAnswer', 'post');
+
+
+//内部大赛列表
+Route::rule('athletics/competitionList', 'api/athletics/competitionList', 'post');
+//内部大赛详情
+Route::rule('athletics/competitionInfo', 'api/athletics/competitionInfo', 'post');
+//内部大赛详情
+Route::rule('athletics/joinCompetition', 'api/athletics/joinCompetition', 'post');
 
 return [
 

@@ -134,6 +134,9 @@ class Athletics extends Base
         }
         $pageNum = input("pageNum");
         $pageSize = input("pageSize");
+        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
 
         $user = $this->query["user"];
         $athleticsService = new AthleticsService();
@@ -169,6 +172,47 @@ class Athletics extends Base
         $user = $this->query["user"];
         $athleticsService = new AthleticsService();
         $returnData = $athleticsService->submitPkAnswer($user, $pkUuid, $answers, $answerTime);
+        return $this->jsonResponse($returnData);
+    }
+
+    public function competitionList()
+    {
+        $pageNum = input("pageNum");
+        $pageSize = input("pageSize");
+        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $athleticsService = new AthleticsService();
+        $returnData = $athleticsService->competitionList($user, $pageNum, $pageSize);
+
+        return $this->jsonResponse($returnData);
+    }
+
+    public function competitionInfo()
+    {
+        $competitionUuid = input("uuid");
+        if (empty($competitionUuid)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $athleticsService = new AthleticsService();
+        $returnData = $athleticsService->competitionInfo($user, $competitionUuid);
+        return $this->jsonResponse($returnData);
+    }
+
+    public function joinCompetition()
+    {
+        $competitionUuid = input("uuid");
+        if (empty($competitionUuid)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $athleticsService = new AthleticsService();
+        $returnData = $athleticsService->joinCompetition($user, $competitionUuid);
         return $this->jsonResponse($returnData);
     }
 }

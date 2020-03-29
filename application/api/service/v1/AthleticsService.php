@@ -11,6 +11,8 @@ namespace app\api\service\v1;
 use app\api\service\Base;
 use app\common\AppException;
 use app\common\Constant;
+use app\common\enum\InternalCompetitionIsFinishEnum;
+use app\common\enum\InternalCompetitionStatusEnum;
 use app\common\enum\PkIsInitiatorEnum;
 use app\common\enum\PkStatusEnum;
 use app\common\enum\PkTypeEnum;
@@ -18,9 +20,12 @@ use app\common\enum\QuestionDifficultyLevelEnum;
 use app\common\enum\QuestionTypeEnum;
 use app\common\enum\UserCoinReduceTypeEnum;
 use app\common\helper\Redis;
+use app\common\model\InternalCompetitionJoinModel;
+use app\common\model\InternalCompetitionModel;
 use app\common\model\PkJoinModel;
 use app\common\model\PkModel;
 use app\common\model\SingleChoiceModel;
+use app\common\model\UserBaseModel;
 use app\common\model\UserCoinLogModel;
 use think\Db;
 
@@ -389,6 +394,131 @@ class AthleticsService extends Base
         $redis = Redis::factory();
         pushPkFinishList($pkUuid, $redis);
         return $returnData;
+    }
+
+    public function competitionList($user, $pageNum, $pageSize)
+    {
+        $internalCompetitionModel = new InternalCompetitionModel();
+        $internalCompetitions = $internalCompetitionModel->getList($pageNum, $pageSize);
+
+        $returnData["list"] = [];
+        foreach ($internalCompetitions as $item) {
+            $returnData["list"][] = [
+                "uuid" => $item["uuid"],
+                "image_url" => getImageUrl($item["image_url"]),
+                "name" => $item["name"],
+                "status" => $this->getInternalCompetitionStatus($item),
+            ];
+        }
+
+        return $returnData;
+    }
+
+    public function competitionInfo($user, $competitionUuid)
+    {
+        $internalCompetitionModel = new InternalCompetitionModel();
+        $competition = $internalCompetitionModel->findByUuid($competitionUuid);
+        if ($competition == null) {
+            throw AppException::factory(AppException::INTERNAL_COMPETITION_NOT_EXISTS);
+        }
+
+        $returnData = [
+            "uuid" => $competitionUuid,
+            "status" => $this->getInternalCompetitionStatus($competition),
+            "image_url" => getImageUrl($competition["image_url"]),
+            "name" => $competition["name"],
+            "user_level_floor" => $competition["user_level_floor"],
+            "apply_begin_date" => date("Y-m-d", $competition["online_time"]),
+            "apply_deadline" => date("Y-m-d", $competition["apply_deadline"]),
+            "submit_answer_begin_date" => date("Y-m-d", $competition["online_time"]),
+            "submit_answer_deadline" => date("Y-m-d", $competition["submit_answer_deadline"]),
+            "question" => json_decode($competition["question"]),
+            "is_join" => 0,
+            "is_submit_answer" => 0,
+            "answer" => [
+                "text" => "",
+                "images" => [],
+            ],
+        ];
+
+        $internalCompetitionJoinModel = new InternalCompetitionJoinModel();
+        $competitionJoin = $internalCompetitionJoinModel->findByUserAndCompetition($user["uuid"], $competitionUuid);
+        if ($competitionJoin != null) {
+            $returnData["is_join"] = 1;
+            $returnData["is_submit_answer"] = $competitionJoin["is_submit_answer"];
+            $competitionJoin["answer"]?$returnData["answer"]=json_decode($competitionJoin["answer"], true):null;
+        }
+
+        return $returnData;
+    }
+
+    public function joinCompetition($user, $competitionUuid)
+    {
+        $internalCompetitionModel = new InternalCompetitionModel();
+        $competition = $internalCompetitionModel->findByUuid($competitionUuid);
+        if ($competition == null) {
+            throw AppException::factory(AppException::INTERNAL_COMPETITION_NOT_EXISTS);
+        }
+
+        //用户不能重复参与大赛
+        $internalCompetitionJoinModel = new InternalCompetitionJoinModel();
+        $competitionJoin = $internalCompetitionJoinModel->findByUserAndCompetition($user["uuid"], $competitionUuid);
+        if ($competitionJoin != null) {
+            throw AppException::factory(AppException::INTERNAL_COMPETITION_JOIN_ALREADY);
+        }
+
+        //大赛在报名阶段才能报名
+        $competitionStatus = $this->getInternalCompetitionStatus($competition);
+        if ($competitionStatus != InternalCompetitionStatusEnum::APPLYING) {
+            throw AppException::factory(AppException::INTERNAL_COMPETITION_STATUS_NOT_APPLYING);
+        }
+
+        //三星以上用户才能参赛
+        $userModel = new UserBaseModel();
+        $user = $userModel->findByUuid($user["uuid"]);
+        if ($user == null) {
+            throw AppException::factory(AppException::USER_NOT_EXISTS);
+        } else if ($user["level"] < $competition["user_level_floor"]) {
+      //      throw AppException::factory(AppException::INTERNAL_COMPETITION_USER_LEVEL_LOW);
+        }
+
+        Db::startTrans();
+        try {
+            //添加参与纪录
+            $joinData = [
+                "uuid" => getRandomString(),
+                "c_uuid" => $competitionUuid,
+                "user_uuid" => $user["uuid"],
+            ];
+            $internalCompetitionJoinModel->save($joinData);
+
+            //大赛参与人数+1
+            $internalCompetitionModel->where("uuid", $competitionUuid)
+                ->inc("join_num", 1)
+                ->update(["update_time"=>time()]);
+
+            Db::commit();
+
+            return new \stdClass();
+        } catch (\Throwable $e) {
+            Db::rollback();
+            throw $e;
+        }
+    }
+
+    public function getInternalCompetitionStatus($competition)
+    {
+        if ($competition["is_finish"] == InternalCompetitionIsFinishEnum::YES) {
+            $status = InternalCompetitionStatusEnum::FINISH;
+        } else if ($competition["submit_answer_deadline"] <= time()) {
+            $status = InternalCompetitionStatusEnum::SUBMIT_ANSWER_FINISH;
+        } else if ($competition["apply_deadline"] <= time()) {
+            $status = InternalCompetitionStatusEnum::UNDERWAY;
+        } else {
+            $status = InternalCompetitionStatusEnum::APPLYING;
+        }
+
+        return $status;
     }
 
     private function getNovicePkQuestions($redis)
