@@ -215,4 +215,41 @@ class Athletics extends Base
         $returnData = $athleticsService->joinCompetition($user, $competitionUuid);
         return $this->jsonResponse($returnData);
     }
+
+    public function submitCompetitionDraft()
+    {
+        $competitionUuid = input("uuid");
+        $answer = input("answer");
+        if (empty($competitionUuid)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+        if (!is_array($answer) || count($answer) > 2 || (!isset($answer["text"]) && !isset($answer["images"]))) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $athleticsService = new AthleticsService();
+        $returnData = $athleticsService->submitCompetitionAnswer($user, $competitionUuid, $answer, true);
+        return $this->jsonResponse($returnData);
+    }
+
+    public function submitCompetition()
+    {
+        $competitionUuid = input("uuid");
+        $answer = input("answer");
+        if (empty($competitionUuid)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+        if (!is_array($answer) || count($answer) > 2 || (!isset($answer["text"]) && !isset($answer["images"]))) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+        if (empty($answer["text"]) && empty($answer["images"])) {
+            throw AppException::factory(AppException::INTERNAL_COMPETITION_ANSWER_EMPTY);
+        }
+
+        $user = $this->query["user"];
+        $athleticsService = new AthleticsService();
+        $returnData = $athleticsService->submitCompetitionAnswer($user, $competitionUuid, $answer);
+        return $this->jsonResponse($returnData);
+    }
 }

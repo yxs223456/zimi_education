@@ -11,6 +11,7 @@ namespace app\api\service\v1;
 use app\api\service\Base;
 use app\common\AppException;
 use app\common\Constant;
+use app\common\enum\CompetitionAnswerIsSubmitEnum;
 use app\common\enum\InternalCompetitionIsFinishEnum;
 use app\common\enum\InternalCompetitionStatusEnum;
 use app\common\enum\PkIsInitiatorEnum;
@@ -479,7 +480,7 @@ class AthleticsService extends Base
         if ($user == null) {
             throw AppException::factory(AppException::USER_NOT_EXISTS);
         } else if ($user["level"] < $competition["user_level_floor"]) {
-      //      throw AppException::factory(AppException::INTERNAL_COMPETITION_USER_LEVEL_LOW);
+            throw AppException::factory(AppException::INTERNAL_COMPETITION_USER_LEVEL_LOW);
         }
 
         Db::startTrans();
@@ -505,6 +506,39 @@ class AthleticsService extends Base
             throw $e;
         }
     }
+
+    public function submitCompetitionAnswer($user, $competitionUuid, $answer, $isDraft = false)
+    {
+        $internalCompetitionModel = new InternalCompetitionModel();
+        $competition = $internalCompetitionModel->findByUuid($competitionUuid);
+        if ($competition == null) {
+            throw AppException::factory(AppException::INTERNAL_COMPETITION_NOT_EXISTS);
+        }
+
+        //用户需参与了大赛
+        //用户提交答案后不能再提交
+        //不能超过提交答案截止时间
+        $internalCompetitionJoinModel = new InternalCompetitionJoinModel();
+        $competitionJoin = $internalCompetitionJoinModel->findByUserAndCompetition($user["uuid"], $competitionUuid);
+        if ($competitionJoin == null) {
+            throw AppException::factory(AppException::INTERNAL_COMPETITION_NOT_JOIN);
+        } else if ($competitionJoin["is_submit_answer"] == CompetitionAnswerIsSubmitEnum::YES) {
+            throw AppException::factory(AppException::INTERNAL_COMPETITION_SUBMIT_ANSWER_ALREADY);
+        } else if ($competition["submit_answer_deadline"] <= time()) {
+            throw AppException::factory(AppException::INTERNAL_COMPETITION_SUBMIT_ANSWER_TIMEOUT);
+        }
+
+        //纪录用户答案
+        $competitionJoin->answer = json_encode($answer, JSON_UNESCAPED_UNICODE);
+        if ($isDraft == false) {
+            $competitionJoin->is_submit_answer = CompetitionAnswerIsSubmitEnum::YES;
+            $competitionJoin->submit_answer_time = time();
+        }
+        $competition->save();
+
+        return new \stdClass();
+    }
+
 
     public function getInternalCompetitionStatus($competition)
     {

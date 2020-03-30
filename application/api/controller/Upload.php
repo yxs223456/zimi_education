@@ -37,4 +37,24 @@ class Upload extends Base
         ]);
     }
 
+    public function multiUpload()
+    {
+        $files = $this->request->file();
+        $returnData = [];
+        foreach ($files as $file) {
+            $fileInfo = $file->getInfo();
+            if ($fileInfo["error"] != 0 || $fileInfo["size"] == 0) {
+                throw AppException::factory(AppException::COM_PARAMS_ERR);
+            }
+            $tempFile = $fileInfo['tmp_name'];
+            $fileName = md5(uniqid(mt_rand(), true)).".".strtolower(pathinfo($fileInfo['name'])["extension"]);
+            $fileUrl = "static/api/" . $fileName;
+            $filePath = "public/" . $fileUrl;
+            move_uploaded_file($tempFile, Env::get("root_path") . $filePath);
+            $returnData[] = ["url" => $fileUrl];
+        }
+
+        return $this->jsonResponse($returnData);
+    }
+
 }

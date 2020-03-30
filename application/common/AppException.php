@@ -51,6 +51,10 @@ class AppException extends \Exception
     const INTERNAL_COMPETITION_JOIN_ALREADY = [5001, "你已经参与该项大赛"];
     const INTERNAL_COMPETITION_STATUS_NOT_APPLYING = [5002, "大赛已过报名时间，下届记得准时呦~"];
     const INTERNAL_COMPETITION_USER_LEVEL_LOW = [5003, "你的等级不满足条件，快去答题升级吧"];
+    const INTERNAL_COMPETITION_NOT_JOIN = [5004, "你没有参与该项大赛"];
+    const INTERNAL_COMPETITION_SUBMIT_ANSWER_ALREADY = [5005, "你已经提交了答案，不能再修改"];
+    const INTERNAL_COMPETITION_SUBMIT_ANSWER_TIMEOUT = [5006, "本次大赛已过提交作品截止时间"];
+    const INTERNAL_COMPETITION_ANSWER_EMPTY = [5007, "作品不能为空"];
 
     public static function factory($errConst)
     {

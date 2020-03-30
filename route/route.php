@@ -15,8 +15,10 @@ Route::get('think', function () {
 
 Route::get('hello/:name', 'index/hello');
 
-//上传文件
+//上传单个文件
 Route::rule('upload/index', 'api/upload/index', 'post');
+//上传多个文件
+Route::rule('upload/multiUpload', 'api/upload/multiUpload', 'post');
 
 
 //发送注册验证码
@@ -111,6 +113,10 @@ Route::rule('athletics/competitionList', 'api/athletics/competitionList', 'post'
 Route::rule('athletics/competitionInfo', 'api/athletics/competitionInfo', 'post');
 //内部大赛详情
 Route::rule('athletics/joinCompetition', 'api/athletics/joinCompetition', 'post');
+//提交内部大赛作品草稿
+Route::rule('athletics/submitCompetitionDraft', 'api/athletics/submitCompetitionDraft', 'post');
+//提交内部大赛作品
+Route::rule('athletics/submitCompetition', 'api/athletics/submitCompetition', 'post');
 
 return [
 
