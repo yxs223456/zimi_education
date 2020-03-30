@@ -39,15 +39,14 @@ class Upload extends Base
 
     public function multiUpload()
     {
-        $files = $this->request->file();
+        $files = $_FILES;
         $returnData = [];
         foreach ($files as $file) {
-            $fileInfo = $file->getInfo();
-            if ($fileInfo["error"] != 0 || $fileInfo["size"] == 0) {
+            if ($file["error"] != 0 || $file["size"] == 0) {
                 throw AppException::factory(AppException::COM_PARAMS_ERR);
             }
-            $tempFile = $fileInfo['tmp_name'];
-            $fileName = md5(uniqid(mt_rand(), true)).".".strtolower(pathinfo($fileInfo['name'])["extension"]);
+            $tempFile = $file['tmp_name'];
+            $fileName = md5(uniqid(mt_rand(), true)).".".strtolower(pathinfo($file['name'])["extension"]);
             $fileUrl = "static/api/" . $fileName;
             $filePath = "public/" . $fileUrl;
             move_uploaded_file($tempFile, Env::get("root_path") . $filePath);
