@@ -19,4 +19,7 @@ class UserWritingSourceTypeEnum
 
     const STUDY = 1;
     const STUDY_DSC = "自我学习模块";
+
+    const SYNTHESIZE = 2;
+    const SYNTHESIZE_DSC = "综合练习模块";
 }

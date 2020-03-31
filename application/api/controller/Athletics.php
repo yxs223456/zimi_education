@@ -59,7 +59,6 @@ class Athletics extends Base
     {
         $param = $this->request->getContent();
         $param = json_decode($param, true);
-
         if (empty($param["uuid"]) || empty($param["answers"])) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }

@@ -369,6 +369,8 @@ class QuestionService extends Base
             $randomWritingUuid = getRandomWriting($difficultyLevel, 1, $redis);
             if (!$randomWritingUuid) {
                 $randomWriting = $writingModel->getRandom($difficultyLevel);
+                $randomWritingUuid = [$randomWriting["uuid"]];
+                pushCacheQuestionLibraryList(QuestionTypeEnum::WRITING, $difficultyLevel, $redis);
             } else {
                 $randomWriting = $writingModel->getByUuid($randomWritingUuid[0]);
             }
@@ -511,6 +513,9 @@ class QuestionService extends Base
             throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_ALREADY);
         }
 
+        $writingModel = new WritingModel();
+        $userWritingModel = new UserWritingModel();
+
         Db::startTrans();
         try {
             //纪录用户答案
@@ -519,8 +524,25 @@ class QuestionService extends Base
             $synthesize->save();
 
             //同步作文内容以便统一审核
+            foreach ($answers as $item) {
+                if ($item["type"] == QuestionTypeEnum::WRITING) {
+                    foreach ($item["list"] as $answerInfo) {
+                        $writing = $writingModel->findByUuid($answerInfo["uuid"]);
 
-
+                        $userWritingData = [
+                            "user_uuid" => $user["uuid"],
+                            "source_type" => UserWritingSourceTypeEnum::SYNTHESIZE,
+                            "source_uuid" => $uuid,
+                            "difficulty_level" => $writing["difficulty_level"],
+                            "requirements" => $writing["requirements"],
+                            "topic" => $writing["topic"],
+                            "content" => json_encode($answerInfo["answer"], JSON_UNESCAPED_UNICODE),
+                            "total_score" => 30,
+                        ];
+                        $userWritingModel->save($userWritingData);
+                    }
+                }
+            }
             Db::commit();
 
             return new \stdClass();
