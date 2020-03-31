@@ -428,18 +428,15 @@ class AthleticsService extends Base
             "status" => $this->getInternalCompetitionStatus($competition),
             "image_url" => getImageUrl($competition["image_url"]),
             "name" => $competition["name"],
+            "description" => $competition["description"],
             "user_level_floor" => $competition["user_level_floor"],
             "apply_begin_date" => date("Y-m-d", $competition["online_time"]),
             "apply_deadline" => date("Y-m-d", $competition["apply_deadline"]),
             "submit_answer_begin_date" => date("Y-m-d", $competition["online_time"]),
             "submit_answer_deadline" => date("Y-m-d", $competition["submit_answer_deadline"]),
-            "question" => json_decode($competition["question"]),
             "is_join" => 0,
+            "question" => null,
             "is_submit_answer" => 0,
-            "answer" => [
-                "text" => "",
-                "images" => [],
-            ],
         ];
 
         $internalCompetitionJoinModel = new InternalCompetitionJoinModel();
@@ -447,7 +444,7 @@ class AthleticsService extends Base
         if ($competitionJoin != null) {
             $returnData["is_join"] = 1;
             $returnData["is_submit_answer"] = $competitionJoin["is_submit_answer"];
-            $competitionJoin["answer"]?$returnData["answer"]=json_decode($competitionJoin["answer"], true):null;
+            $returnData["question"] = json_decode($competitionJoin["question"]);
         }
 
         return $returnData;
@@ -483,6 +480,11 @@ class AthleticsService extends Base
             throw AppException::factory(AppException::INTERNAL_COMPETITION_USER_LEVEL_LOW);
         }
 
+        //为用户随机选择题目
+        $allQuestion = json_decode($competition["question"], true);
+        $randomKey = random_int(0, count($allQuestion) - 1);
+        $randomQuestion = $allQuestion[$randomKey];
+
         Db::startTrans();
         try {
             //添加参与纪录
@@ -490,6 +492,7 @@ class AthleticsService extends Base
                 "uuid" => getRandomString(),
                 "c_uuid" => $competitionUuid,
                 "user_uuid" => $user["uuid"],
+                "question" => json_encode($randomQuestion, JSON_UNESCAPED_UNICODE),
             ];
             $internalCompetitionJoinModel->save($joinData);
 
@@ -500,7 +503,7 @@ class AthleticsService extends Base
 
             Db::commit();
 
-            return new \stdClass();
+            return $randomQuestion;
         } catch (\Throwable $e) {
             Db::rollback();
             throw $e;
