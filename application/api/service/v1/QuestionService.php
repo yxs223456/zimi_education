@@ -286,10 +286,9 @@ class QuestionService extends Base
                 "difficulty_level" => $writing["difficulty_level"],
                 "requirements" => $writing["requirements"],
                 "topic" => $writing["topic"],
-                "create_time" => time(),
-                "update_time" => time(),
+                "answer" => json_encode($content, JSON_UNESCAPED_UNICODE),
             ];
-            $userStudyWritingModel->insert($userStudyWritingData);
+            $userStudyWritingModel->save($userStudyWritingData);
 
             $userWritingData = [
                 "user_uuid" => $user["uuid"],
@@ -299,10 +298,9 @@ class QuestionService extends Base
                 "requirements" => $writing["requirements"],
                 "topic" => $writing["topic"],
                 "content" => json_encode($content, JSON_UNESCAPED_UNICODE),
-                "create_time" => time(),
-                "update_time" => time(),
+                "total_score" => 100,
             ];
-            $userWritingModel->insert($userWritingData);
+            $userWritingModel->save($userWritingData);
 
             Db::commit();
         } catch (\Throwable $e) {
@@ -484,28 +482,52 @@ class QuestionService extends Base
     public function submitSynthesizeDraft($user, $uuid, $answers)
     {
         $userSynthesizeModel = new UserSynthesizeModel();
+        $synthesize = $userSynthesizeModel->findByUuid($uuid);
+        if ($synthesize == null || $synthesize["user_uuid"] != $user["uuid"]) {
+            throw AppException::factory(AppException::SYNTHESIZE_NOT_EXISTS);
+        }
 
-        $data = [
-            "answers" => json_encode($answers, JSON_UNESCAPED_UNICODE),
-            "update_time" => time(),
-        ];
+        //答案不允许重复提交
+        if ($synthesize["is_finish"] == UserSynthesizeIsFinishEnum::YES) {
+            throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_ALREADY);
+        }
 
-        $userSynthesizeModel->where("user_uuid", $user["uuid"])->where("uuid", $uuid)->update($data);
+        $synthesize->answers = json_encode($answers, JSON_UNESCAPED_UNICODE);
+        $synthesize->save();
+
         return new \stdClass();
     }
 
     public function submitSynthesize($user, $uuid, $answers)
     {
         $userSynthesizeModel = new UserSynthesizeModel();
+        $synthesize = $userSynthesizeModel->findByUuid($uuid);
+        if ($synthesize == null || $synthesize["user_uuid"] != $user["uuid"]) {
+            throw AppException::factory(AppException::SYNTHESIZE_NOT_EXISTS);
+        }
 
-        $data = [
-            "answers" => json_encode($answers, JSON_UNESCAPED_UNICODE),
-            "is_finish" => UserSynthesizeIsFinishEnum::YES,
-            "update_time" => time(),
-        ];
+        //答案不允许重复提交
+        if ($synthesize["is_finish"] == UserSynthesizeIsFinishEnum::YES) {
+            throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_ALREADY);
+        }
 
-        $userSynthesizeModel->where("user_uuid", $user["uuid"])->where("uuid", $uuid)->update($data);
-        return new \stdClass();
+        Db::startTrans();
+        try {
+            //纪录用户答案
+            $synthesize->answers = json_encode($answers, JSON_UNESCAPED_UNICODE);
+            $synthesize->is_finish = UserSynthesizeIsFinishEnum::YES;
+            $synthesize->save();
+
+            //同步作文内容以便统一审核
+
+
+            Db::commit();
+
+            return new \stdClass();
+        } catch (\Throwable $e) {
+            Db::rollback();
+            throw $e;
+        }
     }
 
     public function questionOrderByUuid($uuids, $questions)

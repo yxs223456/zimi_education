@@ -56,6 +56,9 @@ class AppException extends \Exception
     const INTERNAL_COMPETITION_SUBMIT_ANSWER_TIMEOUT = [5006, "本次大赛已过提交作品截止时间"];
     const INTERNAL_COMPETITION_ANSWER_EMPTY = [5007, "作品不能为空"];
 
+    const SYNTHESIZE_NOT_EXISTS = [6000, "综合测试不存在"];
+    const SYNTHESIZE_SUBMIT_ANSWER_ALREADY = [6001, "综合测试答案已提交"];
+
     public static function factory($errConst)
     {
         $e = new self($errConst[1], $errConst[0]);
