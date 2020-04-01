@@ -1,0 +1,225 @@
+{include file="public/header" /}
+<link rel="stylesheet" type="text/css" href="/static/admin/webupload/webuploader.css">
+<link rel="stylesheet" type="text/css" href="/static/admin/webupload/style.css">
+<link href="/static/admin/css/select2.min.css" rel="stylesheet">
+<!-- 配置文件 -->
+<script type="text/javascript" src="/static/admin/ueditor/ueditor.config.js"></script>
+<!-- 编辑器源码文件 -->
+<script type="text/javascript" src="/static/admin/ueditor/ueditor.all.js"></script>
+<style>
+    .file-item{float: left; position: relative; width: 110px;height: 110px; margin: 0 20px 20px 0; padding: 4px;}
+    .file-item .info{overflow: hidden;}
+    .uploader-list{width: 100%; overflow: hidden;}
+</style>
+<style type="text/css">
+    .laydate-icon {
+        background: transparent !important;
+    }
+</style>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight" id="app">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>为作文打分</h5>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal" name="edit" id="signupForm" method="post">
+                        <input type="hidden" value="{$info.uuid}" name="uuid"/>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">题目：</label>
+                            <div class="input-group col-sm-5">
+                                <input type="text" class="form-control" value="{$topic}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+
+                        <input type="hidden" name="requirements" v-model="JSON.stringify(requirements)">
+                        <div v-for="(item, index) in requirements">
+                            <div class="form-group" id="searchGoods">
+                                <label class="col-sm-2 control-label">要求{{index+1}}：</label>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"> </label>
+                                <div class="input-group col-sm-5">
+                                    <input type="text" readonly class="form-control" v-model="item.requirement" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        {if empty($images)}
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">用户作品标题：</label>
+                            <div class="input-group col-sm-5">
+                                <input type="text" class="form-control" value="{$text.title}" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">用户作品内容：</label>
+                            <div class="input-group col-sm-8">
+                                <textarea class="form-control"  rows="30" readonly>{$text.content}</textarea>
+                            </div>
+                        </div>
+                        {else /}
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">用户作品：</label>
+                            <div class="input-group col-sm-5">
+                                {foreach $images as $image}
+                                <img src="/{$image}" alt="" style="max-width:1000px;">
+                                {/foreach}
+                            </div>
+                        </div>
+                        {/if}
+
+                        <div class="hr-line-dashed"></div>
+                        <br><br>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">分数：</label>
+                            <div class="input-group col-sm-5">
+                                <input type="text" class="form-control" name="score" placeholder="满分100分">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="hr-line-dashed"></div>
+                            </div>
+                            <div class="col-sm-4 col-sm-offset-3">
+                                <button id="formSubmit" type="submit" class="btn btn-primary"><i class="fa fa-check"></i> 提交</button>&nbsp;&nbsp;&nbsp;
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public/footer" /}
+<script type="text/javascript" src="/static/admin/webupload/webuploader.min.js"></script>
+<script type="text/javascript" src="/static/admin/js/common.js"></script>
+<script src="/static/admin/js/select2.full.min.js"></script>
+<script src="/static/admin/js/ajaxfileupload.js"></script>
+<!-- 开发环境版本，包含了有帮助的命令行警告 -->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<!-- 引入样式 -->
+<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<!-- 引入组件库 -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script type="text/javascript">
+
+    let app = new Vue({
+        el: "#app",
+        data: {
+            requirements: [
+                {
+                    "requirement": "",
+                },
+            ],
+            selectedLoading: false,
+        },
+        created: function() {
+            let requirements = '{$requirements|raw}';
+            this.requirements = JSON.parse(requirements);
+        },
+        methods: {
+
+        }
+    });
+
+
+
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        // 年月范围
+        laydate.render({
+            elem: "#lotteryTime",
+            type: 'datetime',
+            done: function(value, date){
+                $("input[name='lotteryTime']").val(value);
+            }
+        });
+
+        laydate.render({
+            elem: "#onlineTime",
+            type: 'datetime',
+            done: function(value, date){
+                $("input[name='onlineTime']").val(value);
+            }
+        });
+    });
+
+    var editor = new UE.ui.Editor();
+    editor.render("myEditor");
+    // 在渲染 ueditor 的时候, 将 ueditor 交给一个全局变量
+    var ue = UE.getEditor('myEditor');
+
+    // 重写百度富文本编辑器监听上传图片事件
+    UE.Editor.prototype._bkGetActionUrl = UE.Editor.prototype.getActionUrl;
+    UE.Editor.prototype.getActionUrl = function(action) {
+        if (action == 'uploadimage') {
+            return '{:url("upload/uploadEditorToOss")}';
+        } else {
+            return this._bkGetActionUrl.call(this, action);
+        }
+    };
+
+    //以下为官方示例
+    $().ready(function () {
+
+        // validate signup form on keyup and submit
+        var icon = "<i class='fa fa-times-circle'></i> ";
+        $("#signupForm").validate({
+            rules: {
+                requirements: {
+                    required: true
+                },
+            },
+            focusCleanup:true,
+            submitHandler:function(form){
+
+                $(form).ajaxSubmit({
+                    type: 'post',
+                    url: "{:url('doCheck')}",
+                    beforeSend:function() {
+                        // 显示loading
+                        index2 = layer.load(0, {
+                            shade: [0.3,'#fff']
+                        });
+                        $("#formSubmit").attr('type', 'button')
+                    },
+                    success: function(data){
+
+                        if (data['code'] != 1) {
+                            layer.msg(data.msg,{icon:2,time:1000,shade: 0.1,}, function(index){
+                                layer.close(index)
+                            });
+                            $("#formSubmit").attr('type', 'submit')
+                            return false;
+                        }
+
+                        layer.msg(data.msg,{icon:1,time:1000,shade: 0.1,}, function(index){
+                            window.location.href="{:url('index')}"
+                        });
+                    },
+                    error: function(XmlHttpRequest, textStatus, errorThrown){
+                        layer.msg('error!',{icon:1,time:1000});
+                    },
+                    complete:function() {
+                        // 隐藏loading
+                        layer.close(index2);
+                    }
+                });
+            }
+        });
+    });
+
+</script>
+</body>
+</html>

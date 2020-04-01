@@ -3,12 +3,15 @@
 namespace app\admin\controller;
 
 use app\admin\service\FillTheBlanksService;
+use app\admin\service\InternalCompetitionJoinService;
+use app\admin\service\InternalCompetitionService;
 use app\admin\service\SingleChoiceService;
 use app\admin\service\Admin as adminService;
 use app\admin\service\AuthGroup as authGroupService;
 use app\admin\service\AuthGroupAccess as authGroupAccessService;
 use app\admin\service\AuthRule as authRuleService;
 use app\admin\service\TrueFalseQuestionService;
+use app\admin\service\UserWritingService;
 use app\admin\service\WritingLibraryService;
 use think\Controller;
 
@@ -22,6 +25,9 @@ class Base extends Controller {
     protected $singleChoiceService;
     protected $writingLibraryService;
     protected $trueFalseQuestionService;
+    protected $userWritingService;
+    protected $internalCompetitionJoinService;
+    protected $internalCompetitionService;
 
     /**
      * 依赖注入
@@ -34,12 +40,18 @@ class Base extends Controller {
      * @param SingleChoiceService $singleChoiceService
      * @param WritingLibraryService $writingLibraryService
      * @param TrueFalseQuestionService $trueFalseQuestionService
+     * @param UserWritingService $userWritingService
+     * @param InternalCompetitionJoinService $internalCompetitionJoinService
+     * @param InternalCompetitionService $internalCompetitionService
      */
     public function __construct( AdminService $adminService, AuthGroupService $authGroupService,
                                  AuthGroupAccessService $authGroupAccessService, AuthRuleService $authRuleService,
                                  FillTheBlanksService $fillTheBlanksService, SingleChoiceService $singleChoiceService,
                                  WritingLibraryService $writingLibraryService,
-                                 TrueFalseQuestionService $trueFalseQuestionService){
+                                 TrueFalseQuestionService $trueFalseQuestionService,
+                                 UserWritingService $userWritingService,
+                                 InternalCompetitionJoinService $internalCompetitionJoinService,
+                                 InternalCompetitionService $internalCompetitionService){
 
         parent::__construct();
 
@@ -51,5 +63,8 @@ class Base extends Controller {
         $this->singleChoiceService = $singleChoiceService;
         $this->writingLibraryService = $writingLibraryService;
         $this->trueFalseQuestionService = $trueFalseQuestionService;
+        $this->userWritingService = $userWritingService;
+        $this->internalCompetitionJoinService = $internalCompetitionJoinService;
+        $this->internalCompetitionService = $internalCompetitionService;
     }
 }

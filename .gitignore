@@ -19,4 +19,5 @@ composer.phar
 *.log
 */cache.php
 */log.php
+public/static/api/*
 application/admin/config/*

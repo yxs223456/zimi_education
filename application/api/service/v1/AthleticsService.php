@@ -537,7 +537,7 @@ class AthleticsService extends Base
             $competitionJoin->is_submit_answer = CompetitionAnswerIsSubmitEnum::YES;
             $competitionJoin->submit_answer_time = time();
         }
-        $competition->save();
+        $competitionJoin->save();
 
         return new \stdClass();
     }
