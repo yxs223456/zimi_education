@@ -121,14 +121,19 @@ class TestLibrary extends Common
         $data = [];
         foreach ($fillTheBlanksList as $fillTheBlanks) {
             if ($fillTheBlanks["question"] == "" ||
-                $fillTheBlanks["answer"] == "" ||
+                $fillTheBlanks["answer"] == [] ||
                 $fillTheBlanks["difficulty_level"] == "") {
                 continue;
             }
+            $answers = array_column($fillTheBlanks["answer"], "answer");
+            if (count($answers) != mb_substr_count($fillTheBlanks["question"], '${value}')) {
+                continue;
+            }
+
             $data[] = [
                 "uuid" => createUuid(),
                 "question" => $fillTheBlanks["question"],
-                "answer" => $fillTheBlanks["answer"],
+                "answer" => json_encode($answers, JSON_UNESCAPED_UNICODE),
                 "difficulty_level" => $fillTheBlanks["difficulty_level"],
                 "is_use" => $fillTheBlanks["is_use"],
                 "create_time" => $time,
@@ -147,8 +152,19 @@ class TestLibrary extends Common
     public function editFillTheBlanks()
     {
         $id = input('param.id');
+        $info = $this->fillTheBlanksService->findById($id);
 
-        $this->assign("info",$this->fillTheBlanksService->findById($id));
+        $this->assign("info", $info);
+
+        $answersArr = json_decode($info["answer"], true);
+        $answers = [];
+        foreach ($answersArr as $item) {
+            $answers[]["answer"] = $item;
+        }
+
+        $this->assign("info", $info);
+        $this->assign("answers", json_encode($answers));
+
 
         return $this->fetch("editFillTheBlanks");
     }
@@ -158,12 +174,19 @@ class TestLibrary extends Common
         $id = input('param.id');
         $info = $this->fillTheBlanksService->findById($id);
 
+        $answers = json_decode(input("answers"), true);
+        $answers = array_column($answers, "answer");
+        if (count($answers) != mb_substr_count(input("question"), '${value}')) {
+            $this->error("答案数量与下划线数量不对应");
+        }
+
         $updateData = [
             "question" => input("question"),
-            "answer" => input("answer"),
+            "answer" => json_encode($answers, JSON_UNESCAPED_UNICODE),
             "difficulty_level" => input("difficulty_level"),
             "update_time" => time(),
         ];
+
         $this->fillTheBlanksService->updateByIdAndData($id, $updateData);
 
         if ($info["difficulty_level"] != $updateData["difficulty_level"]) {

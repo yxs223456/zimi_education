@@ -1,6 +1,23 @@
 {include file="public/header" /}
+<link rel="stylesheet" type="text/css" href="/static/admin/webupload/webuploader.css">
+<link rel="stylesheet" type="text/css" href="/static/admin/webupload/style.css">
+<link href="/static/admin/css/select2.min.css" rel="stylesheet">
+<!-- 配置文件 -->
+<script type="text/javascript" src="/static/admin/ueditor/ueditor.config.js"></script>
+<!-- 编辑器源码文件 -->
+<script type="text/javascript" src="/static/admin/ueditor/ueditor.all.js"></script>
+<style>
+    .file-item{float: left; position: relative; width: 110px;height: 110px; margin: 0 20px 20px 0; padding: 4px;}
+    .file-item .info{overflow: hidden;}
+    .uploader-list{width: 100%; overflow: hidden;}
+</style>
+<style type="text/css">
+    .laydate-icon {
+        background: transparent !important;
+    }
+</style>
 <body class="gray-bg">
-<div class="wrapper wrapper-content animated fadeInRight">
+<div class="wrapper wrapper-content animated fadeInRight" id="app">
     <div class="row">
         <div class="col-sm-12">
             <div class="ibox float-e-margins">
@@ -19,12 +36,24 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">答案：</label>
-                            <div class="input-group col-sm-5">
-                                <input type="text" name="answer" id="answer" class="form-control" value="{$info.answer}">
+                        <input type="hidden" name="answers" v-model="JSON.stringify(answers)">
+                        <div v-for="(item, index) in answers">
+                            <div class="form-group" id="searchGoods">
+                                <label class="col-sm-2 control-label">第{{index+1}}空答案：：</label>
+                                <div class="input-group col-sm-5">
+                                    <a href="javascript:;" @click="delAnswer(index)"><font style="color:red;">删除</font></a>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"> </label>
+                                <div class="input-group col-sm-5">
+                                    <input type="text" name="" class="form-control" v-model="item.answer" >
+                                </div>
                             </div>
                         </div>
+                        <a href="javascript:;" @click="addAnswer"><font color="blue" style="margin-left:200px;">添加一个答案</font></a href="javascript:">
+
 
                         <div class="form-group">
                             <label class="col-sm-2 control-label">难度等级：</label>
@@ -55,11 +84,62 @@
     </div>
 </div>
 {include file="public/footer" /}
+<script type="text/javascript" src="/static/admin/webupload/webuploader.min.js"></script>
+<script type="text/javascript" src="/static/admin/js/common.js"></script>
+<script src="/static/admin/js/select2.full.min.js"></script>
+<script src="/static/admin/js/ajaxfileupload.js"></script>
+<!-- 开发环境版本，包含了有帮助的命令行警告 -->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<!-- 引入样式 -->
+<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<!-- 引入组件库 -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
 <script type="text/javascript">
+    let app = new Vue({
+        el: "#app",
+        data: {
+            answers: [
+                {
+                    "answer": "",
+                },
+            ],
+            selectedLoading: false,
+        },
+        created: function() {
+            let answers = '{$answers|raw}';
+            this.answers = JSON.parse(answers);
+        },
+        methods: {
+
+            // 添加答案
+            addAnswer: function() {
+
+                let answer = {
+                    "answer": "",
+                };
+                this.answers.push(answer);
+            },
+            // 删除答案
+            delAnswer: function(index) {
+
+                if (this.answers.length <= 1) {
+                    this.$message.error('至少留一个啊');
+                    return false;
+                }
+
+                this.answers.splice(index, 1);
+
+            },
+
+
+        }
+    });
+
     function interBlank() {
         var oldValue = $("#question").val();
         $("#question").val(oldValue + "${value}");
     }
+
 
     $(function(){
 
@@ -67,13 +147,6 @@
 
             if (common.isNullOrEmpty($('#question').val())) {
                 layer.msg('题目中有问题还空着呢',{icon:2,time:1500,shade: 0.1}, function(index){
-                    layer.close(index);
-                });
-                return false;
-            }
-
-            if (common.isNullOrEmpty($('#answer').val())) {
-                layer.msg('题目中有答案还空着呢',{icon:2,time:1500,shade: 0.1}, function(index){
                     layer.close(index);
                 });
                 return false;
