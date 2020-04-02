@@ -203,7 +203,7 @@ class QuestionService extends Base
             $returnData[] = [
                 "uuid" => $question["uuid"],
                 "question" => $question["question"],
-                "answer" => $question["answer"],
+                "answer" => [$question["answer"]],
             ];
         }
 
