@@ -119,4 +119,11 @@ class Constant
 
     //pk等待加入最长时间72小时， 超过72小时人数不足自动流局
     const PK_WAIT_JOIN_TIME = 72 * 3600;
+
+    //参与DE大赛奖励
+    const JOIN_INTERNAL_COMPETITION_REWARD = [
+        "coin" => 10,
+        "pk_coin" => 10,
+        "talent_coin" => 1,
+    ];
 }

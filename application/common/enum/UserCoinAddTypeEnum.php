@@ -43,4 +43,10 @@ class UserCoinAddTypeEnum
 
     const CONTINUOUS_SIGN_30_DAY = 9;
     const CONTINUOUS_SIGN_30_DAY_DESC = "连续签到30天";
+
+    const JOIN_INTERNAL_COMPETITION = 10;
+    const JOIN_INTERNAL_COMPETITION_DSC = "参与DE内部大赛";
+
+    const INTERNAL_COMPETITION_WIN = 11;
+    const INTERNAL_COMPETITION_WIN_DSC = "DE内部大赛取得名次";
 }

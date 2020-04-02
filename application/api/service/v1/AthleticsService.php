@@ -19,7 +19,10 @@ use app\common\enum\PkStatusEnum;
 use app\common\enum\PkTypeEnum;
 use app\common\enum\QuestionDifficultyLevelEnum;
 use app\common\enum\QuestionTypeEnum;
+use app\common\enum\UserCoinAddTypeEnum;
 use app\common\enum\UserCoinReduceTypeEnum;
+use app\common\enum\UserPkCoinAddTypeEnum;
+use app\common\enum\UserTalentCoinAddTypeEnum;
 use app\common\helper\Redis;
 use app\common\model\InternalCompetitionJoinModel;
 use app\common\model\InternalCompetitionModel;
@@ -28,6 +31,8 @@ use app\common\model\PkModel;
 use app\common\model\SingleChoiceModel;
 use app\common\model\UserBaseModel;
 use app\common\model\UserCoinLogModel;
+use app\common\model\UserPkCoinLogModel;
+use app\common\model\UserTalentCoinLogModel;
 use think\Db;
 
 class AthleticsService extends Base
@@ -484,6 +489,9 @@ class AthleticsService extends Base
         $allQuestion = json_decode($competition["question"], true);
         $randomKey = random_int(0, count($allQuestion) - 1);
         $randomQuestion = $allQuestion[$randomKey];
+        $userCoinLogModel = new UserCoinLogModel();
+        $userPkCoinLogModel = new UserPkCoinLogModel();
+        $userTalentCoinLogModel = new UserTalentCoinLogModel();
 
         Db::startTrans();
         try {
@@ -501,7 +509,48 @@ class AthleticsService extends Base
                 ->inc("join_num", 1)
                 ->update(["update_time"=>time()]);
 
+            //参赛学生可获得 10DE，10PK值,1 才情值
+            $userModel->where("uuid", $user["uuid"])
+                ->inc("coin", Constant::JOIN_INTERNAL_COMPETITION_REWARD["coin"])
+                ->inc("pk_coin", Constant::JOIN_INTERNAL_COMPETITION_REWARD["pk_coin"])
+                ->inc("talent_coin", Constant::JOIN_INTERNAL_COMPETITION_REWARD["talent_coin"])
+                ->update(["update_time"=>time()]);
+            $newUser = $userModel->findByUuid($user["uuid"])->toArray();
+
+            $userCoinLogModel->recordAddLog(
+                $user["uuid"],
+                UserCoinAddTypeEnum::JOIN_INTERNAL_COMPETITION,
+                Constant::JOIN_INTERNAL_COMPETITION_REWARD["coin"],
+                $newUser["coin"] - Constant::JOIN_INTERNAL_COMPETITION_REWARD["coin"],
+                $newUser["coin"],
+                UserCoinAddTypeEnum::JOIN_INTERNAL_COMPETITION_DSC,
+                $competitionUuid);
+
+            $userPkCoinLogModel->recordAddLog(
+                $user["uuid"],
+                UserPkCoinAddTypeEnum::JOIN_INTERNAL_COMPETITION,
+                Constant::JOIN_INTERNAL_COMPETITION_REWARD["pk_coin"],
+                $newUser["pk_coin"] - Constant::JOIN_INTERNAL_COMPETITION_REWARD["pk_coin"],
+                $newUser["pk_coin"],
+                UserPkCoinAddTypeEnum::JOIN_INTERNAL_COMPETITION_DSC,
+                $competitionUuid
+            );
+
+            $userTalentCoinLogModel->recordAddLog(
+                $user["uuid"],
+                UserTalentCoinAddTypeEnum::JOIN_INTERNAL_COMPETITION,
+                Constant::JOIN_INTERNAL_COMPETITION_REWARD["talent_coin"],
+                $newUser["talent_coin"] - Constant::JOIN_INTERNAL_COMPETITION_REWARD["talent_coin"],
+                $newUser["talent_coin"],
+                UserTalentCoinAddTypeEnum::JOIN_INTERNAL_COMPETITION_DSC,
+                $competitionUuid
+            );
+
             Db::commit();
+
+            //缓存用户信息
+            $redis = Redis::factory();
+            cacheUserInfoByToken($newUser, $redis);
 
             return $randomQuestion;
         } catch (\Throwable $e) {
