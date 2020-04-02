@@ -72,6 +72,14 @@
                             </div>
 
                             <div class="form-group">
+                                <label class="col-sm-2 control-label">多个空答案是否有序：</label>
+                                <div class="input-group col-sm-5">
+                                    <input type="radio" v-model="item.is_sequence" value="1">有序 &nbsp;&nbsp;
+                                    <input type="radio" v-model="item.is_sequence" value="0">无序
+                                </div>
+                            </div>
+
+                            <div class="form-group">
                                 <label class="col-sm-2 control-label">加入题库：</label>
                                 <div class="input-group col-sm-5">
                                     <input type="radio" v-model="item.is_use" value="1">立即加入 &nbsp;&nbsp;
@@ -124,6 +132,7 @@
                     ],
                     difficulty_level: "",
                     is_use: "1",
+                    is_sequence: "1",
                 }
             ],
             selectedLoading: false,
@@ -147,6 +156,7 @@
                     ],
                     difficulty_level: "",
                     is_use: "1",
+                    is_sequence: "1",
                 };
                 this.fillTheBlanksList.push(fillTheBlanks);
             },

@@ -136,6 +136,7 @@ class TestLibrary extends Common
                 "answer" => json_encode($answers, JSON_UNESCAPED_UNICODE),
                 "difficulty_level" => $fillTheBlanks["difficulty_level"],
                 "is_use" => $fillTheBlanks["is_use"],
+                "is_sequence" => $fillTheBlanks["is_sequence"],
                 "create_time" => $time,
                 "update_time" => $time,
             ];
@@ -184,6 +185,7 @@ class TestLibrary extends Common
             "question" => input("question"),
             "answer" => json_encode($answers, JSON_UNESCAPED_UNICODE),
             "difficulty_level" => input("difficulty_level"),
+            "is_sequence" => input("is_sequence"),
             "update_time" => time(),
         ];
 
