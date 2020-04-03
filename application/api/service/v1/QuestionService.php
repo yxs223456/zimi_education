@@ -87,7 +87,7 @@ class QuestionService extends Base
                 "uuid" => $item["uuid"],
                 "question" => $item["question"],
                 "possible_answers" => json_decode($item["possible_answers"], true),
-                "answer" => $item["answer"],
+                "answer" => [$item["answer"]],
             ];
         }
 
@@ -141,7 +141,8 @@ class QuestionService extends Base
             $returnData[] = [
                 "uuid" => $question["uuid"],
                 "question" => $question["question"],
-                "answer" => $question["answer"],
+                "answer" => json_decode($question["answer"], true),
+                "is_sequence" => $question["is_sequence"],
             ];
         }
 
@@ -172,7 +173,7 @@ class QuestionService extends Base
                 "uuid" => $question["uuid"],
                 "question" => $question["question"],
                 "possible_answers" => json_decode($question["possible_answers"], true),
-                "answer" => $question["answer"],
+                "answer" => [$question["answer"]],
             ];
         }
 
@@ -202,7 +203,7 @@ class QuestionService extends Base
             $returnData[] = [
                 "uuid" => $question["uuid"],
                 "question" => $question["question"],
-                "answer" => $question["answer"],
+                "answer" => [$question["answer"]],
             ];
         }
 

@@ -89,6 +89,22 @@ class CheckCompetition extends Base
 
     public function doCheck()
     {
+        $param = input();
+        if (!isset($param["score"]) || $param["score"] < 0 || $param["score"] > 100) {
+            $this->error("分值范围错误");
+        }
+        $score = (int) $param["score"];
 
+        $internalCompetitionJoin = $this->internalCompetitionJoinService->findByMap(["uuid"=>$param["uuid"]]);
+        if ($internalCompetitionJoin == null) {
+            $this->error("参与纪录不存在");
+        }
+
+        $internalCompetitionJoin->is_comment = InternalCompetitionJoinIsCommentEnum::YES;
+        $internalCompetitionJoin->score = $score;
+        $internalCompetitionJoin->comment_time = time();
+        $internalCompetitionJoin->save();
+
+        $this->success("批改成功",url("index"));
     }
 }

@@ -22,7 +22,7 @@
         <div class="col-sm-12">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>添加作文题</h5>
+                    <h5>为作文打分</h5>
                 </div>
                 <div class="ibox-content">
                     <form class="form-horizontal" name="edit" id="signupForm" method="post">
@@ -31,47 +31,73 @@
                         <div class="form-group">
                             <label class="col-sm-2 control-label">题目：</label>
                             <div class="input-group col-sm-5">
-                                <input type="text" name="topic" class="form-control" value="{$info.topic}">
+                                <input type="text" class="form-control" value="{$info.topic}" readonly>
                             </div>
                         </div>
 
-                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">题目难度：</label>
+                            <div class="input-group col-sm-5">
+                                <input type="text" class="form-control" value="{$info.difficulty_level}星" readonly>
+                            </div>
+                        </div>
 
-                        <input type="hidden" name="requirements" v-model="JSON.stringify(requirements)">
+                        <input type="hidden"  v-model="JSON.stringify(requirements)">
                         <div v-for="(item, index) in requirements">
                             <div class="form-group" id="searchGoods">
                                 <label class="col-sm-2 control-label">要求{{index+1}}：</label>
-                                <div class="input-group col-sm-5">
-                                    <a href="javascript:;" @click="delRequirement(index)"><font style="color:red;">删除</font></a>
-                                </div>
                             </div>
 
                             <div class="form-group">
                                 <label class="col-sm-2 control-label"> </label>
                                 <div class="input-group col-sm-5">
-                                    <input type="text" name="" class="form-control" v-model="item.requirement" >
+                                    <input type="text" readonly class="form-control" v-model="item.requirement" >
                                 </div>
                             </div>
                         </div>
-                        <a href="javascript:;" @click="addRequirement"><font color="blue" style="margin-left:200px;">添加要求</font></a href="javascript:">
-
                         <div class="hr-line-dashed"></div>
 
+                        {if empty($images)}
                         <div class="form-group">
-                            <label class="col-sm-2 control-label">难度等级：</label>
+                            <label class="col-sm-2 control-label">用户作品标题：</label>
                             <div class="input-group col-sm-5">
-                                <select name="difficulty_level" id="difficulty_level" class="form-control">
-                                    <option {$info.difficulty_level == 1 ? 'selected' : ''} value="1">1星</option>
-                                    <option {$info.difficulty_level == 2 ? 'selected' : ''} value="2">2星</option>
-                                    <option {$info.difficulty_level == 3 ? 'selected' : ''} value="3">3星</option>
-                                    <option {$info.difficulty_level == 4 ? 'selected' : ''} value="4">4星</option>
-                                    <option {$info.difficulty_level == 5 ? 'selected' : ''} value="5">5星</option>
-                                    <option {$info.difficulty_level == 6 ? 'selected' : ''} value="6">6星</option>
-                                </select>
+                                <input type="text" class="form-control" value="{$text.title}" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">用户作品内容：</label>
+                            <div class="input-group col-sm-8">
+                                <textarea class="form-control"  rows="30" readonly>{$text.content}</textarea>
+                            </div>
+                        </div>
+                        {else /}
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">用户作品：</label>
+                            <div class="input-group col-sm-5">
+                                {foreach $images as $image}
+                                <img src="/{$image}" alt="" style="max-width:1000px;">
+                                {/foreach}
+                            </div>
+                        </div>
+                        {/if}
+
+                        <div class="hr-line-dashed"></div>
+                        <br><br>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">分数：</label>
+                            <div class="input-group col-sm-5">
+                                <input type="text" class="form-control" name="score" placeholder="满分{$info.total_score}">
                             </div>
                         </div>
 
-                        <br><br>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">评语：</label>
+                            <div class="input-group col-sm-5">
+                                <textarea class="form-control" name="comment" rows="10"></textarea>
+                            </div>
+                        </div>
 
                         <div class="form-group">
                             <div class="col-sm-12">
@@ -115,26 +141,6 @@
             this.requirements = JSON.parse(requirements);
         },
         methods: {
-
-            // 添加一题
-            addRequirement: function() {
-
-                let requirement = {
-                    "requirement": "",
-                };
-                this.requirements.push(requirement);
-            },
-            // 删除一题
-            delRequirement: function(index) {
-
-                if (this.requirements.length <= 1) {
-                    this.$message.error('至少留一个啊');
-                    return false;
-                }
-
-                this.requirements.splice(index, 1);
-
-            },
 
         }
     });
@@ -192,7 +198,7 @@
 
                 $(form).ajaxSubmit({
                     type: 'post',
-                    url: "{:url('editWritingPost')}",
+                    url: "{:url('doStudyWritingCheck')}",
                     beforeSend:function() {
                         // 显示loading
                         index2 = layer.load(0, {
@@ -211,7 +217,7 @@
                         }
 
                         layer.msg(data.msg,{icon:1,time:1000,shade: 0.1,}, function(index){
-                            window.location.href="{:url('writingList',['page'=>$page,'difficulty_level'=>$difficultyLevel])}"
+                            window.location.href="{:url('studyWritingList')}"
                         });
                     },
                     error: function(XmlHttpRequest, textStatus, errorThrown){

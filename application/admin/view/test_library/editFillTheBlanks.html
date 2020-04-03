@@ -27,6 +27,8 @@
                 <div class="ibox-content">
                     <form class="form-horizontal" name="edit" id="edit" method="post" action="{:url('editFillTheBlanksPost')}">
                         <input type="hidden" value="{$info.id}" name="id"/>
+                        <input type="hidden" value="{$page}" name="page"/>
+                        <input type="hidden" value="{$difficultyLevel}" name="difficultyLevel"/>
 
                         <div class="form-group">
                             <label class="col-sm-2 control-label">题目：</label>

@@ -18,4 +18,15 @@ class UserWritingService extends Base
         parent::__construct();
         $this->currentModel = new UserWritingModel();
     }
+
+    public function getListByCondition($condition)
+    {
+        $list = $this->currentModel
+            ->where($condition['whereSql'])
+            ->order(['is_comment'=>'asc', 'id'=>'asc'])
+            ->paginate(\config("paginate.list_rows"), false,
+                ["query" => $condition['pageMap']]);
+
+        return $list;
+    }
 }
