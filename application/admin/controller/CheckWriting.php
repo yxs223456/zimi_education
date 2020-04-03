@@ -8,6 +8,9 @@
 
 namespace app\admin\controller;
 
+use app\common\enum\UserWritingIsCommentEnum;
+use app\common\enum\UserWritingSourceTypeEnum;
+
 class CheckWriting extends Base
 {
     public function convertRequestToWhereSql() {
@@ -25,9 +28,6 @@ class CheckWriting extends Base
 
             switch ($key) {
 
-                case "question":
-                    $whereSql .= " and question LIKE '%".$value."%'";
-                    break;
                 case "difficulty_level":
                     $whereSql .= " and difficulty_level = '$value'";
                     break;
@@ -43,5 +43,41 @@ class CheckWriting extends Base
 
         return $data;
 
+    }
+
+    public function studyWritingList()
+    {
+        $condition = $this->convertRequestToWhereSql();
+        $condition["whereSql"] .= " and source_type = " . UserWritingSourceTypeEnum::STUDY;
+        $list = $this->userWritingService->getListByCondition($condition);
+        $this->assign('list', $list);
+
+        $userWritingIsComment = UserWritingIsCommentEnum::getAllList();
+        $this->assign("userWritingIsComment", $userWritingIsComment);
+
+        return $this->fetch("studyWritingList");
+    }
+
+    public function checkStudyWriting()
+    {
+        $id = input("param.id");
+
+        $userWriting = $this->userWritingService->findById($id);
+        $requirementsArr = json_decode($userWriting["requirements"], true);
+        $requirements = [];
+        foreach ($requirementsArr as $item) {
+            $requirements[]["requirement"] = $item;
+        }
+
+        $answer = json_decode($userWriting["content"], true);
+        $images = $answer["images"]??[];
+        $text = $answer["text"]??[];
+
+        $this->assign("info", $userWriting);
+        $this->assign("requirements", json_encode($requirements));
+        $this->assign("images", $images);
+        $this->assign("text", $text);
+
+        return $this->fetch("checkStudyWriting");
     }
 }
