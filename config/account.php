@@ -21,8 +21,8 @@ return [
 
     "we_chat" => [
         "mobile" => [
-            "app_id" => "",
-            "app_secret" => "",
+            "app_id" => "wxcbcc3c48199cc7f7",
+            "app_secret" => "d292960d82769f4ffabc0e19b1b040ed",
         ],
     ],
 

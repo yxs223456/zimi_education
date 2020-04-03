@@ -11,7 +11,9 @@ use app\admin\service\AuthGroup as authGroupService;
 use app\admin\service\AuthGroupAccess as authGroupAccessService;
 use app\admin\service\AuthRule as authRuleService;
 use app\admin\service\TrueFalseQuestionService;
+use app\admin\service\UserBaseService;
 use app\admin\service\UserStudyWritingService;
+use app\admin\service\UserSynthesizeService;
 use app\admin\service\UserWritingService;
 use app\admin\service\WritingLibraryService;
 use think\Controller;
@@ -26,8 +28,10 @@ class Base extends Controller {
     protected $singleChoiceService;
     protected $writingLibraryService;
     protected $trueFalseQuestionService;
+    protected $userBaseService;
     protected $userWritingService;
     protected $userStudyWritingService;
+    protected $userSynthesizeService;
     protected $internalCompetitionJoinService;
     protected $internalCompetitionService;
 
@@ -42,8 +46,10 @@ class Base extends Controller {
      * @param SingleChoiceService $singleChoiceService
      * @param WritingLibraryService $writingLibraryService
      * @param TrueFalseQuestionService $trueFalseQuestionService
+     * @param UserBaseService $userBaseService
      * @param UserWritingService $userWritingService
      * @param UserStudyWritingService $userStudyWritingService
+     * @param UserSynthesizeService $userSynthesizeService
      * @param InternalCompetitionJoinService $internalCompetitionJoinService
      * @param InternalCompetitionService $internalCompetitionService
      */
@@ -52,8 +58,10 @@ class Base extends Controller {
                                  FillTheBlanksService $fillTheBlanksService, SingleChoiceService $singleChoiceService,
                                  WritingLibraryService $writingLibraryService,
                                  TrueFalseQuestionService $trueFalseQuestionService,
+                                 UserBaseService $userBaseService,
                                  UserWritingService $userWritingService,
                                  UserStudyWritingService $userStudyWritingService,
+                                 UserSynthesizeService $userSynthesizeService,
                                  InternalCompetitionJoinService $internalCompetitionJoinService,
                                  InternalCompetitionService $internalCompetitionService){
 
@@ -67,8 +75,10 @@ class Base extends Controller {
         $this->singleChoiceService = $singleChoiceService;
         $this->writingLibraryService = $writingLibraryService;
         $this->trueFalseQuestionService = $trueFalseQuestionService;
+        $this->userBaseService = $userBaseService;
         $this->userWritingService = $userWritingService;
         $this->userStudyWritingService = $userStudyWritingService;
+        $this->userSynthesizeService = $userSynthesizeService;
         $this->internalCompetitionJoinService = $internalCompetitionJoinService;
         $this->internalCompetitionService = $internalCompetitionService;
     }
