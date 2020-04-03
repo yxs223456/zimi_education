@@ -211,7 +211,7 @@
                         }
 
                         layer.msg(data.msg,{icon:1,time:1000,shade: 0.1,}, function(index){
-                            window.location.href="{:url('writingList')}"
+                            window.location.href="{:url('writingList',['page'=>$page,'difficulty_level'=>$difficultyLevel])}"
                         });
                     },
                     error: function(XmlHttpRequest, textStatus, errorThrown){

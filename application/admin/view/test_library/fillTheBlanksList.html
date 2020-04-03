@@ -74,20 +74,20 @@
                                     {/if}
                                 </td>
                                 <td>
-                                    <a href="{:url('editFillTheBlanks',['id'=>$vo['id']])}" class="btn btn-primary btn-xs">
+                                    <a href="{:url('editFillTheBlanks',['id'=>$vo['id'],'difficultyLevel'=>$difficulty_level??'','page'=>$page??1])}" class="btn btn-primary btn-xs">
                                         <i class="fa fa-paste"></i> 编辑</a>&nbsp;
 
                                     {if condition="$vo['is_use'] eq 1"}
-                                    <a class="red btn btn-danger btn-xs" href="{:url('operateLibraryCache',['uuid'=>$vo['uuid'],'difficulty_level'=>$vo['difficulty_level'],'do'=>'remove','type'=>'fillTheBlanks'])}">
+                                    <a class="red btn btn-danger btn-xs" href="{:url('operateLibraryCache',['uuid'=>$vo['uuid'],'difficultyLevel'=>$difficulty_level??'','page'=>$page??1,'difficulty_level'=>$vo['difficulty_level'],'do'=>'remove','type'=>'fillTheBlanks'])}">
                                         移出题库
                                     </a>
                                     {else /}
-                                    <a class="red btn btn-info btn-xs" href="{:url('operateLibraryCache',['uuid'=>$vo['uuid'],'difficulty_level'=>$vo['difficulty_level'],'do'=>'add','type'=>'fillTheBlanks'])}">
+                                    <a class="red btn btn-info btn-xs" href="{:url('operateLibraryCache',['uuid'=>$vo['uuid'],'difficultyLevel'=>$difficulty_level??'','page'=>$page??1,'difficulty_level'=>$vo['difficulty_level'],'do'=>'add','type'=>'fillTheBlanks'])}">
                                         加入题库
                                     </a>
                                     {/if}
 
-                                    <a href="{:url('deleteFillTheBlanks',['id'=>$vo['id']])}" class="btn btn-danger btn-xs">
+                                    <a href="{:url('deleteFillTheBlanks',['id'=>$vo['id'],'difficultyLevel'=>$difficulty_level??'','page'=>$page??1])}" class="btn btn-danger btn-xs">
                                         <i class="fa fa-trash-o"></i> 删除</a>
                                 </td>
 

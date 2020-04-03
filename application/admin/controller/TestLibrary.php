@@ -58,6 +58,7 @@ class TestLibrary extends Common
     //填空题列表
     public function fillTheBlanksList()
     {
+
         $condition = $this->convertRequestToWhereSql();
 
         $list = $this->fillTheBlanksService->getListByCondition($condition);
@@ -166,6 +167,8 @@ class TestLibrary extends Common
         $this->assign("info", $info);
         $this->assign("answers", json_encode($answers));
 
+        $this->assign('page', input('page', 1));
+        $this->assign('difficultyLevel', input('difficultyLevel', ''));
 
         return $this->fetch("editFillTheBlanks");
     }
@@ -199,7 +202,9 @@ class TestLibrary extends Common
             }
         }
 
-        $this->success("修改成功",url("fillTheBlanksList"));
+        $page = input("page",1);
+        $difficultyLevel = input('difficultyLevel', '');
+        $this->success("修改成功",url("fillTheBlanksList?page=$page&difficulty_level=$difficultyLevel"));
     }
 
     public function deleteFillTheBlanks()
@@ -215,7 +220,9 @@ class TestLibrary extends Common
         ];
         $this->fillTheBlanksService->updateByIdAndData($id, $updateData);
 
-        $this->success("删除成功");
+        $page = input("page",1);
+        $difficultyLevel = input('difficultyLevel', '');
+        $this->success("删除成功", url("fillTheBlanksList?page=$page&difficulty_level=$difficultyLevel"));
     }
 
     //单选题列表
@@ -364,6 +371,9 @@ class TestLibrary extends Common
         $this->assign("info", $info);
         $this->assign("answers", $answers);
 
+        $this->assign('page', input('page', 1));
+        $this->assign('difficultyLevel', input('difficultyLevel', ''));
+
         return $this->fetch("editSingleChoice");
     }
 
@@ -403,7 +413,9 @@ class TestLibrary extends Common
             }
         }
 
-        $this->success("修改成功",url("singleChoiceList"));
+        $page = input("page",1);
+        $difficultyLevel = input('difficultyLevel', '');
+        $this->success("修改成功",url("singleChoiceList?page=$page&difficulty_level=$difficultyLevel"));
     }
 
     public function deleteSingleChoice()
@@ -419,7 +431,9 @@ class TestLibrary extends Common
         ];
         $this->singleChoiceService->updateByIdAndData($id, $updateData);
 
-        $this->success("删除成功");
+        $page = input("page",1);
+        $difficultyLevel = input('difficultyLevel', '');
+        $this->success("删除成功", url("singleChoiceList?page=$page&difficulty_level=$difficultyLevel"));
     }
 
     //作文题列表
@@ -545,6 +559,9 @@ class TestLibrary extends Common
         $this->assign("info", $info);
         $this->assign("requirements", json_encode($requirements));
 
+        $this->assign('page', input('page', 1));
+        $this->assign('difficultyLevel', input('difficultyLevel', ''));
+
         return $this->fetch("editWriting");
     }
 
@@ -599,8 +616,7 @@ class TestLibrary extends Common
             }
         }
 
-        $this->success("修改成功",url("writingList"));
-
+        $this->success("修改成功");
     }
 
     public function deleteWriting()
@@ -616,7 +632,9 @@ class TestLibrary extends Common
         ];
         $this->writingLibraryService->updateByIdAndData($id, $updateData);
 
-        $this->success("删除成功");
+        $page = input("page",1);
+        $difficultyLevel = input('difficultyLevel', '');
+        $this->success("删除成功", url("writingList?page=$page&difficulty_level=$difficultyLevel"));
     }
 
     //判断题列表
@@ -720,6 +738,9 @@ class TestLibrary extends Common
 
         $this->assign("info",$this->trueFalseQuestionService->findById($id));
 
+        $this->assign('page', input('page', 1));
+        $this->assign('difficultyLevel', input('difficultyLevel', ''));
+
         return $this->fetch("editTrueFalseQuestion");
     }
 
@@ -744,7 +765,9 @@ class TestLibrary extends Common
             }
         }
 
-        $this->success("修改成功",url("trueFalseQuestionList"));
+        $page = input("page",1);
+        $difficultyLevel = input('difficultyLevel', '');
+        $this->success("修改成功",url("trueFalseQuestionList?page=$page&difficulty_level=$difficultyLevel"));
     }
 
     public function deleteTrueFalseQuestion()
@@ -760,7 +783,9 @@ class TestLibrary extends Common
         ];
         $this->trueFalseQuestionService->updateByIdAndData($id, $updateData);
 
-        $this->success("删除成功");
+        $page = input("page",1);
+        $difficultyLevel = input('difficultyLevel', '');
+        $this->success("删除成功", url("trueFalseQuestionList?page=$page&difficulty_level=$difficultyLevel"));
     }
 
     //操作题库缓存
@@ -771,6 +796,11 @@ class TestLibrary extends Common
         $uuid = input("uuid");
         $difficultyLevel = input("difficulty_level");
         $do = input("do");
+
+        //跳转参数
+        $page = input("page",1);
+        $difficulty_level = input('difficultyLevel', '');
+
         $redis = Redis::factory();
         if ($do == "add") {
             $dbUpdateData = [
@@ -794,7 +824,7 @@ class TestLibrary extends Common
                 Db::name("fill_the_blanks")
                     ->where("uuid", $uuid)
                     ->update($dbUpdateData);
-                $this->redirect("fillTheBlanksList");
+                $this->redirect("fillTheBlanksList?page=$page&difficulty_level=$difficulty_level");
                 break;
             case "singleChoice":
                 if ($do == "add") {
@@ -805,7 +835,7 @@ class TestLibrary extends Common
                 Db::name("single_choice")
                     ->where("uuid", $uuid)
                     ->update($dbUpdateData);
-                $this->redirect("singleChoiceList");
+                $this->redirect("singleChoiceList?page=$page&difficulty_level=$difficulty_level");
                 break;
             case "trueFalseQuestion":
                 if ($do == "add") {
@@ -816,7 +846,7 @@ class TestLibrary extends Common
                 Db::name("true_false_question")
                     ->where("uuid", $uuid)
                     ->update($dbUpdateData);
-                $this->redirect("trueFalseQuestionList");
+                $this->redirect("trueFalseQuestionList?page=$page&difficulty_level=$difficulty_level");
                 break;
             case "writing":
                 if ($do == "add") {
@@ -827,7 +857,7 @@ class TestLibrary extends Common
                 Db::name("writing")
                     ->where("uuid", $uuid)
                     ->update($dbUpdateData);
-                $this->redirect("writingList");
+                $this->redirect("writingList?page=$page&difficulty_level=$difficulty_level");
                 break;
 
         }

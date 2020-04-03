@@ -11,6 +11,7 @@ use app\admin\service\AuthGroup as authGroupService;
 use app\admin\service\AuthGroupAccess as authGroupAccessService;
 use app\admin\service\AuthRule as authRuleService;
 use app\admin\service\TrueFalseQuestionService;
+use app\admin\service\UserStudyWritingService;
 use app\admin\service\UserWritingService;
 use app\admin\service\WritingLibraryService;
 use think\Controller;
@@ -26,6 +27,7 @@ class Base extends Controller {
     protected $writingLibraryService;
     protected $trueFalseQuestionService;
     protected $userWritingService;
+    protected $userStudyWritingService;
     protected $internalCompetitionJoinService;
     protected $internalCompetitionService;
 
@@ -41,6 +43,7 @@ class Base extends Controller {
      * @param WritingLibraryService $writingLibraryService
      * @param TrueFalseQuestionService $trueFalseQuestionService
      * @param UserWritingService $userWritingService
+     * @param UserStudyWritingService $userStudyWritingService
      * @param InternalCompetitionJoinService $internalCompetitionJoinService
      * @param InternalCompetitionService $internalCompetitionService
      */
@@ -50,6 +53,7 @@ class Base extends Controller {
                                  WritingLibraryService $writingLibraryService,
                                  TrueFalseQuestionService $trueFalseQuestionService,
                                  UserWritingService $userWritingService,
+                                 UserStudyWritingService $userStudyWritingService,
                                  InternalCompetitionJoinService $internalCompetitionJoinService,
                                  InternalCompetitionService $internalCompetitionService){
 
@@ -64,6 +68,7 @@ class Base extends Controller {
         $this->writingLibraryService = $writingLibraryService;
         $this->trueFalseQuestionService = $trueFalseQuestionService;
         $this->userWritingService = $userWritingService;
+        $this->userStudyWritingService = $userStudyWritingService;
         $this->internalCompetitionJoinService = $internalCompetitionJoinService;
         $this->internalCompetitionService = $internalCompetitionService;
     }
