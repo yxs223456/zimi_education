@@ -116,7 +116,7 @@ class UserService extends Base
             }
         }
         //把用户信息记录到redis
-        cacheUserInfoByToken($userInfo, $redis);
+        cacheUserInfoByToken($userInfo->toArray(), $redis);
 
         return $this->userInfoForRequire($userInfo);
     }
