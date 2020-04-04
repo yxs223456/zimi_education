@@ -74,7 +74,7 @@ class UserService extends Base
 
             //手机号存在，没有绑定其他微信，进行绑定
             $this->recordUserWeChatInfo($userByPhone, $userWeChatInfo);
-            $userInfo = $userByPhone;
+            $userInfo = $userByPhone->toArray();
         } else {
             //手机号不存在，绑定手机号
             //验证密码格式是否正确
@@ -108,7 +108,6 @@ class UserService extends Base
                 $userModel->addUserInviteCountByUuid($parentUuid);
 
                 Db::commit();
-
             } catch (\Throwable $e) {
                 Db::rollback();
                 Log::write("create user by phone and we chat error:" . $e->getMessage(), "ERROR");
@@ -116,7 +115,7 @@ class UserService extends Base
             }
         }
         //把用户信息记录到redis
-        cacheUserInfoByToken($userInfo->toArray(), $redis);
+        cacheUserInfoByToken($userInfo, $redis);
 
         return $this->userInfoForRequire($userInfo);
     }
