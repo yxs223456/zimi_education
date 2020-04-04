@@ -22,6 +22,30 @@ function getUserInfoByToken($token, Redis $redis) {
     return $redis->hGetAll($key);
 }
 
+// 缓存用户微信信息，用于后期绑定手机号
+function cacheUserWeChatInfo(array $weChatInfo, Redis $redis) {
+    do {
+        $weChatInfoKey = getRandomString(10);
+        $key = "de_education:weChatInfo:$weChatInfoKey";
+    } while($redis->exists($key));
+
+    $redis->setex($key, 6 * 3600, json_encode($weChatInfo, JSON_UNESCAPED_UNICODE));
+    return $weChatInfoKey;
+}
+
+// 重缓存中获取用户微信信息
+function getUserWeChatInfo($weChatInfoKey, Redis $redis)
+{
+    $key = "de_education:weChatInfo:$weChatInfoKey";
+    $data = $redis->get($key);
+
+    if ($data) {
+        return json_decode($data, true);
+    } else {
+        return [];
+    }
+}
+
 //将单选题放入题库缓存
 function addFillTheBlanksArray(array $fillTheBlanksList, Redis $redis) {
     $list = [

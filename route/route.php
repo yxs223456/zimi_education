@@ -39,6 +39,8 @@ Route::rule('user/resetPassword', 'api/user/resetPassword', 'post');
 Route::rule('user/bindWeChat', 'api/user/bindWeChat', 'post');
 //微信登录
 Route::rule('user/weChatSignIn', 'api/user/weChatSignIn', 'post');
+//微信绑定手机号
+Route::rule('user/bindPhone', 'api/user/bindPhone', 'post');
 //微信登录
 Route::rule('user/userInfo', 'api/user/userInfo', 'post');
 //修改用户信息

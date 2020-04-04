@@ -48,6 +48,79 @@ class UserService extends Base
         return [];
     }
 
+    //微信绑定手机号
+    public function bindPhone($weChatInfoKey, $phone, $code, $password, $inviteCode)
+    {
+        //用户微信信息
+        $redis = Redis::factory();
+        $userWeChatInfo = getUserWeChatInfo($weChatInfoKey, $redis);
+        if ($userWeChatInfo == []) {
+            throw AppException::factory(AppException::USER_BIND_PHONE_KEY_TIMEOUT);
+        }
+
+        //微信号存在
+        $userModel = new UserBaseModel();
+        $userByWeChat = $userModel->getUserByUnionid($userWeChatInfo["unionid"]);
+        if ($userByWeChat) {
+            throw AppException::factory(AppException::WE_CHAT_BIND_ALREADY);
+        }
+
+        $userByPhone = $userModel->getUserByPhone($phone);
+        if ($userByPhone) {
+            //手机号存在，并已经绑定其他微信，则报错
+            if ($userByPhone["unionid"]) {
+                throw AppException::factory(AppException::USER_BIND_WE_CHAT_ALREADY);
+            }
+
+            //手机号存在，没有绑定其他微信，进行绑定
+            $this->recordUserWeChatInfo($userByPhone, $userWeChatInfo);
+            $userInfo = $userByPhone;
+        } else {
+            //手机号不存在，绑定手机号
+            //验证密码格式是否正确
+            if ($this->checkPasswordFormat($password) == false) {
+                throw AppException::factory(AppException::USER_PASSWORD_FORMAT_ERROR);
+            }
+
+            //判断验证码是否正确（不验证手机号是否注册）
+            if (MobTech::verify($phone, $code) == false) {
+                throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
+            }
+
+            //判断邀请码是否存在
+            if ($inviteCode) {
+                $inviteUser = $userModel->getUserByInviteCode($inviteCode);
+                if (!$inviteUser) {
+                    throw AppException::factory(AppException::USER_INVITE_CODE_NOT_EXISTS);
+                }
+                $parentUuid = $inviteUser["uuid"];
+            } else {
+                $parentUuid = "";
+                $inviteCode = "";
+            }
+
+            Db::startTrans();
+            try {
+
+                //通过手机号创建用户
+                $userInfo = $this->createUserByPhoneAndWeChat($phone, $password, $parentUuid, $inviteCode, $userWeChatInfo);
+
+                $userModel->addUserInviteCountByUuid($parentUuid);
+
+                Db::commit();
+
+            } catch (\Throwable $e) {
+                Db::rollback();
+                Log::write("create user by phone and we chat error:" . $e->getMessage(), "ERROR");
+                throw AppException::factory(AppException::USER_CREATE_ERROR);
+            }
+        }
+        //把用户信息记录到redis
+        cacheUserInfoByToken($userInfo, $redis);
+
+        return $this->userInfoForRequire($userInfo);
+    }
+
     //通过手机号注册用户
     public function singUp($phone, $code, $password, $inviteCode)
     {
@@ -62,7 +135,6 @@ class UserService extends Base
         if ($this->checkPasswordFormat($password) == false) {
             throw AppException::factory(AppException::USER_PASSWORD_FORMAT_ERROR);
         }
-
 
         //判断验证码是否正确（不验证手机号是否注册）
         if (MobTech::verify($phone, $code) == false) {
@@ -176,6 +248,43 @@ class UserService extends Base
             "uuid" => $uuid,
             "phone" => $phone,
             "password" => $encryptPassword,
+            "token" => $token,
+            "invite_code" => $inviteCode,
+            "parent_uuid" => $parentUuid,
+            "parent_invite_code" => $parentInviteCode,
+            "create_time" => $time,
+            "update_time" => $time,
+        ];
+
+        $userBaseModel = new UserBaseModel();
+
+        $id = $userBaseModel->insertGetId($userInfo);
+
+        $userInfo = $userBaseModel->where("id", $id)->find()->toArray();
+
+        return $userInfo;
+    }
+
+    private function createUserByPhoneAndWeChat($phone, $password, $parentUuid, $parentInviteCode, $userWeChatInfo)
+    {
+        $encryptPassword = Pbkdf2::create_hash($password);
+        $inviteCode = createInviteCode(6);
+        $token = getRandomString(32);
+        $uuid = getRandomString(32);
+        $time = time();
+
+        $userInfo = [
+            "uuid" => $uuid,
+            "phone" => $phone,
+            "password" => $encryptPassword,
+            "unionid" => $userWeChatInfo["unionid"],
+            "mobile_openid" => $userWeChatInfo["openid"],
+            "nickname" => $userWeChatInfo["nickname"],
+            "head_image_url" => $userWeChatInfo["headimgurl"],
+            "sex" => $userWeChatInfo["sex"],
+            "country" => $userWeChatInfo["country"],
+            "province" => $userWeChatInfo["province"],
+            "city" => $userWeChatInfo["city"],
             "token" => $token,
             "invite_code" => $inviteCode,
             "parent_uuid" => $parentUuid,
@@ -350,7 +459,11 @@ class UserService extends Base
         $userModel = new UserBaseModel();
         $user = $userModel->where("unionid", $userWeChatInfo["unionid"])->find();
         if (empty($user)) {
-            throw AppException::factory(AppException::WE_CHAT_NOT_BIND_USER);
+            $redis = Redis::factory();
+            return [
+                "user_exists" => 0,
+                "key" => cacheUserWeChatInfo($userWeChatInfo, $redis),
+            ];
         }
 
         //纪录用户微信信息
@@ -361,7 +474,10 @@ class UserService extends Base
         $redis = Redis::factory();
         cacheUserInfoByToken($userInfo, $redis);
 
-        return $this->userInfoForRequire($userInfo);
+        return [
+            "user_exists" => 1,
+            "user_info" => $this->userInfoForRequire($userInfo)
+        ];
     }
 
     public function userInfo($user)
@@ -603,7 +719,6 @@ class UserService extends Base
         $user->country = $userWeChatInfo["country"];
         $user->province = $userWeChatInfo["province"];
         $user->city = $userWeChatInfo["city"];
-        $user->update_time = time();
         $user->save();
 
     }
