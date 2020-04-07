@@ -227,9 +227,27 @@ function createInviteCode($length = 10)
     return $str;
 }
 
-function getImageUrl($headImageUrl)
+function getImageUrl($imageUrl)
 {
-    return str_replace("static/api", config("web.self_domain") . "/static/api", $headImageUrl);
+    return str_replace("static/api", config("web.self_domain") . "/static/api", $imageUrl);
+}
+
+function getHeadImageUrl($headImageUrl)
+{
+    if ($headImageUrl == "") {
+        return \app\common\Constant::DEFAULT_HEAD_IMAGE_URL;
+    } else {
+        return getImageUrl($headImageUrl);
+    }
+}
+
+function getNickname($nickname)
+{
+    if ($nickname == "") {
+        return \app\common\Constant::DEFAULT_NICKNAME;
+    } else {
+        return $nickname;
+    }
 }
 
 function gmt_iso8601($time) {

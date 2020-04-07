@@ -13,6 +13,7 @@ use app\admin\service\AuthRule as authRuleService;
 use app\admin\service\TrueFalseQuestionService;
 use app\admin\service\UserBaseService;
 use app\admin\service\UserStudyWritingService;
+use app\admin\service\UserSynthesizeRankService;
 use app\admin\service\UserSynthesizeService;
 use app\admin\service\UserWritingService;
 use app\admin\service\WritingLibraryService;
@@ -32,6 +33,7 @@ class Base extends Controller {
     protected $userWritingService;
     protected $userStudyWritingService;
     protected $userSynthesizeService;
+    protected $userSynthesizeRankService;
     protected $internalCompetitionJoinService;
     protected $internalCompetitionService;
 
@@ -49,6 +51,7 @@ class Base extends Controller {
      * @param UserBaseService $userBaseService
      * @param UserWritingService $userWritingService
      * @param UserStudyWritingService $userStudyWritingService
+     * @param UserSynthesizeRankService $userSynthesizeRankService
      * @param UserSynthesizeService $userSynthesizeService
      * @param InternalCompetitionJoinService $internalCompetitionJoinService
      * @param InternalCompetitionService $internalCompetitionService
@@ -61,6 +64,7 @@ class Base extends Controller {
                                  UserBaseService $userBaseService,
                                  UserWritingService $userWritingService,
                                  UserStudyWritingService $userStudyWritingService,
+                                 UserSynthesizeRankService $userSynthesizeRankService,
                                  UserSynthesizeService $userSynthesizeService,
                                  InternalCompetitionJoinService $internalCompetitionJoinService,
                                  InternalCompetitionService $internalCompetitionService){
@@ -78,6 +82,7 @@ class Base extends Controller {
         $this->userBaseService = $userBaseService;
         $this->userWritingService = $userWritingService;
         $this->userStudyWritingService = $userStudyWritingService;
+        $this->userSynthesizeRankService = $userSynthesizeRankService;
         $this->userSynthesizeService = $userSynthesizeService;
         $this->internalCompetitionJoinService = $internalCompetitionJoinService;
         $this->internalCompetitionService = $internalCompetitionService;

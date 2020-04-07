@@ -120,6 +120,10 @@ Route::rule('athletics/submitCompetitionDraft', 'api/athletics/submitCompetition
 //提交内部大赛作品
 Route::rule('athletics/submitCompetition', 'api/athletics/submitCompetition', 'post');
 
+
+//综合测试排行榜
+Route::rule('rank/synthesizeRank', 'api/rank/synthesizeRank', 'post');
+
 return [
 
 ];

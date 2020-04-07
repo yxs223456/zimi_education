@@ -901,3 +901,37 @@ function getPkFinishList(\Redis $redis) {
 
     return $data;
 }
+
+//测试榜晋级列表
+function pushSynthesizeUpdateList($nickname, $difficultyLevel, \Redis $redis) {
+    $key = "de_education:synthesizeUpdateLis:$difficultyLevel";
+    switch ($difficultyLevel) {
+        case 1:
+            $string = $nickname . "晋级一星榜单，请继续努力~";
+            break;
+        case 2:
+            $string = $nickname . "晋级二星榜单，请继续努力~";
+            break;
+        case 3:
+            $string = $nickname . "晋级三星榜单，请继续努力~";
+            break;
+        case 4:
+            $string = $nickname . "晋级四星榜单，请继续努力~";
+            break;
+        case 5:
+            $string = $nickname . "晋级五星榜单，请继续努力~";
+            break;
+        case 6:
+            $string = $nickname . "晋级六星榜单，请继续努力~";
+            break;
+        default:
+            return;
+    }
+    $redis->lPush($key, $string);
+}
+
+//测试榜晋级列表
+function getSynthesizeUpdateList($difficultyLevel, \Redis $redis) {
+    $key = "de_education:synthesizeUpdateLis:$difficultyLevel";
+    return $redis->lRange($key, 0, 4);
+}
