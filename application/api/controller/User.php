@@ -16,7 +16,7 @@ class User extends Base
     protected $beforeActionList = [
         'checkAuth' => [
             'except' => 'test,getCodeForSignUp,signUp,getCodeForSignIn,signInByCode,signInByPassword,
-            getCodeForResetPassword,resetPassword,weChatSignIn',
+            getCodeForResetPassword,resetPassword,weChatSignIn,bindPhone',
         ],
     ];
 
@@ -155,6 +155,25 @@ class User extends Base
 
         $userService = new UserService();
         $returnData = $userService->weChatSignIn($code);
+
+        return $this->jsonResponse($returnData);
+    }
+
+    //微信绑定手机号
+    public function bindPhone()
+    {
+        $key = input("key");
+        $phone = input("phone");
+        $code = input("code", null);
+        $password = input("password", null);
+        $inviteCode = input("invite_code");
+
+        if ($key === null || !checkIsMobile($phone) || $code === null || $password === null) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $userService = new UserService();
+        $returnData = $userService->bindPhone($key, $phone, $code, $password, $inviteCode);
 
         return $this->jsonResponse($returnData);
     }
