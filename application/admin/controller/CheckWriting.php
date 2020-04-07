@@ -344,6 +344,7 @@ class CheckWriting extends Base
                 $redis = Redis::factory();
                 $userInfo = $user->toArray();
                 cacheUserInfoByToken($userInfo, $redis);
+                pushSynthesizeUpdateList($userInfo["nickname"], $userSynthesize["difficulty_level"], $redis);
             }
             $this->success("修改成功");
         } catch (\Throwable $e) {
