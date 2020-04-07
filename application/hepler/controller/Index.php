@@ -6,7 +6,7 @@
  * Time: 18:35
  */
 
-namespace app\api\controller;
+namespace app\hepler\controller;
 
 use think\Controller;
 
