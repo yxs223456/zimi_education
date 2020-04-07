@@ -422,13 +422,13 @@ class QuestionService extends Base
                         $singleChoiceAnswers = array_column($item["list"], "answer", "uuid");
                         break;
                     case QuestionTypeEnum::FILL_THE_BLANKS:
-                        $fillTheBlanksAnswers = array_column($item["list"], "answer", "uuid");
+                        $fillTheBlanksAnswers = array_column($item["list"], "answers", "uuid");
                         break;
                     case QuestionTypeEnum::TRUE_FALSE_QUESTION:
                         $trueFalseQuestionAnswers = array_column($item["list"], "answer", "uuid");
                         break;
                     case QuestionTypeEnum::WRITING:
-                        $writingAnswers = array_column($item["list"], "answer", "uuid");
+                        $writingAnswers = array_column($item["list"], "content", "uuid");
                         break;
                 }
             }
@@ -453,7 +453,7 @@ class QuestionService extends Base
             $returnData["exercises"]["fillTheBlanks"]["list"][] = [
                 "uuid" => $fillTheBlanks["uuid"],
                 "question" => $fillTheBlanks["question"],
-                "answer" => isset($fillTheBlanksAnswers[$fillTheBlanks["uuid"]])?$fillTheBlanksAnswers[$fillTheBlanks["uuid"]]:"",
+                "answers" => isset($fillTheBlanksAnswers[$fillTheBlanks["uuid"]])?$fillTheBlanksAnswers[$fillTheBlanks["uuid"]]:"",
             ];
         }
         foreach ($randomTrueFalseQuestion as $trueFalseQuestion) {
@@ -463,7 +463,7 @@ class QuestionService extends Base
             $returnData["exercises"]["trueFalseQuestion"]["list"][] = [
                 "uuid" => $trueFalseQuestion["uuid"],
                 "question" => $trueFalseQuestion["question"],
-                "answer" => isset($trueFalseQuestionAnswers[$trueFalseQuestion["uuid"]])?$trueFalseQuestionAnswers[$trueFalseQuestion["uuid"]]:null,
+                "answer" => isset($trueFalseQuestionAnswers[$trueFalseQuestion["uuid"]])?$trueFalseQuestionAnswers[$trueFalseQuestion["uuid"]]:0,
             ];
         }
         $returnData["exercises"]["writing"] = [
@@ -473,7 +473,7 @@ class QuestionService extends Base
                     "uuid" => $randomWriting["uuid"],
                     "topic"=> $randomWriting["topic"],
                     "requirements" => json_decode($randomWriting["requirements"], true),
-                    "answer" => isset($writingAnswers[$randomWriting["uuid"]])?$writingAnswers[$randomWriting["uuid"]]:["text"=>"","images"=>[]],
+                    "content" => isset($writingAnswers[$randomWriting["uuid"]])?$writingAnswers[$randomWriting["uuid"]]:["text"=>"","images"=>[]],
                 ]
             ],
         ];
@@ -537,7 +537,7 @@ class QuestionService extends Base
                             "difficulty_level" => $writing["difficulty_level"],
                             "requirements" => $writing["requirements"],
                             "topic" => $writing["topic"],
-                            "content" => json_encode($answerInfo["answer"], JSON_UNESCAPED_UNICODE),
+                            "content" => json_encode($answerInfo["content"], JSON_UNESCAPED_UNICODE),
                             "total_score" => 30,
                         ];
                         $userWritingModel->save($userWritingData);

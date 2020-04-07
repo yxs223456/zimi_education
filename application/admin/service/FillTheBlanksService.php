@@ -30,4 +30,12 @@ class FillTheBlanksService extends Base
             ->field("count(1) total, difficulty_level")
             ->select();
     }
+
+    public function getByUuids(array $uuids)
+    {
+        return $this->currentModel
+            ->whereIn("uuid", $uuids)
+            ->select()
+            ->toArray();
+    }
 }

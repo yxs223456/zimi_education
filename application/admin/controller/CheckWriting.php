@@ -8,6 +8,7 @@
 
 namespace app\admin\controller;
 
+use app\common\enum\FillTheBlanksAnswerIsSequenceEnum;
 use app\common\enum\QuestionTypeEnum;
 use app\common\enum\UserStudyWritingIsCommentEnum;
 use app\common\enum\UserWritingIsCommentEnum;
@@ -194,14 +195,10 @@ class CheckWriting extends Base
             $this->error('用户不存在');
         }
 
-        $singleChoice = [];
         $singleChoiceUuids = [];
-        $fillTheBlanks = [];
         $fillTheBlanksUuids = [];
-        $trueFalseQuestion = [];
         $trueFalseQuestionUuids = [];
-        $writing = [];
-        $writingUuids = [];
+
         $questions = json_decode($userSynthesize["questions"], true);
         foreach ($questions as $item) {
             switch ($item["type"]) {
@@ -214,27 +211,109 @@ class CheckWriting extends Base
                 case QuestionTypeEnum::TRUE_FALSE_QUESTION:
                     $trueFalseQuestionUuids = $item["uuids"];
                     break;
-                case QuestionTypeEnum::WRITING:
-                    $writingUuids = $item["uuids"];
-                    break;
             }
         }
 
+        $singleChoice = $this->singleChoiceService->getByUuids($singleChoiceUuids);
+        $singleChoiceAnswer = array_column($singleChoice, null, "uuid");
 
+        $fillTheBlanks = $this->fillTheBlanksService->getByUuids($fillTheBlanksUuids);
+        $fillTheBlanksAnswer = array_column($fillTheBlanks, null, "uuid");
+
+        $trueFalseQuestion = $this->trueFalseQuestionService->getByUuids($trueFalseQuestionUuids);
+        $trueFalseQuestionAnswer = array_column($trueFalseQuestion, null, "uuid");
+
+        $answers = json_decode($userSynthesize["answers"], true);
+        $userScore = $score;
+        $scoreInfo = [];
+        foreach ($answers as $item) {
+            $scoreInfoData = [
+                "type" => $item["type"],
+                "list" => []
+            ];
+            if ($item["type"] == QuestionTypeEnum::SINGLE_CHOICE) {
+                foreach ($item["list"] as $answerInfo) {
+                    $isRight = 0;
+                    if (isset($singleChoiceAnswer[$answerInfo["uuid"]]) &&
+                        $singleChoiceAnswer[$answerInfo["uuid"]]["answer"] == $answerInfo["answer"]) {
+                        $isRight = 1;
+                        $userScore += 2;
+                    }
+                    $scoreInfoData["list"][] = [
+                        "uuid" => $answerInfo["uuid"],
+                        "answer" => $singleChoiceAnswer[$answerInfo["uuid"]]["answer"],
+                        "user_answer" => $answerInfo["answer"],
+                        "is_right" => $isRight,
+                        "score" => 2,
+                    ];
+                }
+            } else if ($item["type"] == QuestionTypeEnum::FILL_THE_BLANKS) {
+                foreach ($item["list"] as $answerInfo) {
+                    $isRight = 0;
+                    if (isset($fillTheBlanksAnswer[$answerInfo["uuid"]])) {
+                        $answer = json_decode($fillTheBlanksAnswer[$answerInfo["uuid"]]["answer"], true);
+                        if ($fillTheBlanksAnswer[$answerInfo["uuid"]]["is_sequence"] == FillTheBlanksAnswerIsSequenceEnum::YES) {
+                            if ($answer == $answerInfo["answer"]) {
+                                $isRight = 1;
+                                $userScore += 2;
+                            }
+                        } else {
+                            if (count($answerInfo["answer"]) == count($answer)) {
+                                $isRight = 1;
+                                $userScore += 2;
+                                foreach ($answer as $value) {
+                                    if (!in_array($value, $answerInfo["answer"])) {
+                                        $isRight = 0;
+                                        $userScore -= 2;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        $scoreInfoData["list"][] = [
+                            "uuid" => $answerInfo["uuid"],
+                            "answer" => $answer,
+                            "user_answer" => $answerInfo["answer"],
+                            "is_right" => $isRight,
+                            "score" => 2,
+                        ];
+                    }
+                }
+            } else if ($item["type"] == QuestionTypeEnum::TRUE_FALSE_QUESTION) {
+                foreach ($item["list"] as $answerInfo) {
+                    $isRight = 0;
+                    if (isset($trueFalseQuestionAnswer[$answerInfo["uuid"]]) &&
+                        $trueFalseQuestionAnswer[$answerInfo["uuid"]]["answer"] == $answerInfo["answer"]) {
+                        $isRight = 1;
+                        $userScore += 2;
+                    }
+                    $scoreInfoData["list"][] = [
+                        "uuid" => $answerInfo["uuid"],
+                        "answer" => $trueFalseQuestionAnswer[$answerInfo["uuid"]]["answer"],
+                        "user_answer" => $answerInfo["answer"],
+                        "is_right" => $isRight,
+                        "score" => 2,
+                    ];
+                }
+            }
+        }
+
+        var_dump($scoreInfo);
+        var_dump($userScore);
 
         Db::startTrans();
         try {
-            $userWriting->score = $score;
-            $userWriting->comment = $param["comment"];
-            $userWriting->comment_time = time();
-            $userWriting->is_comment = UserWritingIsCommentEnum::YES;
-            $userWriting->save();
-
-            $userSynthesize->is_comment = UserStudyWritingIsCommentEnum::YES;
-            $userSynthesize->save();
+//            $userWriting->score = $score;
+//            $userWriting->comment = $param["comment"];
+//            $userWriting->comment_time = time();
+//            $userWriting->is_comment = UserWritingIsCommentEnum::YES;
+//            $userWriting->save();
+//
+//            $userSynthesize->is_comment = UserStudyWritingIsCommentEnum::YES;
+//            $userSynthesize->save();
 
             Db::commit();
-            $this->success("修改成功",url("studyWritingList"));
+            $this->success("修改成功");
         } catch (\Throwable $e) {
             Db::rollback();
             throw $e;
