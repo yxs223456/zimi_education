@@ -7,5 +7,5 @@
  */
 
 return [
-    "self_domain" => "http://zimi.yangxiushan.top",
+    "self_domain" => "https://api.quwan.org.cn",
 ];
