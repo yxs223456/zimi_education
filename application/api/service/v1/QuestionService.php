@@ -453,7 +453,7 @@ class QuestionService extends Base
             $returnData["exercises"]["fillTheBlanks"]["list"][] = [
                 "uuid" => $fillTheBlanks["uuid"],
                 "question" => $fillTheBlanks["question"],
-                "answers" => isset($fillTheBlanksAnswers[$fillTheBlanks["uuid"]])?$fillTheBlanksAnswers[$fillTheBlanks["uuid"]]:"",
+                "answers" => isset($fillTheBlanksAnswers[$fillTheBlanks["uuid"]])?$fillTheBlanksAnswers[$fillTheBlanks["uuid"]]:[],
             ];
         }
         foreach ($randomTrueFalseQuestion as $trueFalseQuestion) {
@@ -473,7 +473,7 @@ class QuestionService extends Base
                     "uuid" => $randomWriting["uuid"],
                     "topic"=> $randomWriting["topic"],
                     "requirements" => json_decode($randomWriting["requirements"], true),
-                    "content" => isset($writingAnswers[$randomWriting["uuid"]])?$writingAnswers[$randomWriting["uuid"]]:["text"=>"","images"=>[]],
+                    "contents" => isset($writingAnswers[$randomWriting["uuid"]])?$writingAnswers[$randomWriting["uuid"]]:["text"=>["title"=>"","content"=>""],"images"=>[]],
                 ]
             ],
         ];
@@ -537,7 +537,7 @@ class QuestionService extends Base
                             "difficulty_level" => $writing["difficulty_level"],
                             "requirements" => $writing["requirements"],
                             "topic" => $writing["topic"],
-                            "content" => json_encode($answerInfo["content"], JSON_UNESCAPED_UNICODE),
+                            "content" => json_encode($answerInfo["contents"], JSON_UNESCAPED_UNICODE),
                             "total_score" => 30,
                         ];
                         $userWritingModel->save($userWritingData);
