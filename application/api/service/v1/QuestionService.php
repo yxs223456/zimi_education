@@ -435,35 +435,80 @@ class QuestionService extends Base
         }
         $returnData["uuid"] = $synthesizeUuid;
         $returnData["exercises"] = [];
-        foreach ($randomSingleChoice as $singleChoice) {
+        $returnData["location"] = [
+            "type"=>QuestionTypeEnum::SINGLE_CHOICE,
+            "index"=>0
+        ];
+        foreach ($randomSingleChoice as $key=>$singleChoice) {
             if (!isset($returnData["exercises"]["singleChoice"])) {
                 $returnData["exercises"]["singleChoice"]["type"] = QuestionTypeEnum::SINGLE_CHOICE;
+            }
+
+            if (isset($singleChoiceAnswers[$singleChoice["uuid"]])) {
+                $userAnswer = $singleChoiceAnswers[$singleChoice["uuid"]];
+                if ($key == count($randomSingleChoice) - 1) {
+                    $returnData["location"] = [
+                        "type"=>QuestionTypeEnum::FILL_THE_BLANKS,
+                        "index"=>0
+                    ];
+                } else {
+                    $returnData["location"]["index"] = $key+1;
+                }
+            } else {
+                $userAnswer = "";
             }
             $returnData["exercises"]["singleChoice"]["list"][] = [
                 "uuid" => $singleChoice["uuid"],
                 "question" => $singleChoice["question"],
                 "possible_answers" => json_decode($singleChoice["possible_answers"], true),
-                "answer" => isset($singleChoiceAnswers[$singleChoice["uuid"]])?$singleChoiceAnswers[$singleChoice["uuid"]]:"",
+                "answer" => $userAnswer,
             ];
+
         }
-        foreach ($randomFillTheBlanks as $fillTheBlanks) {
+        foreach ($randomFillTheBlanks as $key=>$fillTheBlanks) {
             if (!isset($returnData["exercises"]["fillTheBlanks"])) {
                 $returnData["exercises"]["fillTheBlanks"]["type"] = QuestionTypeEnum::FILL_THE_BLANKS;
+            }
+            if (isset($fillTheBlanksAnswers[$fillTheBlanks["uuid"]])) {
+                $userAnswer = $fillTheBlanksAnswers[$fillTheBlanks["uuid"]];
+                if ($key == count($randomFillTheBlanks) - 1) {
+                    $returnData["location"] = [
+                        "type"=>QuestionTypeEnum::TRUE_FALSE_QUESTION,
+                        "index"=>0
+                    ];
+                } else {
+                    $returnData["location"]["index"] = $key+1;
+                }
+            } else {
+                $userAnswer = [];
             }
             $returnData["exercises"]["fillTheBlanks"]["list"][] = [
                 "uuid" => $fillTheBlanks["uuid"],
                 "question" => $fillTheBlanks["question"],
-                "answers" => isset($fillTheBlanksAnswers[$fillTheBlanks["uuid"]])?$fillTheBlanksAnswers[$fillTheBlanks["uuid"]]:[],
+                "answers" => $userAnswer,
             ];
         }
-        foreach ($randomTrueFalseQuestion as $trueFalseQuestion) {
+        foreach ($randomTrueFalseQuestion as $key=>$trueFalseQuestion) {
             if (!isset($returnData["exercises"]["trueFalseQuestion"])) {
                 $returnData["exercises"]["trueFalseQuestion"]["type"] = QuestionTypeEnum::TRUE_FALSE_QUESTION;
+            }
+            if (isset($trueFalseQuestionAnswers[$trueFalseQuestion["uuid"]])) {
+                $userAnswer = $trueFalseQuestionAnswers[$trueFalseQuestion["uuid"]];
+                if ($key == count($randomTrueFalseQuestion) - 1) {
+                    $returnData["location"] = [
+                        "type"=>QuestionTypeEnum::WRITING,
+                        "index"=>0
+                    ];
+                } else {
+                    $returnData["location"]["index"] = $key+1;
+                }
+            } else {
+                $userAnswer = 0;
             }
             $returnData["exercises"]["trueFalseQuestion"]["list"][] = [
                 "uuid" => $trueFalseQuestion["uuid"],
                 "question" => $trueFalseQuestion["question"],
-                "answer" => isset($trueFalseQuestionAnswers[$trueFalseQuestion["uuid"]])?$trueFalseQuestionAnswers[$trueFalseQuestion["uuid"]]:0,
+                "answer" => $userAnswer,
             ];
         }
         $returnData["exercises"]["writing"] = [
