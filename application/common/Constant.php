@@ -10,6 +10,12 @@ namespace app\common;
 
 class Constant
 {
+    //默认昵称
+    const DEFAULT_HEAD_IMAGE_URL = "";
+
+    //默认头像
+    const DEFAULT_NICKNAME = "";
+
     //手机验证码有效期30分钟
     const PHONE_VERIFICATION_CODE_VALID_TIME = 1800;
 

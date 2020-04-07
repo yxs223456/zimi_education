@@ -11,9 +11,12 @@ namespace app\admin\controller;
 use app\common\enum\FillTheBlanksAnswerIsSequenceEnum;
 use app\common\enum\QuestionTypeEnum;
 use app\common\enum\UserStudyWritingIsCommentEnum;
+use app\common\enum\UserSynthesizeScoreIsFinishEnum;
 use app\common\enum\UserWritingIsCommentEnum;
 use app\common\enum\UserWritingSourceTypeEnum;
+use app\common\helper\Redis;
 use think\Db;
+use think\response\Json;
 
 class CheckWriting extends Base
 {
@@ -296,23 +299,52 @@ class CheckWriting extends Base
                     ];
                 }
             }
-        }
 
-        var_dump($scoreInfo);
-        var_dump($userScore);
+            $scoreInfo[] = $scoreInfoData;
+        }
 
         Db::startTrans();
         try {
-//            $userWriting->score = $score;
-//            $userWriting->comment = $param["comment"];
-//            $userWriting->comment_time = time();
-//            $userWriting->is_comment = UserWritingIsCommentEnum::YES;
-//            $userWriting->save();
-//
-//            $userSynthesize->is_comment = UserStudyWritingIsCommentEnum::YES;
-//            $userSynthesize->save();
+            $userWriting->score = $score;
+            $userWriting->comment = $param["comment"];
+            $userWriting->comment_time = time();
+            $userWriting->is_comment = UserWritingIsCommentEnum::YES;
+            $userWriting->save();
+
+            $userSynthesize->score = $userScore;
+            $userSynthesize->score_info = json_encode($scoreInfo, JSON_UNESCAPED_UNICODE);
+            $userSynthesize->score_is_finish = UserSynthesizeScoreIsFinishEnum::YES;
+            $userSynthesize->save();
+
+            //当前星级题大于80分即可获得当前星级称
+            $isUpdate = false;
+            if ($score >= 80 && $userSynthesize->difficulty_level > $user->level) {
+                $user->level = $userSynthesize->difficulty_level;
+                $user->save();
+                $isUpdate = true;
+            }
+
+            $userSynthesizeRank = $this->userSynthesizeRankService
+                ->findByUserUuidAndDifficultyLevel($userSynthesize["user_uuid"], $userSynthesize["difficulty_level"]);
+            if ($userSynthesizeRank) {
+                $userSynthesizeRank->total_score += $userScore;
+                $userSynthesizeRank->save();
+            } else {
+                $userSynthesizeRankData = [
+                    "user_uuid" => $userSynthesize["user_uuid"],
+                    "difficulty_level" => $userSynthesize["difficulty_level"],
+                    "total_score" => $userScore,
+                ];
+                $this->userSynthesizeRankService->saveByData($userSynthesizeRankData);
+            }
 
             Db::commit();
+
+            if ($isUpdate == true) {
+                $redis = Redis::factory();
+                $userInfo = $user->toArray();
+                cacheUserInfoByToken($userInfo, $redis);
+            }
             $this->success("修改成功");
         } catch (\Throwable $e) {
             Db::rollback();
