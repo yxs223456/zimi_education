@@ -31,4 +31,9 @@ class Rank extends Base
         $rankService = new RankService();
         return $this->jsonResponse($rankService->synthesizeRank($user, $difficultyLevel));
     }
+
+    public function synthesizeLike()
+    {
+
+    }
 }

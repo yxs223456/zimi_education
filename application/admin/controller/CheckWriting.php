@@ -318,7 +318,7 @@ class CheckWriting extends Base
 
             //当前星级题大于80分即可获得当前星级称
             $isUpdate = false;
-            if ($score >= 0 && $userSynthesize->difficulty_level > $user->level) {
+            if ($score >= 80 && $userSynthesize->difficulty_level > $user->level) {
                 $user->level = $userSynthesize->difficulty_level;
                 $user->save();
                 $isUpdate = true;
@@ -346,7 +346,7 @@ class CheckWriting extends Base
                 cacheUserInfoByToken($userInfo, $redis);
                 pushSynthesizeUpdateList($userInfo["nickname"], $userSynthesize["difficulty_level"], $redis);
             }
-            $this->success("修改成功");
+            $this->success("评分成功");
         } catch (\Throwable $e) {
             Db::rollback();
             throw $e;
