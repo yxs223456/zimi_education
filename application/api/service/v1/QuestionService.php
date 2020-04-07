@@ -434,11 +434,11 @@ class QuestionService extends Base
             }
         }
         $returnData["uuid"] = $synthesizeUuid;
-        $returnData["exercises"] = [];
         $returnData["location"] = [
             "type"=>QuestionTypeEnum::SINGLE_CHOICE,
             "index"=>0
         ];
+        $returnData["exercises"] = [];
         foreach ($randomSingleChoice as $key=>$singleChoice) {
             if (!isset($returnData["exercises"]["singleChoice"])) {
                 $returnData["exercises"]["singleChoice"]["type"] = QuestionTypeEnum::SINGLE_CHOICE;
