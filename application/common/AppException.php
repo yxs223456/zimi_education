@@ -61,6 +61,10 @@ class AppException extends \Exception
     const SYNTHESIZE_NOT_EXISTS = [6000, "综合测试不存在"];
     const SYNTHESIZE_SUBMIT_ANSWER_ALREADY = [6001, "综合测试答案已提交"];
 
+    const RANK_LIKE_SELF = [7000, "不能给自己点赞呦~"];
+    const RANK_DAILY_LIKE_THREE_TIMES = [7001, "每日只能助力3次呦~"];
+    const RANK_DAILY_LIKE_SOMEONE_ONE_TIMES = [7002, "每天只能助力同一人一次"];
+
     public static function factory($errConst)
     {
         $e = new self($errConst[1], $errConst[0]);

@@ -132,4 +132,10 @@ class Constant
         "pk_coin" => 10,
         "talent_coin" => 1,
     ];
+
+    //用户综合测试升级所需分数
+    const SYNTHESIZE_UPDATE_LEVEL_SCORE = 80;
+
+    //用户每日点赞次数上限，（各榜互不影响）
+    const RANK_LIKE_TIMES = 3;
 }

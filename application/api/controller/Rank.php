@@ -31,4 +31,20 @@ class Rank extends Base
         $rankService = new RankService();
         return $this->jsonResponse($rankService->synthesizeRank($user, $difficultyLevel));
     }
+
+    public function synthesizeLike()
+    {
+        $userUuid = input("user_uuid");
+        $difficultyLevel = input("difficulty_level");
+        if (empty($userUuid)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+        if ($difficultyLevel === null || !in_array($difficultyLevel, QuestionDifficultyLevelEnum::getAllValues())) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+        $user = $this->query["user"];
+
+        $rankService = new RankService();
+        return $this->jsonResponse($rankService->synthesizeLike($user, $userUuid, $difficultyLevel));
+    }
 }

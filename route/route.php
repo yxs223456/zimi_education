@@ -123,6 +123,8 @@ Route::rule('athletics/submitCompetition', 'api/athletics/submitCompetition', 'p
 
 //综合测试排行榜
 Route::rule('rank/synthesizeRank', 'api/rank/synthesizeRank', 'post');
+//综合测试排行榜点赞
+Route::rule('rank/synthesizeLike', 'api/rank/synthesizeLike', 'post');
 
 return [
 

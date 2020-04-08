@@ -935,3 +935,20 @@ function getSynthesizeUpdateList($difficultyLevel, \Redis $redis) {
     $key = "de_education:synthesizeUpdateLis:$difficultyLevel";
     return $redis->lRange($key, 0, 4);
 }
+
+//纪录用户测试榜今日点赞信息
+function cacheSynthesizeRankLikeTodayInfo($userUuid, $difficultyLevel, array $info, \Redis $redis) {
+    $key = "de_education:synthesizeRankLikeInfo:$difficultyLevel:$userUuid:" . date("ymd");
+    $redis->setex($key, 86400, json_encode($info, JSON_UNESCAPED_UNICODE));
+}
+
+//用户测试榜今日点赞信息
+function getSynthesizeRankLikeTodayInfo($userUuid, $difficultyLevel, \Redis $redis) {
+    $key = "de_education:synthesizeRankLikeInfo:$difficultyLevel:$userUuid:" . date("ymd");
+    $info = $redis->get($key);
+    if ($info) {
+        return json_decode($info, true);
+    } else {
+        return [];
+    }
+}
