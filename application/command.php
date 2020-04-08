@@ -13,4 +13,5 @@ return [
     'app\command\AddCoinByFinishTask',
     'app\command\CacheQuestionLibrary',
     'app\command\ReceiveContinuousSignReward',
+    'app\command\InternalCompetitionFinish',
 ];

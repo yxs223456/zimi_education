@@ -570,6 +570,7 @@ class AthleticsService extends Base
         //用户需参与了大赛
         //用户提交答案后不能再提交
         //不能超过提交答案截止时间
+        //答题时间限制在一小时以内
         $internalCompetitionJoinModel = new InternalCompetitionJoinModel();
         $competitionJoin = $internalCompetitionJoinModel->findByUserAndCompetition($user["uuid"], $competitionUuid);
         if ($competitionJoin == null) {
@@ -578,6 +579,8 @@ class AthleticsService extends Base
             throw AppException::factory(AppException::INTERNAL_COMPETITION_SUBMIT_ANSWER_ALREADY);
         } else if ($competition["submit_answer_deadline"] <= time()) {
             throw AppException::factory(AppException::INTERNAL_COMPETITION_SUBMIT_ANSWER_TIMEOUT);
+        } else if (time() - strtotime($competitionJoin["create_time"]) > Constant::INTERNAL_COMPETITION_SUBMIT_ANSWER_TIME_LIMIT) {
+            throw AppException::factory(AppException::INTERNAL_COMPETITION_SUBMIT_ANSWER_TIME_LIMIT);
         }
 
         //纪录用户答案
@@ -585,6 +588,7 @@ class AthleticsService extends Base
         if ($isDraft == false) {
             $competitionJoin->is_submit_answer = CompetitionAnswerIsSubmitEnum::YES;
             $competitionJoin->submit_answer_time = time();
+            $competitionJoin->submit_answer_second = time() - strtotime($competitionJoin->create_time);
         }
         $competitionJoin->save();
 

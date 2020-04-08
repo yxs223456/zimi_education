@@ -133,6 +133,9 @@ class Constant
         "talent_coin" => 1,
     ];
 
+    //DE大赛答题限制
+    const INTERNAL_COMPETITION_SUBMIT_ANSWER_TIME_LIMIT = 3600;
+
     //用户综合测试升级所需分数
     const SYNTHESIZE_UPDATE_LEVEL_SCORE = 80;
 
