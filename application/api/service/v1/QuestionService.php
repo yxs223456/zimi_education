@@ -14,6 +14,7 @@ use app\common\Constant;
 use app\common\enum\NoviceTestIsShowEnum;
 use app\common\enum\QuestionDifficultyLevelEnum;
 use app\common\enum\QuestionTypeEnum;
+use app\common\enum\TrueFalseQuestionAnswerEnum;
 use app\common\enum\UserSynthesizeIsFinishEnum;
 use app\common\enum\UserWritingSourceTypeEnum;
 use app\common\helper\Redis;
@@ -203,7 +204,7 @@ class QuestionService extends Base
             $returnData[] = [
                 "uuid" => $question["uuid"],
                 "question" => $question["question"],
-                "answer" => [$question["answer"]],
+                "answer" => [$question["answer"]==TrueFalseQuestionAnswerEnum::DESC_TRUE?"A":"B"],
             ];
         }
 
@@ -503,7 +504,7 @@ class QuestionService extends Base
                     $returnData["location"]["index"] = $key+1;
                 }
             } else {
-                $userAnswer = 0;
+                $userAnswer = "";
             }
             $returnData["exercises"]["trueFalseQuestion"]["list"][] = [
                 "uuid" => $trueFalseQuestion["uuid"],

@@ -10,6 +10,7 @@ namespace app\admin\controller;
 
 use app\common\enum\FillTheBlanksAnswerIsSequenceEnum;
 use app\common\enum\QuestionTypeEnum;
+use app\common\enum\TrueFalseQuestionAnswerEnum;
 use app\common\enum\UserStudyWritingIsCommentEnum;
 use app\common\enum\UserSynthesizeScoreIsFinishEnum;
 use app\common\enum\UserWritingIsCommentEnum;
@@ -285,15 +286,19 @@ class CheckWriting extends Base
             } else if ($item["type"] == QuestionTypeEnum::TRUE_FALSE_QUESTION) {
                 foreach ($item["list"] as $answerInfo) {
                     $isRight = 0;
-                    if (isset($trueFalseQuestionAnswer[$answerInfo["uuid"]]) &&
-                        $trueFalseQuestionAnswer[$answerInfo["uuid"]]["answer"] == $answerInfo["answer"]) {
-                        $isRight = 1;
-                        $userScore += 2;
+                    $userAnswer = 0;
+                    if (isset($trueFalseQuestionAnswer[$answerInfo["uuid"]])) {
+                        $userAnswer = $answerInfo["answer"]=="A"?TrueFalseQuestionAnswerEnum::DESC_TRUE:
+                            ($answerInfo["answer"]=="B"?TrueFalseQuestionAnswerEnum::DESC_FALSE:0);
+                        if ($trueFalseQuestionAnswer[$answerInfo["uuid"]]["answer"] == $userAnswer) {
+                            $isRight = 1;
+                            $userScore += 2;
+                        }
                     }
                     $scoreInfoData["list"][] = [
                         "uuid" => $answerInfo["uuid"],
                         "answer" => $trueFalseQuestionAnswer[$answerInfo["uuid"]]["answer"],
-                        "user_answer" => $answerInfo["answer"],
+                        "user_answer" => $userAnswer,
                         "is_right" => $isRight,
                         "score" => 2,
                     ];

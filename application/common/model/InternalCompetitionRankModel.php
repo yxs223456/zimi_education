@@ -55,11 +55,14 @@ class InternalCompetitionRankModel extends Base
         if ($userRank == null) {
             return 0;
         } else {
-            $count = $this->where("total_talent_coin", ">", $userRank["total_score"])
-                ->where("like_count", ">", $userRank["like_count"])
+            $count1 = $this->where("total_talent_coin", ">", $userRank["total_talent_coin"])->count();
+            $count2 = $this->where("total_talent_coin", $userRank["total_talent_coin"])
+                ->where("like_count", ">", $userRank["like_count"])->count();
+            $count3 = $this->where("total_talent_coin", $userRank["total_talent_coin"])
+                ->where("like_count", $userRank["like_count"])
                 ->where("update_time", "<", $userRank["update_time"])
                 ->count();
-            return $count+1;
+            return $count1+$count2+$count3+1;
         }
     }
 }

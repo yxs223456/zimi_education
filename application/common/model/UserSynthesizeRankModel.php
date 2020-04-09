@@ -32,12 +32,17 @@ class UserSynthesizeRankModel extends Base
         if ($userSynthesizeRank == null) {
             return 0;
         } else {
-            $count = $this->where("difficulty_level", $difficultyLevel)
-                ->where("total_score", ">", $userSynthesizeRank["total_score"])
-                ->where("like_count", ">", $userSynthesizeRank["like_count"])
+            $count1 = $this->where("difficulty_level", $difficultyLevel)
+                ->where("total_score", ">", $userSynthesizeRank["total_score"])->count();
+            $count2 = $this->where("difficulty_level", $difficultyLevel)
+                ->where("total_score", $userSynthesizeRank["total_score"])
+                ->where("like_count", ">", $userSynthesizeRank["like_count"])->count();
+            $count3 = $this->where("difficulty_level", $difficultyLevel)
+                ->where("total_score", $userSynthesizeRank["total_score"])
+                ->where("like_count", $userSynthesizeRank["like_count"])
                 ->where("update_time", "<", $userSynthesizeRank["update_time"])
                 ->count();
-            return $count+1;
+            return $count1+$count2+$count3+1;
         }
     }
 }
