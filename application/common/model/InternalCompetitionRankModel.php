@@ -8,6 +8,8 @@
 
 namespace app\common\model;
 
+use think\Db;
+
 class InternalCompetitionRankModel extends Base
 {
     protected $table = 'internal_competition_rank';
@@ -21,8 +23,9 @@ class InternalCompetitionRankModel extends Base
     {
         $internalCompetitionRank = $this->findByUserUuid($userUuid);
         if ($internalCompetitionRank) {
-            $internalCompetitionRank->total_talent_coin += $talentCoin;
-            $internalCompetitionRank->save();
+            Db::name($this->table)->where("user_uuid", $userUuid)
+                ->inc("total_talent_coin", $talentCoin)
+                ->update(["update_time"=>time()]);
         } else {
             $internalCompetitionRankData = [
                 "user_uuid" => $userUuid,
