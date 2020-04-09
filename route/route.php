@@ -125,6 +125,10 @@ Route::rule('athletics/submitCompetition', 'api/athletics/submitCompetition', 'p
 Route::rule('rank/synthesizeRank', 'api/rank/synthesizeRank', 'post');
 //综合测试排行榜点赞
 Route::rule('rank/synthesizeLike', 'api/rank/synthesizeLike', 'post');
+//才情排行榜
+Route::rule('rank/competitionRank', 'api/rank/competitionRank', 'post');
+//才情排行榜点赞
+Route::rule('rank/competitionLike', 'api/rank/competitionLike', 'post');
 
 return [
 

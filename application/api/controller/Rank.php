@@ -47,4 +47,25 @@ class Rank extends Base
         $rankService = new RankService();
         return $this->jsonResponse($rankService->synthesizeLike($user, $userUuid, $difficultyLevel));
     }
+
+    public function competitionRank()
+    {
+        $user = $this->query["user"];
+
+        $rankService = new RankService();
+        return $this->jsonResponse($rankService->competitionRank($user));
+    }
+
+    public function competitionLike()
+    {
+        $userUuid = input("user_uuid");
+        if (empty($userUuid)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+
+        $rankService = new RankService();
+        return $this->jsonResponse($rankService->competitionLike($user, $userUuid));
+    }
 }

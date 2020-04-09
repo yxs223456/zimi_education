@@ -132,17 +132,7 @@ class InternalCompetitionFinish extends Command
                         ];
 
                         //修改才情排行榜
-                        $internalCompetitionRank = $internalCompetitionRankModel->findByUserUuid($winner["user_uuid"]);
-                        if ($internalCompetitionRank) {
-                            $internalCompetitionRank->total_talent_coin += $talentCoin;
-                            $internalCompetitionRank->save();
-                        } else {
-                            $internalCompetitionRankData = [
-                                "user_uuid" => $winner["user_uuid"],
-                                "total_talent_coin" => $talentCoin,
-                            ];
-                            $internalCompetitionRankModel->save($internalCompetitionRankData);
-                        }
+                       $internalCompetitionRankModel->addTalentCoin($winner["user_uuid"],$talentCoin);
                     }
                     if ($pkFlowData) {
                         $pkCoinLogModel->insertAll($pkFlowData);
@@ -157,16 +147,16 @@ class InternalCompetitionFinish extends Command
 
                     Db::commit();
 
+                    //缓存获胜者信息
+                    $newUsers = $userModel->whereIn("uuid", $userUuids)->select()->toArray();
+                    $redis = Redis::factory();
+                    foreach ($newUsers as $newUser) {
+                        cacheUserInfoByToken($newUser, $redis);
+                    }
+
                 } catch (\Throwable $e) {
                     Db::rollback();
                     Log::write("internal competition finish error:". $e->getMessage(), "ERROR");
-                }
-
-                //缓存获胜者信息
-                $newUsers = $userModel->whereIn("uuid", $userUuids)->select()->toArray();
-                $redis = Redis::factory();
-                foreach ($newUsers as $newUser) {
-                    cacheUserInfoByToken($newUser, $redis);
                 }
             }
         }

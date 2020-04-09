@@ -952,3 +952,20 @@ function getSynthesizeRankLikeTodayInfo($userUuid, $difficultyLevel, \Redis $red
         return [];
     }
 }
+
+//纪录用户才情榜今日点赞信息
+function cacheCompetitionRankLikeTodayInfo($userUuid, array $info, \Redis $redis) {
+    $key = "de_education:competitionRankLikeInfo:$userUuid:" . date("ymd");
+    $redis->setex($key, 86400, json_encode($info, JSON_UNESCAPED_UNICODE));
+}
+
+//用户才情榜今日点赞信息
+function getCompetitionRankLikeTodayInfo($userUuid, \Redis $redis) {
+    $key = "de_education:competitionRankLikeInfo:$userUuid:" . date("ymd");
+    $info = $redis->get($key);
+    if ($info) {
+        return json_decode($info, true);
+    } else {
+        return [];
+    }
+}

@@ -26,6 +26,7 @@ use app\common\enum\UserTalentCoinAddTypeEnum;
 use app\common\helper\Redis;
 use app\common\model\InternalCompetitionJoinModel;
 use app\common\model\InternalCompetitionModel;
+use app\common\model\InternalCompetitionRankModel;
 use app\common\model\PkJoinModel;
 use app\common\model\PkModel;
 use app\common\model\SingleChoiceModel;
@@ -492,6 +493,7 @@ class AthleticsService extends Base
         $userCoinLogModel = new UserCoinLogModel();
         $userPkCoinLogModel = new UserPkCoinLogModel();
         $userTalentCoinLogModel = new UserTalentCoinLogModel();
+        $internalCompetitionRankModel = new InternalCompetitionRankModel();
 
         Db::startTrans();
         try {
@@ -545,6 +547,9 @@ class AthleticsService extends Base
                 UserTalentCoinAddTypeEnum::JOIN_INTERNAL_COMPETITION_DSC,
                 $competitionUuid
             );
+
+            //才情排行榜增加才情值
+            $internalCompetitionRankModel->addTalentCoin($user["uuid"], Constant::JOIN_INTERNAL_COMPETITION_REWARD["talent_coin"]);
 
             Db::commit();
 
