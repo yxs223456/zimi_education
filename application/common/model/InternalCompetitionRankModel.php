@@ -27,8 +27,11 @@ class InternalCompetitionRankModel extends Base
             $internalCompetitionRankData = [
                 "user_uuid" => $userUuid,
                 "total_talent_coin" => $talentCoin,
+                "create_time" => time(),
+                "update_time" => time(),
             ];
-            $this->save($internalCompetitionRankData);
+            //使用save会产生bug
+            $this->insert($internalCompetitionRankData);
         }
     }
 
