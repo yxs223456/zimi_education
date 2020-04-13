@@ -493,7 +493,7 @@ class UserService extends Base
             throw AppException::factory(AppException::USER_NOT_EXISTS);
         }
 
-        //1.邀请用户不可改变 2.只要没有邀请人即可添加任意用户为邀请人
+        //1.邀请用户不可改变 2.只要没有邀请人即可添加任意用户为邀请人3.不能填自己的邀请码
         if (isset($modifyUserInfo["parent_invite_code"])) {
             if ($userInfo["parent_invite_code"]) {
                 throw AppException::factory(AppException::USER_PARENT_NOT_ALLOW_MODIFY);
@@ -501,7 +501,10 @@ class UserService extends Base
             if (empty($modifyUserInfo["parent_invite_code"])) {
                 throw AppException::factory(AppException::COM_PARAMS_ERR);
             }
-
+            $modifyUserInfo["parent_invite_code"] = strtoupper($modifyUserInfo["parent_invite_code"]);
+            if ($user["invite_code"] == $modifyUserInfo["parent_invite_code"]) {
+                throw AppException::factory(AppException::USER_INVITE_CODE_SELF);
+            }
             $inviteUser = $userModel->getUserByInviteCode($modifyUserInfo["parent_invite_code"]);
             if (!$inviteUser) {
                 throw AppException::factory(AppException::USER_INVITE_CODE_NOT_EXISTS);
