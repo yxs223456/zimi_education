@@ -432,7 +432,7 @@ class QuestionService extends Base
                         $trueFalseQuestionAnswers = array_column($item["list"], "answer", "uuid");
                         break;
                     case QuestionTypeEnum::WRITING:
-                        $writingAnswers = array_column($item["list"], "content", "uuid");
+                        $writingAnswers = array_column($item["list"], "contents", "uuid");
                         break;
                 }
             }
