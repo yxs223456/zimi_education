@@ -115,6 +115,7 @@ class AthleticsService extends Base
                 "pk_uuid" => $pkData["uuid"],
                 "user_uuid" => $userUuid,
                 "is_initiator" => PkIsInitiatorEnum::YES,
+                "coin" => $initPayCoin,
                 "create_time" => time(),
                 "update_time" => time(),
             ];
@@ -231,6 +232,7 @@ class AthleticsService extends Base
                 "pk_uuid" => $pkUuid,
                 "user_uuid" => $userUuid,
                 "is_initiator" => PkIsInitiatorEnum::NO,
+                "coin" => $pk["join_coin"],
                 "create_time" => time(),
                 "update_time" => time(),
             ];
@@ -525,7 +527,7 @@ class AthleticsService extends Base
                 Constant::JOIN_INTERNAL_COMPETITION_REWARD["coin"],
                 $newUser["coin"] - Constant::JOIN_INTERNAL_COMPETITION_REWARD["coin"],
                 $newUser["coin"],
-                UserCoinAddTypeEnum::JOIN_INTERNAL_COMPETITION_DSC,
+                UserCoinAddTypeEnum::JOIN_INTERNAL_COMPETITION_DESC,
                 $competitionUuid);
 
             $userPkCoinLogModel->recordAddLog(
@@ -534,7 +536,7 @@ class AthleticsService extends Base
                 Constant::JOIN_INTERNAL_COMPETITION_REWARD["pk_coin"],
                 $newUser["pk_coin"] - Constant::JOIN_INTERNAL_COMPETITION_REWARD["pk_coin"],
                 $newUser["pk_coin"],
-                UserPkCoinAddTypeEnum::JOIN_INTERNAL_COMPETITION_DSC,
+                UserPkCoinAddTypeEnum::JOIN_INTERNAL_COMPETITION_DESC,
                 $competitionUuid
             );
 
@@ -544,7 +546,7 @@ class AthleticsService extends Base
                 Constant::JOIN_INTERNAL_COMPETITION_REWARD["talent_coin"],
                 $newUser["talent_coin"] - Constant::JOIN_INTERNAL_COMPETITION_REWARD["talent_coin"],
                 $newUser["talent_coin"],
-                UserTalentCoinAddTypeEnum::JOIN_INTERNAL_COMPETITION_DSC,
+                UserTalentCoinAddTypeEnum::JOIN_INTERNAL_COMPETITION_DESC,
                 $competitionUuid
             );
 

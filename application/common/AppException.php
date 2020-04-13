@@ -61,6 +61,9 @@ class AppException extends \Exception
 
     const SYNTHESIZE_NOT_EXISTS = [6000, "综合测试不存在"];
     const SYNTHESIZE_SUBMIT_ANSWER_ALREADY = [6001, "综合测试答案已提交"];
+    const SYNTHESIZE_SUBMIT_ANSWER_EMPTY = [6002, "答案不能为空呦~"];
+    const SYNTHESIZE_SUBMIT_ANSWER_INVALID = [6003, "答案格式错误"];
+    const SYNTHESIZE_SUBMIT_ANSWER_JUMP = [6004, "不允许跳题作答"];
 
     const RANK_LIKE_SELF = [7000, "不能给自己点赞呦~"];
     const RANK_DAILY_LIKE_THREE_TIMES = [7001, "每日只能助力3次呦~"];
