@@ -398,13 +398,16 @@ class QuestionService extends Base
             foreach ($questions as $item) {
                 switch($item["type"]) {
                     case QuestionTypeEnum::SINGLE_CHOICE:
-                        $randomSingleChoice = $singleChoiceModel->getByUuids($item["uuids"]);
+                        $randomSingleChoice = $singleChoiceModel->getByUuids($item["uuids"])->toArray();
+                        $randomSingleChoice = $this->questionOrderByUuid($item["uuids"], $randomSingleChoice);
                         break;
                     case QuestionTypeEnum::FILL_THE_BLANKS:
-                        $randomFillTheBlanks = $fillTheBlanksModel->getByUuids($item["uuids"]);
+                        $randomFillTheBlanks = $fillTheBlanksModel->getByUuids($item["uuids"])->toArray();
+                        $randomFillTheBlanks = $this->questionOrderByUuid($item["uuids"], $randomFillTheBlanks);
                         break;
                     case QuestionTypeEnum::TRUE_FALSE_QUESTION:
-                        $randomTrueFalseQuestion = $trueFalseQuestionModel->getByUuids($item["uuids"]);
+                        $randomTrueFalseQuestion = $trueFalseQuestionModel->getByUuids($item["uuids"])->toArray();
+                        $randomTrueFalseQuestion = $this->questionOrderByUuid($item["uuids"], $randomTrueFalseQuestion);
                         break;
                     case QuestionTypeEnum::WRITING:
                         $randomWriting = $writingModel->getByUuid($item["uuids"][0]);
