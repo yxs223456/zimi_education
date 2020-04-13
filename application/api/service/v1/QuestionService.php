@@ -601,12 +601,7 @@ class QuestionService extends Base
                     }
                 }
             }
-
-
         }
-
-        var_dump(222);
-        exit;
 
         $synthesize->answers = json_encode($answers, JSON_UNESCAPED_UNICODE);
         $synthesize->save();
@@ -625,6 +620,68 @@ class QuestionService extends Base
         //答案不允许重复提交
         if ($synthesize["is_finish"] == UserSynthesizeIsFinishEnum::YES) {
             throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_ALREADY);
+        }
+
+        //验证答案格式，不允许跳题回答，不允许有空答案
+        $questions = json_decode($synthesize["questions"], true);
+        foreach ($answers as $key=>$item) {
+
+            if (!isset($item["type"]) || !isset($item["list"]) || !is_array($item["list"])) {
+                throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_INVALID);
+            }
+            if ($item["type"] != $questions[$key]["type"]) {
+                throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_JUMP);
+            }
+
+            if ($item["type"] == QuestionTypeEnum::SINGLE_CHOICE) {
+                foreach ($item["list"] as $listKey => $value) {
+                    if (!isset($value["uuid"]) || !isset($value["answer"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_INVALID);
+                    }
+                    if ($value["uuid"] != $questions[$key]["uuids"][$listKey]) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_JUMP);
+                    }
+                    if (empty($value["answer"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_EMPTY);
+                    }
+                }
+            } else if ($item["type"] == QuestionTypeEnum::FILL_THE_BLANKS) {
+                foreach ($item["list"] as $listKey => $value) {
+                    if (!isset($value["uuid"]) || !isset($value["answers"]) || !is_array($value["answers"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_INVALID);
+                    }
+                    if ($value["uuid"] != $questions[$key]["uuids"][$listKey]) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_JUMP);
+                    }
+                    if (empty($value["answers"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_EMPTY);
+                    }
+                }
+            } else if ($item["type"] == QuestionTypeEnum::TRUE_FALSE_QUESTION) {
+                foreach ($item["list"] as $listKey => $value) {
+                    if (!isset($value["uuid"]) || !isset($value["answer"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_INVALID);
+                    }
+                    if ($value["uuid"] != $questions[$key]["uuids"][$listKey]) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_JUMP);
+                    }
+                    if (empty($value["answer"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_EMPTY);
+                    }
+                }
+            } else if ($item["type"] == QuestionTypeEnum::WRITING) {
+                foreach ($item["list"] as $listKey => $value) {
+                    if (!isset($value["uuid"]) || !isset($value["contents"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_INVALID);
+                    }
+                    if ($value["uuid"] != $questions[$key]["uuids"][$listKey]) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_JUMP);
+                    }
+                    if (empty($value["contents"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_EMPTY);
+                    }
+                }
+            }
         }
 
         $writingModel = new WritingModel();
