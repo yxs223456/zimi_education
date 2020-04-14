@@ -22,4 +22,7 @@ class UserPkCoinAddTypeEnum
 
     const INTERNAL_COMPETITION_WIN = 2;
     const INTERNAL_COMPETITION_WIN_DESC = "DE内部大赛取得名次";
+
+    const PK_WIN = 3;
+    const PK_WIN_DESC = "PK获得名次";
 }

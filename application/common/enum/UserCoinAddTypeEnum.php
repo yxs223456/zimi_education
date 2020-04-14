@@ -52,4 +52,10 @@ class UserCoinAddTypeEnum
 
     const PK_GROUP_FAIL = 12;
     const PK_GROUP_FAIL_DESC = "PK成团失败";
+
+    const PK_WIN = 13;
+    const PK_WIN_DESC = "PK获得名次";
+
+    const PK_INITIATOR_WIN = 14;
+    const PK_INITIATOR_WIN_DESC = "PK团长获得pk冠军奖励";
 }
