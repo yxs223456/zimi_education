@@ -14,6 +14,6 @@ return [
     'app\command\CacheQuestionLibrary',
     'app\command\ReceiveContinuousSignReward',
     'app\command\InternalCompetitionFinish',
-    'app\command\pkJoinTimeout',
+    'app\command\PkJoinTimeout',
     'app\command\PkFinish',
 ];
