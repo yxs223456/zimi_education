@@ -90,18 +90,28 @@ class CheckCompetition extends Base
     public function doCheck()
     {
         $param = input();
-        if (!isset($param["score"]) || $param["score"] < 0 || $param["score"] > 100) {
+        if (!isset($param["score"]) || !is_numeric($param["score"]) || $param["score"] < 0 || $param["score"] > 100) {
             $this->error("分值范围错误");
         }
-        $score = (int) $param["score"];
+        $param["score"] = bcadd($param["score"], 0, 2);
 
         $internalCompetitionJoin = $this->internalCompetitionJoinService->findByMap(["uuid"=>$param["uuid"]]);
         if ($internalCompetitionJoin == null) {
             $this->error("参与纪录不存在");
         }
 
+        //前三名的分数不允许有重复
+        $highScore = $this->internalCompetitionJoinService->getTopThreeScoreInfo($internalCompetitionJoin["c_uuid"])
+            ->toArray();
+
+        foreach ($highScore as $item) {
+            if (bccomp($param["score"], $item["score"]) == 0) {
+                $this->error("存在相同的高分");
+            }
+        }
+
         $internalCompetitionJoin->is_comment = InternalCompetitionJoinIsCommentEnum::YES;
-        $internalCompetitionJoin->score = $score;
+        $internalCompetitionJoin->score = $param["score"];
         $internalCompetitionJoin->comment_time = time();
         $internalCompetitionJoin->save();
 
