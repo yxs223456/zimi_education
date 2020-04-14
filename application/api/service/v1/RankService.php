@@ -14,7 +14,9 @@ use app\common\Constant;
 use app\common\helper\Redis;
 use app\common\model\InternalCompetitionLikeLogModel;
 use app\common\model\InternalCompetitionRankModel;
+use app\common\model\PkRankLikeLogModel;
 use app\common\model\SynthesizeRankLikeLogModel;
+use app\common\model\UserPkRankModel;
 use app\common\model\UserSynthesizeRankModel;
 use think\Db;
 
@@ -164,6 +166,79 @@ class RankService extends Base
             "user_uuid" => $likeUserUuid
         ];
         cacheCompetitionRankLikeTodayInfo($user["uuid"], $todayLikeInfo, $redis);
+
+        return new \stdClass();
+    }
+
+    public function pkRank($user, $type)
+    {
+        $userPkRankModel = new UserPkRankModel();
+        $rankList = $userPkRankModel->getRank($type);
+        foreach ($rankList as $key=>$item) {
+            $rankList[$key]["user_uuid"] = $item["user_uuid"];
+            $rankList[$key]["nickname"] = getNickname($item["nickname"]);
+            $rankList[$key]["head_image_url"] = getHeadImageUrl($item["head_image_url"]);
+            $rankList[$key]["rank"] = $key+1;
+        }
+
+        $myRank = [
+            "head_image_url" => getHeadImageUrl($user["head_image_url"]),
+            "nickname" => getNickname($user["nickname"]),
+            "rank" => $userPkRankModel->getUserPkRank($user["uuid"], $type),
+        ];
+
+        return [
+            "rank_list" => $rankList,
+            "my_rank" => $myRank,
+        ];
+    }
+
+    public function pkLike($user, $likeUserUuid, $type)
+    {
+        if ($user["uuid"] == $likeUserUuid) {
+            throw AppException::factory(AppException::RANK_LIKE_SELF);
+        }
+
+        //每人每天可以助力3次（不能同时助力一人）
+        $redis = Redis::factory();
+        $todayPkLikeInfo = getPkRankLikeTodayInfo($user["uuid"], $type, $redis);
+        if (count($todayPkLikeInfo) >= Constant::RANK_LIKE_TIMES) {
+            throw AppException::factory(AppException::RANK_DAILY_LIKE_THREE_TIMES);
+        }
+        foreach ($todayPkLikeInfo as $item) {
+            if ($item["user_uuid"] == $likeUserUuid) {
+                throw AppException::factory(AppException::RANK_DAILY_LIKE_SOMEONE_ONE_TIMES);
+            }
+        }
+
+        $pkRankLikeLogModel = new PkRankLikeLogModel();
+        $userPkRankModel = new UserPkRankModel();
+        Db::startTrans();
+        try {
+            //助力纪录
+            $likeInfo = [
+                "user_uuid" => $user["uuid"],
+                "like_user_uuid" => $likeUserUuid,
+                "type" => $type,
+                "create_date" => date("Y-m-d"),
+            ];
+            $pkRankLikeLogModel->save($likeInfo);
+
+            //增加被助力次数
+            $userPkRankModel->where("user_uuid", $likeUserUuid)
+                ->where("type", $type)
+                ->setInc("like_count", 1);
+            Db::commit();
+        } catch (\Throwable $e) {
+            Db::rollback();
+            throw $e;
+        }
+
+        //纪录助力
+        $todayPkLikeInfo[] = [
+            "user_uuid" => $likeUserUuid
+        ];
+        cachePkRankLikeTodayInfo($user["uuid"], $type, $todayPkLikeInfo, $redis);
 
         return new \stdClass();
     }

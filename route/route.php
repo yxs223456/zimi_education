@@ -129,6 +129,10 @@ Route::rule('rank/synthesizeLike', 'api/rank/synthesizeLike', 'post');
 Route::rule('rank/competitionRank', 'api/rank/competitionRank', 'post');
 //才情排行榜点赞
 Route::rule('rank/competitionLike', 'api/rank/competitionLike', 'post');
+//pk排行榜
+Route::rule('rank/pkRank', 'api/rank/pkRank', 'post');
+//pk排行榜点赞
+Route::rule('rank/pkLike', 'api/rank/pkLike', 'post');
 
 return [
 

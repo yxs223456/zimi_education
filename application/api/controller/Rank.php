@@ -10,6 +10,7 @@ namespace app\api\controller;
 
 use app\api\service\v1\RankService;
 use app\common\AppException;
+use app\common\enum\PkTypeEnum;
 use app\common\enum\QuestionDifficultyLevelEnum;
 
 class Rank extends Base
@@ -67,5 +68,33 @@ class Rank extends Base
 
         $rankService = new RankService();
         return $this->jsonResponse($rankService->competitionLike($user, $userUuid));
+    }
+
+    public function pkRank()
+    {
+        $type = input("type");
+        if ($type === null || !in_array($type, PkTypeEnum::getAllValues())) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+        $user = $this->query["user"];
+
+        $rankService = new RankService();
+        return $this->jsonResponse($rankService->pkRank($user, $type));
+    }
+
+    public function pkLike()
+    {
+        $userUuid = input("user_uuid");
+        $type = input("type");
+        if (empty($userUuid)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+        if ($type === null || !in_array($type, PkTypeEnum::getAllValues())) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+        $user = $this->query["user"];
+
+        $rankService = new RankService();
+        return $this->jsonResponse($rankService->pkLike($user, $userUuid, $type));
     }
 }
