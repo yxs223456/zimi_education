@@ -14,10 +14,13 @@ class PkModel extends Base
 {
     protected $table = 'pk';
 
-    public function getListByType($pkType, $pageNum, $pageSize)
+    public function getListByType($pkType, $pkStatus, $pageNum, $pageSize)
     {
-        return $this->where("type", $pkType)
-            ->whereIn("status", [
+        $data = $this->where("type", $pkType);
+        if ($pkStatus != 0) {
+            $data->where("status", $pkStatus);
+        }
+        return $data->whereIn("status", [
                 PkStatusEnum::WAIT_JOIN,
                 PkStatusEnum::UNDERWAY,
                 PkStatusEnum::FINISH,

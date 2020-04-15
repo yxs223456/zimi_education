@@ -35,4 +35,7 @@ class PkStatusEnum
 
     const FINISH = 6;
     const FINISH_DESC = "结束";
+
+    const AUDIT_FAIL = 7;
+    const AUDIT_FAIL_DESC = "审核不通过";
 }

@@ -12,6 +12,7 @@ use app\api\service\v1\AthleticsService;
 use app\api\service\v1\QuestionService;
 use app\common\AppException;
 use app\common\Constant;
+use app\common\enum\PkStatusEnum;
 use app\common\enum\PkTypeEnum;
 use app\common\enum\QuestionDifficultyLevelEnum;
 
@@ -128,7 +129,11 @@ class Athletics extends Base
     public function pkList()
     {
         $pkType = input("type");
+        $pkStatus = input("status");
         if ($pkType === null || !in_array($pkType, PkTypeEnum::getAllValues())) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+        if (!empty($pkStatus) && !in_array($pkStatus, PkStatusEnum::getAllValues())) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
         $pageNum = input("pageNum");
@@ -139,7 +144,7 @@ class Athletics extends Base
 
         $user = $this->query["user"];
         $athleticsService = new AthleticsService();
-        $returnData = $athleticsService->pkList($user, $pkType, $pageNum, $pageSize);
+        $returnData = $athleticsService->pkList($user, $pkType, $pkStatus,  $pageNum, $pageSize);
 
         return $this->jsonResponse($returnData);
     }

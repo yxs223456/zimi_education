@@ -252,11 +252,11 @@ class AthleticsService extends Base
         return new \stdClass();
     }
 
-    public function pkList($user, $pkType, $pageNum, $pageSize)
+    public function pkList($user, $pkType, $pkStatus, $pageNum, $pageSize)
     {
         $pkModel = new PkModel();
 
-        $pkList = $pkModel->getListByType($pkType, $pageNum, $pageSize)->toArray();
+        $pkList = $pkModel->getListByType($pkType, $pkStatus, $pageNum, $pageSize)->toArray();
 
         $returnData = [];
         if ($pkList) {
