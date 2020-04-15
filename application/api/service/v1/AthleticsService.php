@@ -632,7 +632,7 @@ class AthleticsService extends Base
             $questions = $singleChoiceModel->getRandom($difficultyLevel, $questionCount)->toArray();
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, $difficultyLevel, $redis);
         } else {
-            $questions = $singleChoiceModel->getByUuids($questionsUuids);
+            $questions = $singleChoiceModel->getByUuids($questionsUuids)->toArray();
             $questions = (new QuestionService())->questionOrderByUuid($questionsUuids, $questions);
         }
 
@@ -667,12 +667,12 @@ class AthleticsService extends Base
 
         if (!isset($twoStarQuestions) && !isset($threeStarQuestions)) {
             $questionUuids = array_merge($twoStarQuestionUuids, $threeStarQuestionUuids);
-            $questions = $singleChoiceModel->getByUuids($questionUuids);
+            $questions = $singleChoiceModel->getByUuids($questionUuids)->toArray();
         } else if (!isset($twoStarQuestions) && isset($threeStarQuestions)) {
-            $twoStarQuestions = $singleChoiceModel->getByUuids($twoStarQuestionUuids);
+            $twoStarQuestions = $singleChoiceModel->getByUuids($twoStarQuestionUuids)->toArray();
             $questions = array_merge($twoStarQuestions, $threeStarQuestions);
         } else if (isset($twoStarQuestions) && !isset($threeStarQuestions)) {
-            $threeStarQuestions = $singleChoiceModel->getByUuids($threeStarQuestionUuids);
+            $threeStarQuestions = $singleChoiceModel->getByUuids($threeStarQuestionUuids)->toArray();
             $questions = array_merge($twoStarQuestions, $threeStarQuestions);
         } else {
             $questions = array_merge($twoStarQuestions, $threeStarQuestions);
@@ -711,12 +711,12 @@ class AthleticsService extends Base
 
         if (!isset($fourStarQuestions) && !isset($fiveStarQuestions)) {
             $questionUuids = array_merge($fourStarQuestionUuids, $fiveStarQuestionUuids);
-            $questions = $singleChoiceModel->getByUuids($questionUuids);
+            $questions = $singleChoiceModel->getByUuids($questionUuids)->toArray();
         } else if (!isset($fourStarQuestions) && isset($fiveStarQuestions)) {
-            $fourStarQuestions = $singleChoiceModel->getByUuids($fourStarQuestionUuids);
+            $fourStarQuestions = $singleChoiceModel->getByUuids($fourStarQuestionUuids)->toArray();
             $questions = array_merge($fourStarQuestions, $fiveStarQuestions);
         } else if (isset($fourStarQuestions) && !isset($fiveStarQuestions)) {
-            $fiveStarQuestions = $singleChoiceModel->getByUuids($fiveStarQuestionUuids);
+            $fiveStarQuestions = $singleChoiceModel->getByUuids($fiveStarQuestionUuids)->toArray();
             $questions = array_merge($fourStarQuestions, $fiveStarQuestions);
         } else {
             $questions = array_merge($fourStarQuestions, $fiveStarQuestions);
@@ -748,7 +748,7 @@ class AthleticsService extends Base
             $questions = $singleChoiceModel->getRandom($difficultyLevel, $questionCount)->toArray();
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, $difficultyLevel, $redis);
         } else {
-            $questions = $singleChoiceModel->getByUuids($questionsUuids);
+            $questions = $singleChoiceModel->getByUuids($questionsUuids)->toArray();
             $questions = (new QuestionService())->questionOrderByUuid($questionsUuids, $questions);
         }
 
