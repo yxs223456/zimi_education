@@ -258,7 +258,7 @@ class AthleticsService extends Base
 
         $pkList = $pkModel->getListByType($pkType, $pageNum, $pageSize)->toArray();
 
-        $returnData["list"] = [];
+        $returnData = [];
         if ($pkList) {
             $pkUuids = array_column($pkList, "uuid");
             $pkJoinModel = new PkJoinModel();
@@ -274,7 +274,7 @@ class AthleticsService extends Base
             }
 
             foreach ($pkList as $item) {
-                $returnData["list"][] = [
+                $returnData[] = [
                     "uuid" => $item["uuid"],
                     "name" => $item["name"],
                     "initiator_nickname" => $pkUserInfo[$item["uuid"]][0]["nickname"],
