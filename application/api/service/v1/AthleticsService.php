@@ -629,7 +629,7 @@ class AthleticsService extends Base
         $questionsUuids = getRandomSingleChoice($difficultyLevel, $questionCount, $redis);
 
         if (count($questionsUuids) < $questionCount) {
-            $questions = $singleChoiceModel->getRandom($difficultyLevel, $questionCount);
+            $questions = $singleChoiceModel->getRandom($difficultyLevel, $questionCount)->toArray();
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, $difficultyLevel, $redis);
         } else {
             $questions = $singleChoiceModel->getByUuids($questionsUuids);
@@ -656,12 +656,12 @@ class AthleticsService extends Base
 
         $twoStarQuestionUuids = getRandomSingleChoice(QuestionDifficultyLevelEnum::TWO, $questionCount, $redis);
         if (count($twoStarQuestionUuids) < $questionCount) {
-            $twoStarQuestions = $singleChoiceModel->getRandom(QuestionDifficultyLevelEnum::TWO, $questionCount);
+            $twoStarQuestions = $singleChoiceModel->getRandom(QuestionDifficultyLevelEnum::TWO, $questionCount)->toArray();
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, QuestionDifficultyLevelEnum::TWO, $redis);
         }
         $threeStarQuestionUuids = getRandomSingleChoice(QuestionDifficultyLevelEnum::THREE, $questionCount, $redis);
         if (count($threeStarQuestionUuids) < $questionCount) {
-            $threeStarQuestions = $singleChoiceModel->getRandom(QuestionDifficultyLevelEnum::THREE, $questionCount);
+            $threeStarQuestions = $singleChoiceModel->getRandom(QuestionDifficultyLevelEnum::THREE, $questionCount)->toArray();
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, QuestionDifficultyLevelEnum::THREE, $redis);
         }
 
@@ -700,12 +700,12 @@ class AthleticsService extends Base
 
         $fourStarQuestionUuids = getRandomSingleChoice(QuestionDifficultyLevelEnum::FOUR, $questionCount, $redis);
         if (count($fourStarQuestionUuids) < $questionCount) {
-            $fourStarQuestions = $singleChoiceModel->getRandom(QuestionDifficultyLevelEnum::FOUR, $questionCount);
+            $fourStarQuestions = $singleChoiceModel->getRandom(QuestionDifficultyLevelEnum::FOUR, $questionCount)->toArray();
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, QuestionDifficultyLevelEnum::FOUR, $redis);
         }
         $fiveStarQuestionUuids = getRandomSingleChoice(QuestionDifficultyLevelEnum::FIVE, $questionCount, $redis);
         if (count($fiveStarQuestionUuids) < $questionCount) {
-            $fiveStarQuestions = $singleChoiceModel->getRandom(QuestionDifficultyLevelEnum::FIVE, $questionCount);
+            $fiveStarQuestions = $singleChoiceModel->getRandom(QuestionDifficultyLevelEnum::FIVE, $questionCount)->toArray();
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, QuestionDifficultyLevelEnum::FIVE, $redis);
         }
 
@@ -745,7 +745,7 @@ class AthleticsService extends Base
         $questionsUuids = getRandomSingleChoice($difficultyLevel, $questionCount, $redis);
 
         if (count($questionsUuids) < $questionCount) {
-            $questions = $singleChoiceModel->getRandom($difficultyLevel, $questionCount);
+            $questions = $singleChoiceModel->getRandom($difficultyLevel, $questionCount)->toArray();
             pushCacheQuestionLibraryList(QuestionTypeEnum::SINGLE_CHOICE, $difficultyLevel, $redis);
         } else {
             $questions = $singleChoiceModel->getByUuids($questionsUuids);
