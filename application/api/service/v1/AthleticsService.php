@@ -267,8 +267,8 @@ class AthleticsService extends Base
             $pkUserUuids = [];
             foreach ($pkListUserInfo as $item) {
                 $pkUserInfo[$item["pk_uuid"]][] = [
-                    "nickname" => $item["nickname"],
-                    "head_image_url" => getImageUrl($item["head_image_url"])
+                    "nickname" => getNickname($item["nickname"]),
+                    "head_image_url" => getHeadImageUrl($item["head_image_url"])
                 ];
                 $pkUserUuids[$item["pk_uuid"]][] = $item["uuid"];
             }
@@ -277,6 +277,8 @@ class AthleticsService extends Base
                 $returnData[] = [
                     "uuid" => $item["uuid"],
                     "name" => $item["name"],
+                    "total_num" => $item["total_num"],
+                    "initiator_head_image_url" => $pkUserInfo[$item["uuid"]][0]["head_image_url"],
                     "initiator_nickname" => $pkUserInfo[$item["uuid"]][0]["nickname"],
                     "join_users" => $pkUserInfo[$item["uuid"]],
                     "type" => $item["type"],
