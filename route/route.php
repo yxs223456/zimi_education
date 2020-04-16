@@ -51,6 +51,8 @@ Route::rule('user/signInfo', 'api/user/signInfo', 'post');
 Route::rule('user/sign', 'api/user/sign', 'post');
 //用户领取连续签到奖励
 Route::rule('user/receiveContinuousSignReward', 'api/user/receiveContinuousSignReward', 'post');
+//用户作文本
+Route::rule('user/writingList', 'api/user/writingList', 'post');
 
 
 //任务中心首页

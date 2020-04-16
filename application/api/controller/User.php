@@ -9,6 +9,8 @@
 namespace app\api\controller;
 
 use app\api\service\UserService;
+use app\api\service\v1\AthleticsService;
+use app\api\service\v1\UserWritingService;
 use app\common\AppException;
 
 class User extends Base
@@ -236,6 +238,22 @@ class User extends Base
 
         $userService = new UserService();
         $returnData = $userService->receiveContinuousSignReward($user, $condition);
+
+        return $this->jsonResponse($returnData);
+    }
+
+    //我的作文本
+    public function writingList()
+    {
+        $pageNum = input("pageNum");
+        $pageSize = input("pageSize");
+        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $service = new UserWritingService();
+        $returnData = $service->myWritingList($user, $pageNum, $pageSize);
 
         return $this->jsonResponse($returnData);
     }
