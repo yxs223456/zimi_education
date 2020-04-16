@@ -8,6 +8,9 @@
 
 namespace app\common\model;
 
+use app\common\enum\PkIsInitiatorEnum;
+use app\common\enum\PkStatusEnum;
+
 class PkJoinModel extends Base
 {
     protected $table = 'pk_join';
@@ -40,5 +43,33 @@ class PkJoinModel extends Base
     public function getJoinInfoByPkUuid($pkUuid)
     {
         return $this->where("pk_uuid", $pkUuid)->select();
+    }
+
+    public function pkReportCard($userUuid, $pageNum, $pageSize)
+    {
+        return $this->alias("pkj")
+            ->leftJoin("pk", "pk.uuid=pkj.pk_uuid")
+            ->leftJoin("user_base u", "u.uuid=pk.initiator_uuid")
+            ->where("pkj.user_uuid", $userUuid)
+            ->where("pk.status", PkStatusEnum::FINISH)
+            ->field("pk.uuid,pk.name,u.nickname,u.head_image_url,pkj.create_time,pkj.rank")
+            ->order("pkj.id", "desc")
+            ->limit(($pageNum - 1) * $pageSize, $pageSize)
+            ->select()
+            ->toArray();
+
+    }
+
+    public function myJointPk($userUuid, $pageNum, $pageSize)
+    {
+        return $this->alias("pkj")
+            ->leftJoin("pk", "pk.uuid=pkj.pk_uuid")
+            ->where("pkj.user_uuid", $userUuid)
+            ->where("pkj.is_initiator", PkIsInitiatorEnum::NO)
+            ->field("pk.uuid,pk.name,pk.status,pk.type")
+            ->order("pkj.id", "desc")
+            ->limit(($pageNum - 1) * $pageSize, $pageSize)
+            ->select()
+            ->toArray();
     }
 }

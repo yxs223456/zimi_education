@@ -107,6 +107,12 @@ Route::rule('athletics/pkList', 'api/athletics/pkList', 'post');
 Route::rule('athletics/pkInfo', 'api/athletics/pkInfo', 'post');
 //提交pk答案
 Route::rule('athletics/submitPkAnswer', 'api/athletics/submitPkAnswer', 'post');
+//我的pk成绩单
+Route::rule('athletics/pkReportCard', 'api/athletics/pkReportCard', 'post');
+//我发起的pk
+Route::rule('athletics/myInitPk', 'api/athletics/myInitPk', 'post');
+//我参与的pk
+Route::rule('athletics/myJointPk', 'api/athletics/myJointPk', 'post');
 
 
 //内部大赛列表

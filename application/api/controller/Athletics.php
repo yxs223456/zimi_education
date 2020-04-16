@@ -179,6 +179,51 @@ class Athletics extends Base
         return $this->jsonResponse($returnData);
     }
 
+    public function pkReportCard()
+    {
+        $pageNum = input("pageNum");
+        $pageSize = input("pageSize");
+        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $athleticsService = new AthleticsService();
+        $returnData = $athleticsService->pkReportCard($user, $pageNum, $pageSize);
+
+        return $this->jsonResponse($returnData);
+    }
+
+    public function myInitPk()
+    {
+        $pageNum = input("pageNum");
+        $pageSize = input("pageSize");
+        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $athleticsService = new AthleticsService();
+        $returnData = $athleticsService->myInitPk($user, $pageNum, $pageSize);
+
+        return $this->jsonResponse($returnData);
+    }
+
+    public function myJointPk()
+    {
+        $pageNum = input("pageNum");
+        $pageSize = input("pageSize");
+        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $athleticsService = new AthleticsService();
+        $returnData = $athleticsService->myJointPk($user, $pageNum, $pageSize);
+
+        return $this->jsonResponse($returnData);
+    }
+
     public function competitionList()
     {
         $pageNum = input("pageNum");

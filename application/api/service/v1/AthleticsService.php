@@ -407,6 +407,103 @@ class AthleticsService extends Base
         return $returnData;
     }
 
+    public function pkReportCard($user, $pageNum, $pageSize)
+    {
+        $pkJoinModel = new PkJoinModel();
+
+        $pkList = $pkJoinModel->pkReportCard($user["uuid"], $pageNum, $pageSize);
+
+        $returnData = [];
+        if ($pkList) {
+            foreach ($pkList as $item) {
+                $returnData[] = [
+                    "uuid" => $item["uuid"],
+                    "name" => $item["name"],
+                    "join_time" => date("Y-m-d", strtotime($item["create_time"])),
+                    "rank" => $item["rank"],
+                    "initiator_head_image_url" => getHeadImageUrl($item["head_image_url"]),
+                    "initiator_nickname" => getNickname($item["nickname"]),
+
+                ];
+            }
+        }
+
+        return $returnData;
+    }
+
+    public function myInitPk($user, $pageNum, $pageSize)
+    {
+        $pkModel = new PkModel();
+
+        $pkList = $pkModel->myInitList($user["uuid"], $pageNum, $pageSize);
+
+        $returnData = [];
+        if ($pkList) {
+            $pkUuids = array_column($pkList, "uuid");
+            $pkJoinModel = new PkJoinModel();
+            $pkListUserInfo = $pkJoinModel->getListUserInfoByPkUuids($pkUuids);
+            $pkUserInfo = [];
+            $pkUserUuids = [];
+            foreach ($pkListUserInfo as $item) {
+                $pkUserInfo[$item["pk_uuid"]][] = [
+                    "nickname" => getNickname($item["nickname"]),
+                    "head_image_url" => getHeadImageUrl($item["head_image_url"])
+                ];
+                $pkUserUuids[$item["pk_uuid"]][] = $item["uuid"];
+            }
+
+            foreach ($pkList as $item) {
+                $returnData[] = [
+                    "uuid" => $item["uuid"],
+                    "name" => $item["name"],
+                    "initiator_head_image_url" => $pkUserInfo[$item["uuid"]][0]["head_image_url"],
+                    "initiator_nickname" => $pkUserInfo[$item["uuid"]][0]["nickname"],
+                    "join_users" => $pkUserInfo[$item["uuid"]],
+                    "type" => $item["type"],
+                    "status" => $item["status"],
+                ];
+            }
+        }
+
+        return $returnData;
+    }
+
+    public function myJointPk($user, $pageNum, $pageSize)
+    {
+        $pkJoinModel = new PkJoinModel();
+
+        $pkList = $pkJoinModel->myJointPk($user["uuid"], $pageNum, $pageSize);
+
+        $returnData = [];
+        if ($pkList) {
+            $pkUuids = array_column($pkList, "uuid");
+            $pkListUserInfo = $pkJoinModel->getListUserInfoByPkUuids($pkUuids);
+            $pkUserInfo = [];
+            $pkUserUuids = [];
+            foreach ($pkListUserInfo as $item) {
+                $pkUserInfo[$item["pk_uuid"]][] = [
+                    "nickname" => getNickname($item["nickname"]),
+                    "head_image_url" => getHeadImageUrl($item["head_image_url"])
+                ];
+                $pkUserUuids[$item["pk_uuid"]][] = $item["uuid"];
+            }
+
+            foreach ($pkList as $item) {
+                $returnData[] = [
+                    "uuid" => $item["uuid"],
+                    "name" => $item["name"],
+                    "initiator_head_image_url" => $pkUserInfo[$item["uuid"]][0]["head_image_url"],
+                    "initiator_nickname" => $pkUserInfo[$item["uuid"]][0]["nickname"],
+                    "join_users" => $pkUserInfo[$item["uuid"]],
+                    "type" => $item["type"],
+                    "status" => $item["status"],
+                ];
+            }
+        }
+
+        return $returnData;
+    }
+
     public function competitionList($user, $pageNum, $pageSize)
     {
         $internalCompetitionModel = new InternalCompetitionModel();
