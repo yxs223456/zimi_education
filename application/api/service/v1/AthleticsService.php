@@ -412,9 +412,9 @@ class AthleticsService extends Base
         $internalCompetitionModel = new InternalCompetitionModel();
         $internalCompetitions = $internalCompetitionModel->getList($pageNum, $pageSize);
 
-        $returnData["list"] = [];
+        $returnData = [];
         foreach ($internalCompetitions as $item) {
-            $returnData["list"][] = [
+            $returnData[] = [
                 "uuid" => $item["uuid"],
                 "image_url" => getImageUrl($item["image_url"]),
                 "name" => $item["name"],
@@ -433,17 +433,26 @@ class AthleticsService extends Base
             throw AppException::factory(AppException::INTERNAL_COMPETITION_NOT_EXISTS);
         }
 
+        if ($competition["user_level_floor"] == 0) {
+            $requirement = "所有学员均可参加";
+        } else {
+            $requirement = $competition["user_level_floor"]."星及以上学员均可参加";
+        }
+
         $returnData = [
             "uuid" => $competitionUuid,
             "status" => $this->getInternalCompetitionStatus($competition),
             "image_url" => getImageUrl($competition["image_url"]),
             "name" => $competition["name"],
             "description" => $competition["description"],
+            "rules" => [
+                "报名时间：".date("Y-m-d", $competition["online_time"])."~".
+                date("Y-m-d", $competition["apply_deadline"]),
+                "提交作品时间：报名后一小时内",
+                "参赛要求：".$requirement,
+                "参赛形式：大赛入口按要求上传作品、可在线作答或者拍照纸质作品。（范文及抄袭按作弊处理）"
+            ],
             "user_level_floor" => $competition["user_level_floor"],
-            "apply_begin_date" => date("Y-m-d", $competition["online_time"]),
-            "apply_deadline" => date("Y-m-d", $competition["apply_deadline"]),
-            "submit_answer_begin_date" => date("Y-m-d", $competition["online_time"]),
-            "submit_answer_deadline" => date("Y-m-d", $competition["submit_answer_deadline"]),
             "is_join" => 0,
             "question" => null,
             "is_submit_answer" => 0,
@@ -603,7 +612,6 @@ class AthleticsService extends Base
 
         return new \stdClass();
     }
-
 
     public function getInternalCompetitionStatus($competition)
     {

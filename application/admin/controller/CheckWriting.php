@@ -17,7 +17,6 @@ use app\common\enum\UserWritingIsCommentEnum;
 use app\common\enum\UserWritingSourceTypeEnum;
 use app\common\helper\Redis;
 use think\Db;
-use think\response\Json;
 
 class CheckWriting extends Base
 {

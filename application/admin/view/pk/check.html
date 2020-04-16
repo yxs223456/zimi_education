@@ -1,0 +1,127 @@
+{include file="public/header" /}
+<link rel="stylesheet" type="text/css" href="/static/admin/webupload/webuploader.css">
+<link rel="stylesheet" type="text/css" href="/static/admin/webupload/style.css">
+<link href="/static/admin/css/select2.min.css" rel="stylesheet">
+<!-- 配置文件 -->
+<script type="text/javascript" src="/static/admin/ueditor/ueditor.config.js"></script>
+<!-- 编辑器源码文件 -->
+<script type="text/javascript" src="/static/admin/ueditor/ueditor.all.js"></script>
+<style>
+    .file-item{float: left; position: relative; width: 110px;height: 110px; margin: 0 20px 20px 0; padding: 4px;}
+    .file-item .info{overflow: hidden;}
+    .uploader-list{width: 100%; overflow: hidden;}
+</style>
+<style type="text/css">
+    .laydate-icon {
+        background: transparent !important;
+    }
+</style>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight" id="app">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>审核PK标题</h5>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal" name="edit" id="signupForm" method="post">
+                        <input type="hidden" value="{$info.uuid}" name="uuid"/>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">标题：</label>
+                            <div class="input-group col-sm-5">
+                                <input type="text" class="form-control" value="{$info.name}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">审核结果：</label>
+                            <div class="input-group col-sm-5">
+                                <input type="radio" name="status" checked="checked" value="3">通过 &nbsp;&nbsp;
+                                <input type="radio" name="status" value="7">不通过
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">不通过原因：</label>
+                            <div class="input-group col-sm-5">
+                                <input type="text" class="form-control" value="包含辱骂暴力等违规内容" name="audit_fail_reason" placeholder="不通过原因">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="hr-line-dashed"></div>
+                            </div>
+                            <div class="col-sm-4 col-sm-offset-3">
+                                <button id="formSubmit" type="submit" class="btn btn-primary"><i class="fa fa-check"></i> 提交</button>&nbsp;&nbsp;&nbsp;
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public/footer" /}
+<script type="text/javascript" src="/static/admin/webupload/webuploader.min.js"></script>
+<script type="text/javascript" src="/static/admin/js/common.js"></script>
+<script src="/static/admin/js/select2.full.min.js"></script>
+<script src="/static/admin/js/ajaxfileupload.js"></script>
+<!-- 开发环境版本，包含了有帮助的命令行警告 -->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<!-- 引入样式 -->
+<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<!-- 引入组件库 -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script type="text/javascript">
+
+    //以下为官方示例
+    $().ready(function () {
+
+        // validate signup form on keyup and submit
+        var icon = "<i class='fa fa-times-circle'></i> ";
+        $("#signupForm").validate({
+            focusCleanup:true,
+            submitHandler:function(form){
+
+                $(form).ajaxSubmit({
+                    type: 'post',
+                    url: "{:url('doCheck')}",
+                    beforeSend:function() {
+                        // 显示loading
+                        index2 = layer.load(0, {
+                            shade: [0.3,'#fff']
+                        });
+                        $("#formSubmit").attr('type', 'button')
+                    },
+                    success: function(data){
+
+                        if (data['code'] != 1) {
+                            layer.msg(data.msg,{icon:2,time:1000,shade: 0.1,}, function(index){
+                                layer.close(index)
+                            });
+                            $("#formSubmit").attr('type', 'submit')
+                            return false;
+                        }
+
+                        layer.msg(data.msg,{icon:1,time:1000,shade: 0.1,}, function(index){
+                            window.location.href="{:url('pkList')}"
+                        });
+                    },
+                    error: function(XmlHttpRequest, textStatus, errorThrown){
+                        layer.msg('error!',{icon:1,time:1000});
+                    },
+                    complete:function() {
+                        // 隐藏loading
+                        layer.close(index2);
+                    }
+                });
+            }
+        });
+    });
+
+</script>
+</body>
+</html>

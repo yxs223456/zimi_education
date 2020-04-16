@@ -5,6 +5,7 @@ namespace app\admin\controller;
 use app\admin\service\FillTheBlanksService;
 use app\admin\service\InternalCompetitionJoinService;
 use app\admin\service\InternalCompetitionService;
+use app\admin\service\PkService;
 use app\admin\service\SingleChoiceService;
 use app\admin\service\Admin as adminService;
 use app\admin\service\AuthGroup as authGroupService;
@@ -36,6 +37,7 @@ class Base extends Controller {
     protected $userSynthesizeRankService;
     protected $internalCompetitionJoinService;
     protected $internalCompetitionService;
+    protected $pkService;
 
     /**
      * 依赖注入
@@ -55,10 +57,14 @@ class Base extends Controller {
      * @param UserSynthesizeService $userSynthesizeService
      * @param InternalCompetitionJoinService $internalCompetitionJoinService
      * @param InternalCompetitionService $internalCompetitionService
+     * @param PkService $pkService
      */
-    public function __construct( AdminService $adminService, AuthGroupService $authGroupService,
-                                 AuthGroupAccessService $authGroupAccessService, AuthRuleService $authRuleService,
-                                 FillTheBlanksService $fillTheBlanksService, SingleChoiceService $singleChoiceService,
+    public function __construct( AdminService $adminService,
+                                 AuthGroupService $authGroupService,
+                                 AuthGroupAccessService $authGroupAccessService,
+                                 AuthRuleService $authRuleService,
+                                 FillTheBlanksService $fillTheBlanksService,
+                                 SingleChoiceService $singleChoiceService,
                                  WritingLibraryService $writingLibraryService,
                                  TrueFalseQuestionService $trueFalseQuestionService,
                                  UserBaseService $userBaseService,
@@ -67,7 +73,8 @@ class Base extends Controller {
                                  UserSynthesizeRankService $userSynthesizeRankService,
                                  UserSynthesizeService $userSynthesizeService,
                                  InternalCompetitionJoinService $internalCompetitionJoinService,
-                                 InternalCompetitionService $internalCompetitionService){
+                                 InternalCompetitionService $internalCompetitionService,
+                                 PkService $pkService){
 
         parent::__construct();
 
@@ -86,5 +93,6 @@ class Base extends Controller {
         $this->userSynthesizeService = $userSynthesizeService;
         $this->internalCompetitionJoinService = $internalCompetitionJoinService;
         $this->internalCompetitionService = $internalCompetitionService;
+        $this->pkService = $pkService;
     }
 }
