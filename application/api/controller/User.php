@@ -257,4 +257,20 @@ class User extends Base
 
         return $this->jsonResponse($returnData);
     }
+
+    //DE币流水
+    public function coinFlowList()
+    {
+        $pageNum = input("pageNum");
+        $pageSize = input("pageSize");
+        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $service = new UserService();
+        $returnData = $service->coinFlowList($user, $pageNum, $pageSize);
+
+        return $this->jsonResponse($returnData);
+    }
 }

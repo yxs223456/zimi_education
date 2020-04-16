@@ -711,6 +711,28 @@ class UserService extends Base
         return new \stdClass();
     }
 
+    public function coinFlowList($user, $pageNum, $pageSize)
+    {
+        $userCoinLogModel = new UserCoinLogModel();
+        $coinFlowList = $userCoinLogModel->getList($user["uuid"], $pageNum, $pageSize);
+
+        $returnData = [];
+        foreach ($coinFlowList as $item) {
+            $returnData[] = [
+                "type" => $item["type"],
+                "add_type" => $item["add_type"],
+                "reduce_type" => $item["reduce_type"],
+                "num" => $item["num"],
+                "before_num" => $item["before_num"],
+                "after_num" => $item["after_num"],
+                "detail_note" => $item["detail_note"],
+                "create_time" => $item["create_time"],
+            ];
+        }
+
+        return $returnData;
+    }
+
     private function recordUserWeChatInfo(Model $user, $userWeChatInfo)
     {
         $user->unionid = $userWeChatInfo["unionid"];

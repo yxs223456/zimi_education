@@ -301,4 +301,19 @@ class Athletics extends Base
         $returnData = $athleticsService->submitCompetitionAnswer($user, $competitionUuid, $answer);
         return $this->jsonResponse($returnData);
     }
+
+    public function competitionReportCard()
+    {
+        $pageNum = input("pageNum");
+        $pageSize = input("pageSize");
+        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $athleticsService = new AthleticsService();
+        $returnData = $athleticsService->competitionReportCard($user, $pageNum, $pageSize);
+
+        return $this->jsonResponse($returnData);
+    }
 }

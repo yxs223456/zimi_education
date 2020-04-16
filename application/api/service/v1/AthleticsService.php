@@ -725,6 +725,36 @@ class AthleticsService extends Base
         return $status;
     }
 
+    public function competitionReportCard($user, $pageNum, $pageSize)
+    {
+        $internalCompetitionModel = new InternalCompetitionModel();
+        $internalCompetitions = $internalCompetitionModel->competitionReportCard($pageNum, $pageSize);
+        if (!$internalCompetitions) {
+            return [];
+        }
+
+        $internalCompetitionUuids = array_column($internalCompetitions, "uuid");
+        $internalCompetitionJoinModel = new InternalCompetitionJoinModel();
+        $userJoinInternalCompetitions = $internalCompetitionJoinModel
+            ->getByUserAndCompetitions($user["uuid"], $internalCompetitionUuids)->toArray();
+        $userJoinInternalCompetitions = array_column($userJoinInternalCompetitions, null, "c_uuid");
+
+        $returnData = [];
+        foreach ($internalCompetitions as $item) {
+            $isJoin = (int) isset($userJoinInternalCompetitions[$item["uuid"]]);
+            $rank = $isJoin?$userJoinInternalCompetitions[$item["uuid"]]["rank"]:0;
+            $returnData[] = [
+                "uuid" => $item["uuid"],
+                "image_url" => getImageUrl($item["image_url"]),
+                "name" => $item["name"],
+                "is_join" => $isJoin,
+                "rank" => $rank,
+            ];
+        }
+
+        return $returnData;
+    }
+
     private function getNovicePkQuestions($redis)
     {
         //新手难度的pk全部是1星题

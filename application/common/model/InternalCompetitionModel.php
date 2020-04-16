@@ -8,6 +8,8 @@
 
 namespace app\common\model;
 
+use app\common\enum\InternalCompetitionIsFinishEnum;
+
 class InternalCompetitionModel extends Base
 {
     protected $table = 'internal_competition';
@@ -19,5 +21,14 @@ class InternalCompetitionModel extends Base
             ->order("id", "desc")
             ->limit(($pageNum-1)*$pageSize, $pageSize)
             ->select();
+    }
+
+    public function competitionReportCard($pageNum, $pageSize)
+    {
+        return $this
+            ->whereTime("is_finish", InternalCompetitionIsFinishEnum::YES)
+            ->order("id", "desc")
+            ->limit(($pageNum-1)*$pageSize, $pageSize)
+            ->select()->toArray();
     }
 }

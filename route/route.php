@@ -53,6 +53,8 @@ Route::rule('user/sign', 'api/user/sign', 'post');
 Route::rule('user/receiveContinuousSignReward', 'api/user/receiveContinuousSignReward', 'post');
 //用户作文本
 Route::rule('user/writingList', 'api/user/writingList', 'post');
+//用户DE币流水
+Route::rule('user/coinFlowList', 'api/user/coinFlowList', 'post');
 
 
 //任务中心首页
@@ -127,6 +129,8 @@ Route::rule('athletics/joinCompetition', 'api/athletics/joinCompetition', 'post'
 Route::rule('athletics/submitCompetitionDraft', 'api/athletics/submitCompetitionDraft', 'post');
 //提交内部大赛作品
 Route::rule('athletics/submitCompetition', 'api/athletics/submitCompetition', 'post');
+//内部大赛成绩单
+Route::rule('athletics/competitionReportCard', 'api/athletics/competitionReportCard', 'post');
 
 
 //综合测试排行榜

@@ -15,6 +15,14 @@ class UserCoinLogModel extends Base
 {
     protected $table = 'user_coin_log';
 
+    public function getList($userUuid, $pageNum, $pageSize)
+    {
+        return $this->where("user_uuid", $userUuid)
+            ->order("id", "desc")
+            ->limit(($pageNum-1)*$pageSize, $pageSize)
+            ->select()->toArray();
+    }
+
     public function getByUserUuidAndAddType($userUuid, $addType)
     {
         return $this->where("user_uuid", $userUuid)
