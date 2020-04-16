@@ -58,4 +58,7 @@ class UserCoinAddTypeEnum
 
     const PK_INITIATOR_WIN = 14;
     const PK_INITIATOR_WIN_DESC = "PK团长获得pk冠军奖励";
+
+    const PK_AUDIT_FAIL = 15;
+    const PK_AUDIT_FAIL_DESC = "PK标题审核不通过";
 }
