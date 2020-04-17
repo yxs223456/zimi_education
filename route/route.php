@@ -99,6 +99,8 @@ Route::rule('athletics/getSynthesize', 'api/athletics/getSynthesize', 'post');
 Route::rule('athletics/submitSynthesizeDraft', 'api/athletics/submitSynthesizeDraft', 'post');
 //综合练习模块，获取练习题答案
 Route::rule('athletics/submitSynthesize', 'api/athletics/submitSynthesize', 'post');
+//综合练习成绩单
+Route::rule('athletics/synthesizeReportCardList', 'api/athletics/synthesizeReportCardList', 'post');
 
 
 //发起pk
@@ -130,7 +132,11 @@ Route::rule('athletics/submitCompetitionDraft', 'api/athletics/submitCompetition
 //提交内部大赛作品
 Route::rule('athletics/submitCompetition', 'api/athletics/submitCompetition', 'post');
 //内部大赛成绩单
-Route::rule('athletics/competitionReportCard', 'api/athletics/competitionReportCard', 'post');
+Route::rule('athletics/competitionReportCardList', 'api/athletics/competitionReportCardList', 'post');
+//内部大赛成绩详情
+Route::rule('athletics/competitionReportCardInfo', 'api/athletics/competitionReportCardInfo', 'post');
+//内部大赛成绩详情用户列表
+Route::rule('athletics/competitionReportCardUserList', 'api/athletics/competitionReportCardUserList', 'post');
 
 
 //综合测试排行榜

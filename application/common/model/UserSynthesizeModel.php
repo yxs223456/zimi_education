@@ -9,6 +9,7 @@
 namespace app\common\model;
 
 use app\common\enum\UserSynthesizeIsFinishEnum;
+use app\common\enum\UserSynthesizeScoreIsFinishEnum;
 
 class UserSynthesizeModel extends Base
 {
@@ -22,5 +23,15 @@ class UserSynthesizeModel extends Base
             ->where("is_finish", UserSynthesizeIsFinishEnum::NO)
             ->order("id", "desc")
             ->find();
+    }
+
+    public function synthesizeReportCardList($userUuid, $difficultyLevel, $pageNum, $pageSize)
+    {
+        return $this->where("user_uuid", $userUuid)
+            ->where("difficulty_level", $difficultyLevel)
+            ->where("score_is_finish", UserSynthesizeScoreIsFinishEnum::YES)
+            ->order("id", "desc")
+            ->limit(($pageNum-1)*$pageSize, $pageSize)
+            ->select()->toArray();
     }
 }

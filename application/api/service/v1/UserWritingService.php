@@ -26,6 +26,7 @@ class UserWritingService extends Base
                     $contents["images"][$key] = getImageUrl($image);
                 }
             }
+
             $returnData[] = [
                 "source_type" => $item["source_type"],
                 "difficulty_level" => $item["difficulty_level"],
@@ -36,9 +37,44 @@ class UserWritingService extends Base
                 "total_score" => (int) $item["total_score"],
                 "score" => (int) $item["score"],
                 "comment" => $item["comment"],
+                "comment_level" => $item["is_comment"]?$this->getCommentLevel($item["total_score"], $item["score"]):"",
             ];
         }
 
         return $returnData;
+    }
+
+    public function getCommentLevel($totalScore, $score)
+    {
+        //满分100分等级：优秀 90-100分，比较优秀80-90，合格70-80,一般60-70,不及格以下
+        //满分30分等级：27-30,24-27,21-24,18-21,18分以下不合格
+        $commentLevel = "";
+        if ($totalScore == 100) {
+            if ($score >= 90) {
+                $commentLevel = "优秀";
+            } else if ($score >= 80) {
+                $commentLevel = "比较优秀";
+            } else if ($score >= 70) {
+                $commentLevel = "合格";
+            } else if ($score >= 60) {
+                $commentLevel = "一般";
+            } else {
+                $commentLevel = "不及格";
+            }
+        } else if ($totalScore == 30) {
+            if ($score >= 27) {
+                $commentLevel = "优秀";
+            } else if ($score >= 24) {
+                $commentLevel = "比较优秀";
+            } else if ($score >= 21) {
+                $commentLevel = "合格";
+            } else if ($score >= 18) {
+                $commentLevel = "一般";
+            } else {
+                $commentLevel = "不及格";
+            }
+        }
+
+        return $commentLevel;
     }
 }

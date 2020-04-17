@@ -75,6 +75,27 @@ class Athletics extends Base
         return $this->jsonResponse($returnData);
     }
 
+    public function synthesizeReportCardList()
+    {
+        $difficultyLevel = input("difficulty_level");
+        if ($difficultyLevel === null || !in_array($difficultyLevel, QuestionDifficultyLevelEnum::getAllValues())) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $pageNum = input("pageNum");
+        $pageSize = input("pageSize");
+        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+
+        $athleticsService = new AthleticsService();
+        $returnData = $athleticsService->synthesizeReportCardList($user, $difficultyLevel, $pageNum, $pageSize);
+
+        return $this->jsonResponse($returnData);
+    }
+
     public function initPk()
     {
         //pk模式验证
@@ -302,7 +323,7 @@ class Athletics extends Base
         return $this->jsonResponse($returnData);
     }
 
-    public function competitionReportCard()
+    public function competitionReportCardList()
     {
         $pageNum = input("pageNum");
         $pageSize = input("pageSize");
@@ -312,7 +333,41 @@ class Athletics extends Base
 
         $user = $this->query["user"];
         $athleticsService = new AthleticsService();
-        $returnData = $athleticsService->competitionReportCard($user, $pageNum, $pageSize);
+        $returnData = $athleticsService->competitionReportCardList($user, $pageNum, $pageSize);
+
+        return $this->jsonResponse($returnData);
+    }
+
+    public function competitionReportCardInfo()
+    {
+        $uuid = input("uuid");
+        if (empty($uuid)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $athleticsService = new AthleticsService();
+        $returnData = $athleticsService->competitionReportCardInfo($user, $uuid);
+
+        return $this->jsonResponse($returnData);
+    }
+
+    public function competitionReportCardUserList()
+    {
+        $uuid = input("uuid");
+        if (empty($uuid)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $pageNum = input("pageNum");
+        $pageSize = input("pageSize");
+        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $athleticsService = new AthleticsService();
+        $returnData = $athleticsService->competitionReportCardUserList($user, $uuid, $pageNum, $pageSize);
 
         return $this->jsonResponse($returnData);
     }

@@ -33,11 +33,28 @@ use app\common\model\SingleChoiceModel;
 use app\common\model\UserBaseModel;
 use app\common\model\UserCoinLogModel;
 use app\common\model\UserPkCoinLogModel;
+use app\common\model\UserSynthesizeModel;
 use app\common\model\UserTalentCoinLogModel;
 use think\Db;
 
 class AthleticsService extends Base
 {
+    public function synthesizeReportCardList($user, $difficultyLevel, $pageNum, $pageSize)
+    {
+        $userSynthesizeModel = new UserSynthesizeModel();
+        $userSynthesizeList = $userSynthesizeModel->synthesizeReportCardList($user["uuid"], $difficultyLevel, $pageNum, $pageSize);
+
+        $returnData = [];
+        foreach ($userSynthesizeList as $item) {
+            $returnData[] = [
+                "finish_time" => date("Y-m-d H:i:s", $item["finish_time"]),
+                "score" => (int) $item["score"],
+            ];
+        }
+
+        return $returnData;
+    }
+
     public function initPk($userUuid, $pkType, $durationHour, $totalNum, $name)
     {
         $redis = Redis::factory();
@@ -725,7 +742,7 @@ class AthleticsService extends Base
         return $status;
     }
 
-    public function competitionReportCard($user, $pageNum, $pageSize)
+    public function competitionReportCardList($user, $pageNum, $pageSize)
     {
         $internalCompetitionModel = new InternalCompetitionModel();
         $internalCompetitions = $internalCompetitionModel->competitionReportCard($pageNum, $pageSize);
@@ -753,6 +770,69 @@ class AthleticsService extends Base
         }
 
         return $returnData;
+    }
+
+    public function competitionReportCardInfo($user, $competitionUuid)
+    {
+        //大赛
+        $internalCompetitionModel = new InternalCompetitionModel();
+        $competition = $internalCompetitionModel->findByUuid($competitionUuid);
+        if (empty($competition)) {
+            throw AppException::factory(AppException::INTERNAL_COMPETITION_NOT_EXISTS);
+        }
+
+        //参与用户
+        $internalCompetitionJoinModel = new InternalCompetitionJoinModel();
+        $joinUsers = $internalCompetitionJoinModel->getJoinUserInfoList($competitionUuid, 1, 8);
+        foreach ($joinUsers as $key=>$joinUser) {
+            $joinUsers[$key]["nickname"] = getNickname($joinUser["nickname"]);
+            $joinUsers[$key]["head_image_url"] = getHeadImageUrl($joinUser["head_image_url"]);
+        }
+
+        //成绩上榜用户
+        $myDescription = "";
+        if ($competition["is_finish"] == InternalCompetitionIsFinishEnum::NO) {
+            $winUsers = [];
+        } else {
+            $redis = Redis::factory();
+            $winUsers = getCompetitionWinUserInfo($competitionUuid, $redis);
+            if (!is_array($winUsers)) {
+                $winUsers = $internalCompetitionJoinModel->getWinUserInfoList($competitionUuid);
+                cacheCompetitionWinUserInfo($competitionUuid, $winUsers, $redis);
+            }
+            foreach ($winUsers as $key=>$winUser) {
+                if ($winUser["uuid"] == $user["uuid"]) {
+                    $myDescription = "恭喜你在本次大赛中获得第{$winUser["rank"]}名的好成绩，快去分享给你的好友，邀请他一起加入";
+                }
+                $winUsers[$key]["nickname"] = getNickname($winUser["nickname"]);
+                $winUsers[$key]["head_image_url"] = getHeadImageUrl($winUser["head_image_url"]);
+            }
+        }
+
+
+        $returnData = [
+            "uuid" => $competitionUuid,
+            "description" => $competition["description"],
+            "organizers" => $competition["organizers"],
+            "join_users" => $joinUsers,
+            "win_users" => $winUsers,
+            "prize" => "奖励才情值等",
+            "my_description" => $myDescription,
+        ];
+
+        return $returnData;
+    }
+
+    public function competitionReportCardUserList($user, $competitionUuid, $pageNum, $pageSize)
+    {
+        $internalCompetitionJoinModel = new InternalCompetitionJoinModel();
+        $joinUsers = $internalCompetitionJoinModel->getJoinUserInfoList($competitionUuid, $pageNum, $pageSize);
+        foreach ($joinUsers as $key=>$joinUser) {
+            $joinUsers[$key]["nickname"] = getNickname($joinUser["nickname"]);
+            $joinUsers[$key]["head_image_url"] = getHeadImageUrl($joinUser["head_image_url"]);
+        }
+
+        return $joinUsers;
     }
 
     private function getNovicePkQuestions($redis)

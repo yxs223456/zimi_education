@@ -695,6 +695,7 @@ class QuestionService extends Base
             //纪录用户答案
             $synthesize->answers = json_encode($answers, JSON_UNESCAPED_UNICODE);
             $synthesize->is_finish = UserSynthesizeIsFinishEnum::YES;
+            $synthesize->finish_time = time();
             $synthesize->save();
 
             //同步作文内容以便统一审核

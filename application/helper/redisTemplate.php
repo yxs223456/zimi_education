@@ -970,6 +970,23 @@ function getCompetitionRankLikeTodayInfo($userUuid, \Redis $redis) {
     }
 }
 
+//缓存内部大赛获胜用户信息
+function cacheCompetitionWinUserInfo($competitionUuid, array $winUserInfo, \Redis $redis) {
+    $key = "de_education:competitionWinUserInfo:$competitionUuid";
+    $redis->setex($key, 86400 * 30, json_encode($winUserInfo, JSON_UNESCAPED_UNICODE));
+}
+
+//内部大赛获胜用户信息
+function getCompetitionWinUserInfo($competitionUuid, \Redis $redis) {
+    $key = "de_education:competitionWinUserInfo:$competitionUuid";
+    $data = $redis->get($key);
+    if ($data) {
+        return json_decode($data, true);
+    } else {
+        return $data;
+    }
+}
+
 //纪录用户pk榜今日点赞信息
 function cachePkRankLikeTodayInfo($userUuid, $type, array $info, \Redis $redis) {
     $key = "de_education:pkRankLikeInfo:$type:$userUuid:" . date("ymd");

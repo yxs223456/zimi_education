@@ -51,7 +51,7 @@ class UserCoinAddTypeEnum
     const INTERNAL_COMPETITION_WIN_DESC = "DE内部大赛取得名次";
 
     const PK_GROUP_FAIL = 12;
-    const PK_GROUP_FAIL_DESC = "PK成团失败";
+    const PK_GROUP_FAIL_DESC = "PK成团失败退还";
 
     const PK_WIN = 13;
     const PK_WIN_DESC = "PK获得名次";
@@ -60,5 +60,5 @@ class UserCoinAddTypeEnum
     const PK_INITIATOR_WIN_DESC = "PK团长获得pk冠军奖励";
 
     const PK_AUDIT_FAIL = 15;
-    const PK_AUDIT_FAIL_DESC = "PK标题审核不通过";
+    const PK_AUDIT_FAIL_DESC = "PK标题审核不通过退还";
 }
