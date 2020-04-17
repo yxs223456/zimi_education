@@ -99,6 +99,7 @@ class Pk extends Base
             }
 
             $pk->status = $status;
+            $pk->audit_time = time();
             if ($status == PkStatusEnum::WAIT_JOIN) {
                 $pk->begin_time = time();
                 $pk->deadline = time() + (3600 * $pk["duration_hour"]);
