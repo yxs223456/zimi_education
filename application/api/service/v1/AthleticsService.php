@@ -570,14 +570,18 @@ class AthleticsService extends Base
             "is_join" => 0,
             "question" => null,
             "is_submit_answer" => 0,
+            "submit_answer_ttl" => 0,
         ];
 
         $internalCompetitionJoinModel = new InternalCompetitionJoinModel();
         $competitionJoin = $internalCompetitionJoinModel->findByUserAndCompetition($user["uuid"], $competitionUuid);
         if ($competitionJoin != null) {
+            $ttl = 3600 - (time() - strtotime($competition->create_time));
+            $ttl = $ttl<=0?0:1000*$ttl;
             $returnData["is_join"] = 1;
             $returnData["is_submit_answer"] = $competitionJoin["is_submit_answer"];
             $returnData["question"] = json_decode($competitionJoin["question"]);
+            $returnData["submit_answer_ttl"] = $ttl;
         }
 
         return $returnData;
