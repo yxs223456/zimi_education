@@ -82,9 +82,9 @@ class Athletics extends Base
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
-        $pageNum = input("pageNum");
-        $pageSize = input("pageSize");
-        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
+        $pageNum = input("page_num");
+        $pageSize = input("page_size");
+        if (!checkInt($pageNum, false) || checkInt($pageSize, false)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
@@ -157,8 +157,8 @@ class Athletics extends Base
         if (!empty($pkStatus) && !in_array($pkStatus, PkStatusEnum::getAllValues())) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
-        $pageNum = input("pageNum");
-        $pageSize = input("pageSize");
+        $pageNum = input("page_num");
+        $pageSize = input("page_size");
         if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
@@ -202,8 +202,8 @@ class Athletics extends Base
 
     public function pkReportCard()
     {
-        $pageNum = input("pageNum");
-        $pageSize = input("pageSize");
+        $pageNum = input("page_num");
+        $pageSize = input("page_size");
         if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
@@ -217,8 +217,8 @@ class Athletics extends Base
 
     public function myInitPk()
     {
-        $pageNum = input("pageNum");
-        $pageSize = input("pageSize");
+        $pageNum = input("page_num");
+        $pageSize = input("page_size");
         if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
@@ -232,8 +232,8 @@ class Athletics extends Base
 
     public function myJointPk()
     {
-        $pageNum = input("pageNum");
-        $pageSize = input("pageSize");
+        $pageNum = input("page_num");
+        $pageSize = input("page_size");
         if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
@@ -247,8 +247,8 @@ class Athletics extends Base
 
     public function competitionList()
     {
-        $pageNum = input("pageNum");
-        $pageSize = input("pageSize");
+        $pageNum = input("page_num");
+        $pageSize = input("page_size");
         if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
@@ -325,8 +325,8 @@ class Athletics extends Base
 
     public function competitionReportCardList()
     {
-        $pageNum = input("pageNum");
-        $pageSize = input("pageSize");
+        $pageNum = input("page_num");
+        $pageSize = input("page_size");
         if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
@@ -359,8 +359,8 @@ class Athletics extends Base
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
-        $pageNum = input("pageNum");
-        $pageSize = input("pageSize");
+        $pageNum = input("page_num");
+        $pageSize = input("page_size");
         if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }

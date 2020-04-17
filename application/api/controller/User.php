@@ -245,8 +245,8 @@ class User extends Base
     //我的作文本
     public function writingList()
     {
-        $pageNum = input("pageNum");
-        $pageSize = input("pageSize");
+        $pageNum = input("page_num");
+        $pageSize = input("page_size");
         if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
@@ -261,8 +261,8 @@ class User extends Base
     //DE币流水
     public function coinFlowList()
     {
-        $pageNum = input("pageNum");
-        $pageSize = input("pageSize");
+        $pageNum = input("page_num");
+        $pageSize = input("page_size");
         if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
