@@ -690,7 +690,7 @@ class AthleticsService extends Base
             $returnData = $randomQuestion;
             $returnData["submit_answer_ttl"] = 3600;
 
-            return $randomQuestion;
+            return $returnData;
         } catch (\Throwable $e) {
             Db::rollback();
             throw $e;
