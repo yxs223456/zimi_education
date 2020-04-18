@@ -576,8 +576,8 @@ class AthleticsService extends Base
         $internalCompetitionJoinModel = new InternalCompetitionJoinModel();
         $competitionJoin = $internalCompetitionJoinModel->findByUserAndCompetition($user["uuid"], $competitionUuid);
         if ($competitionJoin != null) {
-            $ttl = 3600 - (time() - strtotime($competition->create_time));
-            $ttl = $ttl<=0?0:1000*$ttl;
+            $ttl = 3600 - (time() - strtotime($competitionJoin["create_time"]));
+            $ttl = $ttl<=0?0:$ttl;
             $returnData["is_join"] = 1;
             $returnData["is_submit_answer"] = $competitionJoin["is_submit_answer"];
             $returnData["question"] = json_decode($competitionJoin["question"]);
@@ -687,6 +687,8 @@ class AthleticsService extends Base
             //缓存用户信息
             $redis = Redis::factory();
             cacheUserInfoByToken($newUser, $redis);
+            $returnData = $randomQuestion;
+            $returnData["submit_answer_ttl"] = 3600;
 
             return $randomQuestion;
         } catch (\Throwable $e) {
