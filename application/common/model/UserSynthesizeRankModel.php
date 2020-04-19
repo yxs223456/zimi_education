@@ -17,7 +17,7 @@ class UserSynthesizeRankModel extends Base
         return $this->alias("usr")
             ->leftJoin("user_base u", "u.uuid=usr.user_uuid")
             ->where("usr.difficulty_level", $difficultyLevel)
-            ->field("usr.user_uuid,u.nickname,u.head_image_url,usr.like_count")
+            ->field("usr.user_uuid,u.nickname,u.head_image_url,u.novice_level.u.level,usr.like_count")
             ->order(["usr.total_score"=>"desc","usr.like_count"=>"desc","usr.update_time"=>"asc"])
             ->limit(0, 100)
             ->select()->toArray();
