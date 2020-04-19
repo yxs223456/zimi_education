@@ -42,7 +42,7 @@ class InternalCompetitionRankModel extends Base
     {
         return $this->alias("icr")
             ->leftJoin("user_base u", "u.uuid=icr.user_uuid")
-            ->field("icr.user_uuid,u.nickname,u.head_image_url,icr.like_count")
+            ->field("icr.user_uuid,u.nickname,u.head_image_url,icr.total_talent_coin,icr.like_count")
             ->order(["icr.total_talent_coin"=>"desc","icr.like_count"=>"desc","icr.update_time"=>"asc"])
             ->limit(0, 10)
             ->select()->toArray();
