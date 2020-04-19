@@ -31,6 +31,7 @@ class RankService extends Base
             $rankList[$key]["nickname"] = getNickname($item["nickname"]);
             $rankList[$key]["head_image_url"] = getHeadImageUrl($item["head_image_url"]);
             $rankList[$key]["rank"] = $key+1;
+            $rankList[$key]["level"] = (int) $item["level"];
         }
 
         $myRank = [
@@ -108,6 +109,7 @@ class RankService extends Base
             $rankList[$key]["nickname"] = getNickname($item["nickname"]);
             $rankList[$key]["head_image_url"] = getHeadImageUrl($item["head_image_url"]);
             $rankList[$key]["rank"] = $key+1;
+            $rankList[$key]["level"] = (int) $item["level"];
         }
 
         $myRank = [
@@ -179,6 +181,7 @@ class RankService extends Base
             $rankList[$key]["nickname"] = getNickname($item["nickname"]);
             $rankList[$key]["head_image_url"] = getHeadImageUrl($item["head_image_url"]);
             $rankList[$key]["rank"] = $key+1;
+            $rankList[$key]["level"] = (int) $item["level"];
         }
 
         $myRank = [
