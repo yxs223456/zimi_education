@@ -30,7 +30,10 @@ class UserSynthesizeRankModel extends Base
             ->find();
 
         if ($userSynthesizeRank == null) {
-            return 0;
+            return [
+                "rank" => 0,
+                "like_count" => 0,
+            ];
         } else {
             $count1 = $this->where("difficulty_level", $difficultyLevel)
                 ->where("total_score", ">", $userSynthesizeRank["total_score"])->count();
@@ -42,7 +45,10 @@ class UserSynthesizeRankModel extends Base
                 ->where("like_count", $userSynthesizeRank["like_count"])
                 ->where("update_time", "<", $userSynthesizeRank["update_time"])
                 ->count();
-            return $count1+$count2+$count3+1;
+            return [
+                "rank" => $count1+$count2+$count3+1,
+                "like_count" => $userSynthesizeRank["like_count"],
+            ];
         }
     }
 }

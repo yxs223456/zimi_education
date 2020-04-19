@@ -53,7 +53,10 @@ class InternalCompetitionRankModel extends Base
         $userRank = $this->where("user_uuid", $userUuid)->find();
 
         if ($userRank == null) {
-            return 0;
+            return [
+                "rank" => 0,
+                "like_count" => 0,
+            ];
         } else {
             $count1 = $this->where("total_talent_coin", ">", $userRank["total_talent_coin"])->count();
             $count2 = $this->where("total_talent_coin", $userRank["total_talent_coin"])
@@ -62,7 +65,10 @@ class InternalCompetitionRankModel extends Base
                 ->where("like_count", $userRank["like_count"])
                 ->where("update_time", "<", $userRank["update_time"])
                 ->count();
-            return $count1+$count2+$count3+1;
+            return [
+                "rank" => $count1+$count2+$count3+1,
+                "like_count" => $userRank["like_count"],
+            ];
         }
     }
 }

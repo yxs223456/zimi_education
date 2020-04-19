@@ -58,7 +58,10 @@ class UserPkRankModel extends Base
             ->find();
 
         if ($userPkRank == null) {
-            return 0;
+            return [
+                "rank" => 0,
+                "like_count" => 0,
+            ];
         } else {
             $count1 = $this->where("type", $type)
                 ->where("total_pk_coin", ">", $userPkRank["total_pk_coin"])->count();
@@ -70,7 +73,10 @@ class UserPkRankModel extends Base
                 ->where("like_count", $userPkRank["like_count"])
                 ->where("update_time", "<", $userPkRank["update_time"])
                 ->count();
-            return $count1+$count2+$count3+1;
+            return [
+                "rank" => $count1+$count2+$count3+1,
+                "like_count" => $userPkRank["like_count"],
+            ];
         }
     }
 }

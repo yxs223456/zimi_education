@@ -34,10 +34,12 @@ class RankService extends Base
             $rankList[$key]["level"] = (int) $item["level"];
         }
 
+        $myRankInfo = $userSynthesizeRankModel->getUserSynthesizeRank($user["uuid"], $difficultyLevel);
         $myRank = [
             "head_image_url" => getHeadImageUrl($user["head_image_url"]),
             "nickname" => getNickname($user["nickname"]),
-            "rank" => $userSynthesizeRankModel->getUserSynthesizeRank($user["uuid"], $difficultyLevel),
+            "rank" => $myRankInfo["rank"],
+            "like_count" => $myRankInfo["like_count"],
         ];
 
         $redis = Redis::factory();
@@ -112,10 +114,12 @@ class RankService extends Base
             $rankList[$key]["level"] = (int) $item["level"];
         }
 
+        $myRankInfo = $internalCompetitionRankModel->getSelfRank($user["uuid"]);
         $myRank = [
             "head_image_url" => getHeadImageUrl($user["head_image_url"]),
             "nickname" => getNickname($user["nickname"]),
-            "rank" => $internalCompetitionRankModel->getSelfRank($user["uuid"]),
+            "rank" => $myRankInfo["rank"],
+            "like_count" => $myRankInfo["like_count"],
         ];
 
         return [
@@ -184,10 +188,12 @@ class RankService extends Base
             $rankList[$key]["level"] = (int) $item["level"];
         }
 
+        $myRankInfo = $userPkRankModel->getUserPkRank($user["uuid"], $type);
         $myRank = [
             "head_image_url" => getHeadImageUrl($user["head_image_url"]),
             "nickname" => getNickname($user["nickname"]),
-            "rank" => $userPkRankModel->getUserPkRank($user["uuid"], $type),
+            "rank" => $myRankInfo["rank"],
+            "like_count" => $myRankInfo["like_count"],
         ];
 
         return [
