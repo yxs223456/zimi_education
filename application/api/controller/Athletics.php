@@ -84,7 +84,7 @@ class Athletics extends Base
 
         $pageNum = input("page_num");
         $pageSize = input("page_size");
-        if (!checkInt($pageNum, false) || checkInt($pageSize, false)) {
+        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
