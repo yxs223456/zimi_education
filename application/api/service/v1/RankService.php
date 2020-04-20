@@ -9,6 +9,7 @@
 namespace app\api\service\v1;
 
 use app\api\service\Base;
+use app\api\service\UserService;
 use app\common\AppException;
 use app\common\Constant;
 use app\common\helper\Redis;
@@ -26,12 +27,13 @@ class RankService extends Base
     {
         $userSynthesizeRankModel = new UserSynthesizeRankModel();
         $rankList = $userSynthesizeRankModel->getRank($difficultyLevel);
+        $userService = new UserService();
         foreach ($rankList as $key=>$item) {
             $rankList[$key]["user_uuid"] = $item["user_uuid"];
             $rankList[$key]["nickname"] = getNickname($item["nickname"]);
             $rankList[$key]["head_image_url"] = getHeadImageUrl($item["head_image_url"]);
             $rankList[$key]["rank"] = $key+1;
-            $rankList[$key]["level"] = (int) $item["level"];
+            $rankList[$key]["self_medals"] = $userService->userSelfMedals(json_decode($item["self_medals"], true));
         }
 
         $myRankInfo = $userSynthesizeRankModel->getUserSynthesizeRank($user["uuid"], $difficultyLevel);
@@ -40,6 +42,7 @@ class RankService extends Base
             "nickname" => getNickname($user["nickname"]),
             "rank" => $myRankInfo["rank"],
             "like_count" => $myRankInfo["like_count"],
+            "self_medals" => $userService->userSelfMedals(json_decode($user["self_medals"], true)),
         ];
 
         $redis = Redis::factory();
@@ -106,12 +109,13 @@ class RankService extends Base
     {
         $internalCompetitionRankModel = new InternalCompetitionRankModel();
         $rankList = $internalCompetitionRankModel->getRank();
+        $userService = new UserService();
         foreach ($rankList as $key=>$item) {
             $rankList[$key]["user_uuid"] = $item["user_uuid"];
             $rankList[$key]["nickname"] = getNickname($item["nickname"]);
             $rankList[$key]["head_image_url"] = getHeadImageUrl($item["head_image_url"]);
             $rankList[$key]["rank"] = $key+1;
-            $rankList[$key]["level"] = (int) $item["level"];
+            $rankList[$key]["self_medals"] = $userService->userSelfMedals(json_decode($item["self_medals"], true));
         }
 
         $myRankInfo = $internalCompetitionRankModel->getSelfRank($user["uuid"]);
@@ -120,6 +124,7 @@ class RankService extends Base
             "nickname" => getNickname($user["nickname"]),
             "rank" => $myRankInfo["rank"],
             "like_count" => $myRankInfo["like_count"],
+            "self_medals" => $userService->userSelfMedals(json_decode($user["self_medals"], true)),
         ];
 
         return [
@@ -180,12 +185,13 @@ class RankService extends Base
     {
         $userPkRankModel = new UserPkRankModel();
         $rankList = $userPkRankModel->getRank($type);
+        $userService = new UserService();
         foreach ($rankList as $key=>$item) {
             $rankList[$key]["user_uuid"] = $item["user_uuid"];
             $rankList[$key]["nickname"] = getNickname($item["nickname"]);
             $rankList[$key]["head_image_url"] = getHeadImageUrl($item["head_image_url"]);
             $rankList[$key]["rank"] = $key+1;
-            $rankList[$key]["level"] = (int) $item["level"];
+            $rankList[$key]["self_medals"] = $userService->userSelfMedals(json_decode($item["self_medals"], true));
         }
 
         $myRankInfo = $userPkRankModel->getUserPkRank($user["uuid"], $type);
@@ -194,6 +200,7 @@ class RankService extends Base
             "nickname" => getNickname($user["nickname"]),
             "rank" => $myRankInfo["rank"],
             "like_count" => $myRankInfo["like_count"],
+            "self_medals" => $userService->userSelfMedals(json_decode($user["self_medals"], true)),
         ];
 
         return [

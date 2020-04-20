@@ -45,7 +45,7 @@ class UserPkRankModel extends Base
         return $this->alias("upr")
             ->leftJoin("user_base u", "u.uuid=upr.user_uuid")
             ->where("upr.type", $type)
-            ->field("upr.user_uuid,u.nickname,u.head_image_url,u.novice_level,u.level,upr.total_pk_coin,upr.like_count")
+            ->field("upr.user_uuid,u.nickname,u.head_image_url,u.self_medals,upr.total_pk_coin,upr.like_count")
             ->order(["upr.total_pk_coin"=>"desc","upr.like_count"=>"desc","upr.update_time"=>"asc"])
             ->limit(0, 10)
             ->select()->toArray();

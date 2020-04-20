@@ -324,6 +324,14 @@ class CheckWriting extends Base
             $isUpdate = false;
             if ($score >= 0 && $userSynthesize->difficulty_level > $user->level) {
                 $user->level = $userSynthesize->difficulty_level;
+                //用户等级勋章
+                $medals = json_decode($user["medals"], true);
+                $selfMedals = json_decode($user["self_medals"], true);
+                $medals["level"] = $userSynthesize->difficulty_level;
+                $user->medals = json_encode($medals, JSON_UNESCAPED_UNICODE);
+                if (count($selfMedals) == 0 || (count($selfMedals) == 1 && isset($selfMedals["novice_level"]))) {
+                    $user->self_medals = json_encode(["level"=>$userSynthesize->difficulty_level], JSON_UNESCAPED_UNICODE);
+                }
                 $user->save();
                 $isUpdate = true;
             }

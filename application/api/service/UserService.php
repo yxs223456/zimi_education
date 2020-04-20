@@ -835,7 +835,16 @@ class UserService extends Base
         return true;
     }
 
-    public function userMedals($userInfo)
+    public function userSelfMedals($userSelfMedals)
+    {
+        $returnData = [];
+        foreach ($userSelfMedals as $key=>$value) {
+            $returnData[] = getImageUrl(Constant::MEDAL_CONFIG[$key][$value]["url"]);
+        }
+        return $returnData;
+    }
+
+    public function userPkMedals($userInfo)
     {
         //pk值达到100点时获得PK新秀称号、300点获得PK达人、800点获得PK大师、1500点获得PK王
 

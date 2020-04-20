@@ -141,4 +141,94 @@ class Constant
 
     //用户每日点赞次数上限，（各榜互不影响）
     const RANK_LIKE_TIMES = 3;
+
+    //勋章配置
+    const MEDAL_CONFIG = [
+        "novice_level" => [
+            1 => [
+                "id" => 1,
+                "title" => "准一星学员",
+                "url" => "static/medal/1.jpg",
+            ],
+            2 => [
+                "id" => 2,
+                "title" => "准二星学员",
+                "url" => "static/medal/1.jpg",
+            ],
+            3 => [
+                "id" => 3,
+                "title" => "准三星学员",
+                "url" => "static/medal/1.jpg",
+            ],
+            4 => [
+                "id" => 4,
+                "title" => "准四星学员",
+                "url" => "static/medal/1.jpg",
+            ],
+            5 => [
+                "id" => 5,
+                "title" => "准五星学员",
+                "url" => "static/medal/1.jpg",
+            ],
+            6 => [
+                "id" => 6,
+                "title" => "准六星学员",
+                "url" => "static/medal/1.jpg",
+            ],
+        ],
+        "level" => [
+            1 => [
+                "id" => 7,
+                "title" => "一星学员",
+                "url" => "static/medal/1.jpg",
+            ],
+            2 => [
+                "id" => 8,
+                "title" => "二星学员",
+                "url" => "static/medal/1.jpg",
+            ],
+            3 => [
+                "id" => 9,
+                "title" => "三星学员",
+                "url" => "static/medal/1.jpg",
+            ],
+            4 => [
+                "id" => 10,
+                "title" => "四星学员",
+                "url" => "static/medal/1.jpg",
+            ],
+            5 => [
+                "id" => 11,
+                "title" => "五星学员",
+                "url" => "static/medal/1.jpg",
+            ],
+            6 => [
+                "id" => 12,
+                "title" => "六星学员",
+                "url" => "static/medal/1.jpg",
+            ],
+        ],
+        "pk_level" => [
+            1 => [
+                "id" => 13,
+                "title" => "新秀学员",
+                "url" => "static/medal/1.jpg",
+            ],
+            2 => [
+                "id" => 14,
+                "title" => "PK达人",
+                "url" => "static/medal/1.jpg",
+            ],
+            3 => [
+                "id" => 15,
+                "title" => "PK大师",
+                "url" => "static/medal/1.jpg",
+            ],
+            4 => [
+                "id" => 16,
+                "title" => "PK王",
+                "url" => "static/medal/1.jpg",
+            ],
+        ],
+    ];
 }
