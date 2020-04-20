@@ -61,6 +61,7 @@ class UserPkRankModel extends Base
             return [
                 "rank" => 0,
                 "like_count" => 0,
+                "total_pk_coin" => 0,
             ];
         } else {
             $count1 = $this->where("type", $type)
@@ -76,6 +77,7 @@ class UserPkRankModel extends Base
             return [
                 "rank" => $count1+$count2+$count3+1,
                 "like_count" => $userPkRank["like_count"],
+                "total_pk_coin" => $userPkRank["total_pk_coin"],
             ];
         }
     }

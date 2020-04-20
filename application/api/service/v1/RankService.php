@@ -131,6 +131,7 @@ class RankService extends Base
             "head_image_url" => getHeadImageUrl($user["head_image_url"]),
             "nickname" => getNickname($user["nickname"]),
             "rank" => $myRankInfo["rank"],
+            "total_talent_coin" => $myRankInfo["total_talent_coin"],
             "like_count" => $myRankInfo["like_count"],
             "self_medals" => $userService->userSelfMedals(json_decode($user["self_medals"], true)),
         ];
@@ -211,6 +212,7 @@ class RankService extends Base
             "head_image_url" => getHeadImageUrl($user["head_image_url"]),
             "nickname" => getNickname($user["nickname"]),
             "rank" => $myRankInfo["rank"],
+            "total_pk_coin" => $myRankInfo["total_pk_coin"],
             "like_count" => $myRankInfo["like_count"],
             "self_medals" => $userService->userSelfMedals(json_decode($user["self_medals"], true)),
         ];

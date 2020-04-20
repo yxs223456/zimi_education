@@ -56,6 +56,7 @@ class InternalCompetitionRankModel extends Base
             return [
                 "rank" => 0,
                 "like_count" => 0,
+                "total_talent_coin" => 0,
             ];
         } else {
             $count1 = $this->where("total_talent_coin", ">", $userRank["total_talent_coin"])->count();
@@ -68,6 +69,7 @@ class InternalCompetitionRankModel extends Base
             return [
                 "rank" => $count1+$count2+$count3+1,
                 "like_count" => $userRank["like_count"],
+                "total_talent_coin" => $userRank["total_talent_coin"],
             ];
         }
     }
