@@ -8,6 +8,8 @@
 
 namespace app\common\model;
 
+use app\common\enum\InternalCompetitionIsFinishEnum;
+
 class InternalCompetitionJoinModel extends Base
 {
     protected $table = 'internal_competition_join';
@@ -45,6 +47,18 @@ class InternalCompetitionJoinModel extends Base
             ->where("icj.rank", ">", 0)
             ->order("rank", "desc")
             ->field("u.nickname,u.head_image_url,u.uuid,icj.rank")
+            ->select()->toArray();
+    }
+
+    public function competitionReportCardList($userUuid, $pageNum, $pageSize)
+    {
+        return $this->alias("icj")
+            ->leftJoin("internal_competition ic", "icj.c_uuid=ic.uuid")
+            ->where("icj.user_uuid", $userUuid)
+            ->where("ic.is_finish", InternalCompetitionIsFinishEnum::YES)
+            ->field("ic.uuid,ic.image_url,ic.name,icj.rank")
+            ->order("ic.id", "desc")
+            ->limit(($pageNum-1)*$pageSize, $pageSize)
             ->select()->toArray();
     }
 }
