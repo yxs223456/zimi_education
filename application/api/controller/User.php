@@ -273,4 +273,26 @@ class User extends Base
 
         return $this->jsonResponse($returnData);
     }
+
+    //勋章墙
+    public function medals()
+    {
+        $user = $this->query["user"];
+        $service = new UserService();
+        $returnData = $service->medals($user);
+        return $this->jsonResponse($returnData);
+    }
+
+    public function updateSelfMedal()
+    {
+        $medalIds = input("medal_id");
+        if (!is_array($medalIds) || count($medalIds) == 0) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $service = new UserService();
+        $returnData = $service->updateSelfMedal($user, $medalIds);
+        return $this->jsonResponse($returnData);
+    }
 }

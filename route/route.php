@@ -55,6 +55,10 @@ Route::rule('user/receiveContinuousSignReward', 'api/user/receiveContinuousSignR
 Route::rule('user/writingList', 'api/user/writingList', 'post');
 //用户DE币流水
 Route::rule('user/coinFlowList', 'api/user/coinFlowList', 'post');
+//勋章墙
+Route::rule('user/medals', 'api/user/medals', 'post');
+//跟换个人勋章
+Route::rule('user/updateSelfMedal', 'api/user/updateSelfMedal', 'post');
 
 
 //任务中心首页

@@ -13,6 +13,8 @@ use app\common\enum\PhoneVerificationCodeStatusEnum;
 use app\common\enum\PhoneVerificationCodeTypeEnum;
 use app\common\enum\UserCoinAddTypeEnum;
 use app\common\enum\UserIsBindWeChatEnum;
+use app\common\enum\UserLevelEnum;
+use app\common\enum\UserPkLevelEnum;
 use app\common\helper\MobTech;
 use app\common\helper\Pbkdf2;
 use app\common\helper\Redis;
@@ -731,6 +733,136 @@ class UserService extends Base
         }
 
         return $returnData;
+    }
+
+    public function medals($user)
+    {
+        $allMedals = Constant::MEDAL_CONFIG;
+        $userAllMedals = json_decode($user["medals"], true);
+        $userSelfMedals = json_decode($user["self_medals"], true);
+
+        $returnData = [];
+
+        if (count($userSelfMedals) == 0) {
+            $returnData["current_medal"] = new \stdClass();
+        } else {
+            if (isset($userSelfMedals["novice_level"])) {
+                $returnData["current_medal"] = [
+                    "name" => $allMedals["novice_level"][$userSelfMedals["novice_level"]]["name"],
+                    "medal_url" => getImageUrl($allMedals["novice_level"][$userSelfMedals["novice_level"]]["url1"]),
+                ];
+            }
+            if (isset($userSelfMedals["level"])) {
+                $returnData["current_medal"] = [
+                    "name" => $allMedals["level"][$userSelfMedals["level"]]["name"],
+                    "medal_url" => getImageUrl($allMedals["level"][$userSelfMedals["level"]]["url1"]),
+                ];
+            }
+            if (isset($userSelfMedals["pk_level"])) {
+                $returnData["current_medal"] = [
+                    "name" => $allMedals["pk_level"][$userSelfMedals["pk_level"]]["name"],
+                    "medal_url" => getImageUrl($allMedals["pk_level"][$userSelfMedals["pk_level"]]["url1"]),
+                ];
+            }
+        }
+
+        $levelRange = UserLevelEnum::getAllValues();
+        foreach ($levelRange as $level) {
+            $noviceIsWin = 0;
+            $isWin = 0;
+            if ($user["level"] == $level) {
+                $isWin = 1;
+            } else if ($user["level"] == 0 && $user["novice_level"] == $level) {
+                $noviceIsWin = 1;
+            }
+            $returnData["level_list"][] = [
+                "id" => $allMedals["novice_level"][$level]["id"],
+                "name" => $allMedals["novice_level"][$level]["name"],
+                "is_win" => $noviceIsWin,
+                "medal_url" => $noviceIsWin?getImageUrl($allMedals["novice_level"][$level]["url1"]):
+                    getImageUrl($allMedals["novice_level"][$level]["url2"]),
+            ];
+            $returnData["level_list"][] = [
+                "id" => $allMedals["level"][$level]["id"],
+                "name" => $allMedals["level"][$level]["name"],
+                "is_win" => $isWin,
+                "medal_url" => $noviceIsWin?getImageUrl($allMedals["level"][$level]["url1"]):
+                    getImageUrl($allMedals["level"][$level]["url2"]),
+            ];
+        }
+
+        $pkLevelRange = UserPkLevelEnum::getAllValues();
+        foreach ($pkLevelRange as $pkLevel) {
+            $isWin = 0;
+            if (isset($userAllMedals[$pkLevel]) && $userAllMedals[$pkLevel] == $pkLevel) {
+                $isWin = 1;
+            }
+            $returnData["other_list"][] = [
+                "id" => $allMedals["pk_level"][$pkLevel]["id"],
+                "name" => $allMedals["pk_level"][$pkLevel]["name"],
+                "is_win" => $isWin,
+                "medal_url" => $isWin?getImageUrl($allMedals["pk_level"][$pkLevel]["url1"]):
+                    getImageUrl($allMedals["pk_level"][$pkLevel]["url2"]),
+            ];
+        }
+
+        return $returnData;
+    }
+
+    public function updateSelfMedal($user, $medalIds)
+    {
+        $userSelfMedal = [];
+        $userAllMedal = [];
+        $allMedals = Constant::MEDAL_CONFIG;
+
+        if ($user["level"] == 0 && $user["novice_level"] > 0) {
+            foreach ($allMedals["novice_level"] as $noviceLevel => $noviceLevelInfo) {
+                if (in_array($noviceLevelInfo["id"], $medalIds)) {
+                    if ($user["novice_level"] == $noviceLevel) {
+                        $userSelfMedal["novice_level"] = $noviceLevel;
+                    } else {
+                        throw AppException::factory(AppException::USER_NONE_MEDAL);
+                    }
+                }
+            }
+        }
+
+        if ($user["level"] > 0) {
+            foreach ($allMedals["level"] as $level => $levelInfo) {
+                if (in_array($levelInfo["id"], $medalIds)) {
+                    if ($user["level"] == $level) {
+                        $userSelfMedal["level"] = $level;
+                    } else {
+                        throw AppException::factory(AppException::USER_NONE_MEDAL);
+                    }
+                }
+            }
+        }
+
+        foreach ($allMedals["pk_level"] as $pkLevel => $pkLevelInfo) {
+            if (in_array($pkLevelInfo["id"], $medalIds)) {
+                if (isset($userAllMedal["pk_level"]) && $userAllMedal["pk_level"] == $pkLevel) {
+                    $userSelfMedal["pk_level"] = $pkLevel;
+                } else {
+                    throw AppException::factory(AppException::USER_NONE_MEDAL);
+                }
+            }
+        }
+
+        $userModel = new UserBaseModel();
+        Db::name($userModel->getTable())
+            ->where("uuid", $user["uuid"])
+            ->update(
+                [
+                    "self_medals" => json_encode($userSelfMedal, JSON_UNESCAPED_UNICODE),
+                    "update_time" => time(),
+                ]
+            );
+        $newUser = Db::name($userModel->getTable())->where("uuid", $user["uuid"])->find();
+        $redis = Redis::factory();
+        cacheUserInfoByToken($newUser, $redis);
+
+        return new \stdClass();
     }
 
     private function recordUserWeChatInfo(Model $user, $userWeChatInfo)
