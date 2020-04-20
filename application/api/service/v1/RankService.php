@@ -28,12 +28,16 @@ class RankService extends Base
         $userSynthesizeRankModel = new UserSynthesizeRankModel();
         $rankList = $userSynthesizeRankModel->getRank($difficultyLevel);
         $userService = new UserService();
+        $redis = Redis::factory();
+        $todayLikeInfo = getSynthesizeRankLikeTodayInfo($user["uuid"], $difficultyLevel, $redis);
+        $todayLikeInfo = array_column($todayLikeInfo, "user_uuid");
         foreach ($rankList as $key=>$item) {
             $rankList[$key]["user_uuid"] = $item["user_uuid"];
             $rankList[$key]["nickname"] = getNickname($item["nickname"]);
             $rankList[$key]["head_image_url"] = getHeadImageUrl($item["head_image_url"]);
             $rankList[$key]["rank"] = $key+1;
             $rankList[$key]["self_medals"] = $userService->userSelfMedals(json_decode($item["self_medals"], true));
+            $rankList[$key]["is_like"] = (int) in_array($item["user_uuid"], $todayLikeInfo);
         }
 
         $myRankInfo = $userSynthesizeRankModel->getUserSynthesizeRank($user["uuid"], $difficultyLevel);
@@ -110,12 +114,16 @@ class RankService extends Base
         $internalCompetitionRankModel = new InternalCompetitionRankModel();
         $rankList = $internalCompetitionRankModel->getRank();
         $userService = new UserService();
+        $redis = Redis::factory();
+        $todayLikeInfo = getCompetitionRankLikeTodayInfo($user["uuid"], $redis);
+        $todayLikeInfo = array_column($todayLikeInfo, "user_uuid");
         foreach ($rankList as $key=>$item) {
             $rankList[$key]["user_uuid"] = $item["user_uuid"];
             $rankList[$key]["nickname"] = getNickname($item["nickname"]);
             $rankList[$key]["head_image_url"] = getHeadImageUrl($item["head_image_url"]);
             $rankList[$key]["rank"] = $key+1;
             $rankList[$key]["self_medals"] = $userService->userSelfMedals(json_decode($item["self_medals"], true));
+            $rankList[$key]["is_like"] = (int) in_array($item["user_uuid"], $todayLikeInfo);;
         }
 
         $myRankInfo = $internalCompetitionRankModel->getSelfRank($user["uuid"]);
@@ -186,12 +194,16 @@ class RankService extends Base
         $userPkRankModel = new UserPkRankModel();
         $rankList = $userPkRankModel->getRank($type);
         $userService = new UserService();
+        $redis = Redis::factory();
+        $todayLikeInfo = getPkRankLikeTodayInfo($user["uuid"], $type, $redis);
+        $todayLikeInfo = array_column($todayLikeInfo, "user_uuid");
         foreach ($rankList as $key=>$item) {
             $rankList[$key]["user_uuid"] = $item["user_uuid"];
             $rankList[$key]["nickname"] = getNickname($item["nickname"]);
             $rankList[$key]["head_image_url"] = getHeadImageUrl($item["head_image_url"]);
             $rankList[$key]["rank"] = $key+1;
             $rankList[$key]["self_medals"] = $userService->userSelfMedals(json_decode($item["self_medals"], true));
+            $rankList[$key]["is_like"] = (int) in_array($item["user_uuid"], $todayLikeInfo);
         }
 
         $myRankInfo = $userPkRankModel->getUserPkRank($user["uuid"], $type);
