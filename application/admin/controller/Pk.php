@@ -101,8 +101,8 @@ class Pk extends Base
             $pk->status = $status;
             $pk->audit_time = time();
             if ($status == PkStatusEnum::WAIT_JOIN) {
-                $pk->begin_time = time();
-                $pk->deadline = time() + (3600 * $pk["duration_hour"]);
+                //审核通过后，报名截止时间为审核第二日 24 点。
+                $pk->join_deadline = strtotime(date("Y-m-d", time() + 86400) . "23:59:59");
             } else if ($status == PkStatusEnum::AUDIT_FAIL) {
                 $pk->audit_fail_reason = $auditFailReason;
             }

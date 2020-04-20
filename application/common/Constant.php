@@ -123,9 +123,6 @@ class Constant
     //pk审核等待最长时间72小时，审核超时自动流局
     const PK_AUDIT_WAIT_TIME = 72 * 3600;
 
-    //pk等待加入最长时间72小时， 超过72小时人数不足自动流局
-    const PK_WAIT_JOIN_TIME = 72 * 3600;
-
     //参与DE大赛奖励
     const JOIN_INTERNAL_COMPETITION_REWARD = [
         "coin" => 10,
@@ -148,86 +145,102 @@ class Constant
             1 => [
                 "id" => 1,
                 "title" => "准一星学员",
-                "url" => "static/medal/1.jpg",
+                "url1" => "static/medal/novicelevel1.png",
+                "url2" => "static/medal/novicelevel1gray.png",
             ],
             2 => [
                 "id" => 2,
                 "title" => "准二星学员",
-                "url" => "static/medal/1.jpg",
+                "url1" => "static/medal/novicelevel2.png",
+                "url2" => "static/medal/novicelevel2gray.png",
             ],
             3 => [
                 "id" => 3,
                 "title" => "准三星学员",
-                "url" => "static/medal/1.jpg",
+                "url1" => "static/medal/novicelevel3.png",
+                "url2" => "static/medal/novicelevel3gray.png",
             ],
             4 => [
                 "id" => 4,
                 "title" => "准四星学员",
-                "url" => "static/medal/1.jpg",
+                "url1" => "static/medal/novicelevel4.png",
+                "url2" => "static/medal/novicelevel4gray.png",
             ],
             5 => [
                 "id" => 5,
                 "title" => "准五星学员",
-                "url" => "static/medal/1.jpg",
+                "url1" => "static/medal/novicelevel5.png",
+                "url2" => "static/medal/novicelevel5gray.png",
             ],
             6 => [
                 "id" => 6,
                 "title" => "准六星学员",
-                "url" => "static/medal/1.jpg",
+                "url1" => "static/medal/novicelevel6.png",
+                "url2" => "static/medal/novicelevel6gray.png",
             ],
         ],
         "level" => [
             1 => [
                 "id" => 7,
                 "title" => "一星学员",
-                "url" => "static/medal/1.jpg",
+                "url1" => "static/medal/level1.png",
+                "url2" => "static/medal/level1gray.png",
             ],
             2 => [
                 "id" => 8,
                 "title" => "二星学员",
-                "url" => "static/medal/1.jpg",
+                "url1" => "static/medal/level2.png",
+                "url2" => "static/medal/level2gray.png",
             ],
             3 => [
                 "id" => 9,
                 "title" => "三星学员",
-                "url" => "static/medal/1.jpg",
+                "url1" => "static/medal/level3.png",
+                "url2" => "static/medal/level3gray.png",
             ],
             4 => [
                 "id" => 10,
                 "title" => "四星学员",
-                "url" => "static/medal/1.jpg",
+                "url1" => "static/medal/level4.png",
+                "url2" => "static/medal/level4gray.png",
             ],
             5 => [
                 "id" => 11,
                 "title" => "五星学员",
-                "url" => "static/medal/1.jpg",
+                "url1" => "static/medal/level5.png",
+                "url2" => "static/medal/level5gray.png",
             ],
             6 => [
                 "id" => 12,
                 "title" => "六星学员",
-                "url" => "static/medal/1.jpg",
+                "url1" => "static/medal/level6.png",
+                "url2" => "static/medal/level6gray.png",
             ],
         ],
         "pk_level" => [
             1 => [
                 "id" => 13,
                 "title" => "新秀学员",
-                "url" => "static/medal/1.jpg",
+                "url1" => "static/medal/pklevel1",
+                "url2" => "static/medal/graypklevel1",
             ],
             2 => [
                 "id" => 14,
                 "title" => "PK达人",
-                "url" => "static/medal/1.jpg",
+                "url1" => "static/medal/pklevel2",
+                "url2" => "static/medal/graypklevel2",
             ],
             3 => [
                 "id" => 15,
                 "title" => "PK大师",
-                "url" => "static/medal/1.jpg",
+                "url1" => "static/medal/pklevel3",
+                "url2" => "static/medal/graypklevel3",
             ],
             4 => [
-                "id" => 16,
+                "id1" => 16,
                 "title" => "PK王",
-                "url" => "static/medal/1.jpg",
+                "url1" => "static/medal/pklevel4",
+                "url2" => "static/medal/graypklevel4",
             ],
         ],
     ];

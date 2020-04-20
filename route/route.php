@@ -103,6 +103,8 @@ Route::rule('athletics/submitSynthesize', 'api/athletics/submitSynthesize', 'pos
 Route::rule('athletics/synthesizeReportCardList', 'api/athletics/synthesizeReportCardList', 'post');
 
 
+//发起pk规则
+Route::rule('athletics/initPkRule', 'api/athletics/initPkRule', 'post');
 //发起pk
 Route::rule('athletics/initPk', 'api/athletics/initPk', 'post');
 //参与pk

@@ -839,7 +839,7 @@ class UserService extends Base
     {
         $returnData = [];
         foreach ($userSelfMedals as $key=>$value) {
-            $returnData[] = getImageUrl(Constant::MEDAL_CONFIG[$key][$value]["url"]);
+            $returnData[] = getImageUrl(Constant::MEDAL_CONFIG[$key][$value]["url1"]);
         }
         return $returnData;
     }
