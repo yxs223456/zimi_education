@@ -894,7 +894,7 @@ function pushPkFinishList($pkUuid, Redis $redis) {
 }
 
 //弹出PK结算任务
-function getPkFinishList(\Redis $redis) {
+function popPkFinishList(\Redis $redis) {
     $key = "de_education:pkFinishList";
 
     $data = $redis->blPop([$key], 10);

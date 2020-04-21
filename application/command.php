@@ -16,4 +16,5 @@ return [
     'app\command\InternalCompetitionFinish',
     'app\command\PkJoinTimeout',
     'app\command\PkFinish',
+    'app\command\PkTimeoutFinish',
 ];

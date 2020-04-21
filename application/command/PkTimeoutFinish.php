@@ -28,37 +28,24 @@ use think\console\Output;
 use think\Db;
 use think\facade\Log;
 
-class PkFinish extends Command
+class PkTimeoutFinish extends Command
 {
     protected function configure()
     {
         // setName 设置命令行名称
         // setDescription 设置命令行描述
-        $this->setName('de_education:pkFinish')
-            ->setDescription('pk finish');
+        $this->setName('de_education:pkTimeoutFinish')
+            ->setDescription('pk timeout finish');
     }
 
     protected function execute(Input $input, Output $output)
     {
-        while (true) {
-            $redis = Redis::factory();
-            $finishPkInfo = popPkFinishList($redis);
-            $redis->close();
-            if ($finishPkInfo == null || empty($finishPkInfo[1])) {
-                break;
-            }
+        $this->doWork();
 
-            $finishPkInfo = json_decode($finishPkInfo[1], true);
-            if (empty($finishPkInfo["uuid"])) {
-                break;
-            }
-
-            $pkUuid = $finishPkInfo["uuid"];
-            $this->doWork($pkUuid);
-        }
+        sleep(30);
     }
 
-    protected function doWork($pkUuid)
+    protected function doWork()
     {
         $pkModel = new PkModel();
         $pkJoinModel = new PkJoinModel();
@@ -69,13 +56,19 @@ class PkFinish extends Command
         $userService = new UserService();
 
         do {
+            //已经过了截止答题时间（延迟5秒）状态为进行中的pk
             $pk = Db::name($pkModel->getTable())
-                ->where("uuid", $pkUuid)
+                ->where("status", PkStatusEnum::UNDERWAY)
+                ->where("deadline", "<", time()-5)
                 ->find();
 
-            if ($pk == null || $pk["status"] != PkStatusEnum::UNDERWAY) {
+            if ($pk == null) {
                 break;
             }
+
+            $redis = Redis::factory();
+            pushPkFinishList($pk["uuid"], $redis);
+            $redis->close();
 
             //参与PK信息
             $joinCount = Db::name($pkJoinModel->getTable())
