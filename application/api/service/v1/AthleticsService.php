@@ -339,7 +339,7 @@ class AthleticsService extends Base
             "join_deadline" => date("Y-m-d H:i", $pk["join_deadline"]),
             "begin_time" => date("Y-m-d H:i", $pk["begin_time"]),
             "deadline" => date("Y-m-d H:i", $pk["deadline"]),
-            "status" => $pk["status"],
+            "status" => PkStatusEnum::getEnumDescByValue($pk["status"]),
             "type" => $pk["type"],
             "is_initiator" => 0,
             "is_join" => 0,

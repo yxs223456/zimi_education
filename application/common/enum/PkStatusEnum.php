@@ -19,16 +19,16 @@ class PkStatusEnum
     use EnumTrait;
 
     const AUDITING = 1;
-    const AUDITING_DSC = "后台待审核";
+    const AUDITING_DSC = "待审核";
 
     const AUDIT_TIMEOUT = 2;
-    const AUDIT_TIMEOUT_DESC = "后台审核超时";
+    const AUDIT_TIMEOUT_DESC = "审核超时";
 
     const WAIT_JOIN = 3;
-    const WAIT_JOIN_DESC = "等待用户加入";
+    const WAIT_JOIN_DESC = "待加入";
 
     const WAIT_JOIN_TIMEOUT = 4;
-    const WAIT_JOIN_TIMEOUT_DESC = "人数不足流局";
+    const WAIT_JOIN_TIMEOUT_DESC = "流局";
 
     const UNDERWAY = 5;
     const UNDERWAY_DESC = "进行中";
