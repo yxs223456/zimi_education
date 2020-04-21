@@ -9,6 +9,7 @@
 namespace app\api\service\v1;
 
 use app\api\service\Base;
+use app\api\service\UserService;
 use app\common\AppException;
 use app\common\Constant;
 use app\common\enum\CompetitionAnswerIsSubmitEnum;
@@ -689,7 +690,7 @@ class AthleticsService extends Base
             throw AppException::factory(AppException::INTERNAL_COMPETITION_STATUS_NOT_APPLYING);
         }
 
-        //三星以上用户才能参赛
+        //用户等级条件
         $userModel = new UserBaseModel();
         $user = $userModel->findByUuid($user["uuid"]);
         if ($user == null) {
@@ -706,6 +707,7 @@ class AthleticsService extends Base
         $userPkCoinLogModel = new UserPkCoinLogModel();
         $userTalentCoinLogModel = new UserTalentCoinLogModel();
         $internalCompetitionRankModel = new InternalCompetitionRankModel();
+        $userService = new UserService();
 
         Db::startTrans();
         try {
@@ -730,6 +732,19 @@ class AthleticsService extends Base
                 ->inc("talent_coin", Constant::JOIN_INTERNAL_COMPETITION_REWARD["talent_coin"])
                 ->update(["update_time"=>time()]);
             $newUser = $userModel->findByUuid($user["uuid"])->toArray();
+            $userPkLevel = $userService->userPkLevel($newUser);
+            $userAllMedals = json_decode($newUser["medals"], true);
+            if ($userPkLevel != 0 && (!isset($userAllMedals["pk_level"]) || $userAllMedals["pk_level"] < $userPkLevel)) {
+                $userAllMedals["pk_level"] = $userPkLevel;
+                $userUpdateData = ["medals"=>json_encode($userAllMedals)];
+                $userSelfMedals = json_decode($newUser["self_medals"], true);
+                if (count($userSelfMedals) == 0) {
+                    $newUser["self_medals"] = json_encode(["pk_level"=>$userPkLevel]);
+                    $userUpdateData["self_medals"] = $newUser["self_medals"];
+                }
+                $userModel->where("uuid", $user["uuid"])->update($userUpdateData);
+                $newUser["medals"] = json_encode($userAllMedals);
+            }
 
             $userCoinLogModel->recordAddLog(
                 $user["uuid"],

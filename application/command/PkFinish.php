@@ -8,6 +8,7 @@
 
 namespace app\command;
 
+use app\api\service\UserService;
 use app\common\enum\PkIsInitiatorEnum;
 use app\common\enum\PkStatusEnum;
 use app\common\enum\UserCoinAddTypeEnum;
@@ -52,6 +53,7 @@ class PkFinish extends Command
         $userPkRankModel = new UserPkRankModel();
         $userCoinLogModel = new UserCoinLogModel();
         $userPkCoinLogModel = new UserPkCoinLogModel();
+        $userService = new UserService();
 
         do {
             //已经过了截止答题时间（延迟5秒）状态为进行中的pk
@@ -168,6 +170,23 @@ class PkFinish extends Command
                             ->inc("coin",$winCoin)
                             ->inc("pk_coin", $pkCoin)->update(["update_time"=>time()]);
                         $user = Db::name($userModel->getTable())->where("uuid", $pkJoin["user_uuid"])->find();
+
+                        //pk勋章
+                        if ($pkCoin > 0) {
+                            $userPkLevel = $userService->userPkLevel($user);
+                            $userAllMedals = json_decode($user["medals"], true);
+                            if ($userPkLevel != 0 && (!isset($userAllMedals["pk_level"]) || $userAllMedals["pk_level"] < $userPkLevel)) {
+                                $userAllMedals["pk_level"] = $userPkLevel;
+                                $userUpdateData = ["medals"=>json_encode($userAllMedals)];
+                                $userSelfMedals = json_decode($user["self_medals"], true);
+                                if (count($userSelfMedals) == 0) {
+                                    $newUser["self_medals"] = json_encode(["pk_level"=>$userPkLevel]);
+                                    $userUpdateData["self_medals"] = $newUser["self_medals"];
+                                }
+                                $userModel->where("uuid", $user["uuid"])->update($userUpdateData);
+                                $newUser["medals"] = json_encode($userAllMedals);
+                            }
+                        }
 
                         //DE币流水
                         if ($winCoin > 0) {

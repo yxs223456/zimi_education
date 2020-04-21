@@ -976,24 +976,21 @@ class UserService extends Base
         return $returnData;
     }
 
-    public function userPkMedals($userInfo)
+    public function userPkLevel($userInfo)
     {
         //pk值达到100点时获得PK新秀称号、300点获得PK达人、800点获得PK大师、1500点获得PK王
-
         if ($userInfo["pk_coin"] >= 1500) {
-            $pkMedal = "PK王";
+            $pkLevel = UserPkLevelEnum::FOUR;
         } else if ($userInfo["pk_coin"] >= 800) {
-            $pkMedal = "PK大师";
+            $pkLevel = UserPkLevelEnum::THREE;
         } else if ($userInfo["pk_coin"] >= 300) {
-            $pkMedal = "PK达人";
+            $pkLevel = UserPkLevelEnum::TWO;
         } else if ($userInfo["pk_coin"] >= 100) {
-            $pkMedal = "PK新秀称号";
+            $pkLevel = UserPkLevelEnum::ONE;
         } else {
-            $pkMedal = "";
+            $pkLevel = 0;
         }
 
-        return [
-
-        ];
+        return $pkLevel;
     }
 }

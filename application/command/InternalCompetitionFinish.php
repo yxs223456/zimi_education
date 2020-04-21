@@ -8,6 +8,7 @@
 
 namespace app\command;
 
+use app\api\service\UserService;
 use app\common\enum\CompetitionAnswerIsSubmitEnum;
 use app\common\enum\InternalCompetitionIsFinishEnum;
 use app\common\enum\InternalCompetitionJoinIsCommentEnum;
@@ -70,6 +71,7 @@ class InternalCompetitionFinish extends Command
                 $userModel = new UserBaseModel();
                 $userUuids = array_column($winners, "user_uuid");
                 $users = $userModel->whereIn("uuid", $userUuids)->column("pk_coin,talent_coin", "uuid");
+                $userService = new UserService();
 
                 Db::startTrans();
                 try {
@@ -100,6 +102,24 @@ class InternalCompetitionFinish extends Command
                             ->inc("pk_coin", $pkCoin)
                             ->inc("talent_coin", $talentCoin)
                             ->update(["update_time"=>time()]);
+
+                        //pk勋章
+                        $newUser = Db::name($userModel->getTable())
+                            ->where("uuid", $winner["user_uuid"])
+                            ->find();
+                        $userPkLevel = $userService->userPkLevel($newUser);
+                        $userAllMedals = json_decode($newUser["medals"], true);
+                        if ($userPkLevel != 0 && (!isset($userAllMedals["pk_level"]) || $userAllMedals["pk_level"] < $userPkLevel)) {
+                            $userAllMedals["pk_level"] = $userPkLevel;
+                            $userUpdateData = ["medals"=>json_encode($userAllMedals)];
+                            $userSelfMedals = json_decode($newUser["self_medals"], true);
+                            if (count($userSelfMedals) == 0) {
+                                $userUpdateData["self_medals"] = $newUser["self_medals"];
+                            }
+                            Db::name($userModel->getTable())
+                                ->where("uuid", $winner["user_uuid"])
+                                ->update($userUpdateData);
+                        }
 
                         //纪录pk流水
                         $pkFlowData[] = [
