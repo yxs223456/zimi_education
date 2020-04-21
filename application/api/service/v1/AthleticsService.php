@@ -283,15 +283,23 @@ class AthleticsService extends Base
             $pkListUserInfo = $pkJoinModel->getListUserInfoByPkUuids($pkUuids);
             $pkUserInfo = [];
             $pkUserUuids = [];
+            $myJoinList = [];
             foreach ($pkListUserInfo as $item) {
                 $pkUserInfo[$item["pk_uuid"]][] = [
                     "nickname" => getNickname($item["nickname"]),
                     "head_image_url" => getHeadImageUrl($item["head_image_url"])
                 ];
-                $pkUserUuids[$item["pk_uuid"]][] = $item["uuid"];
+                $pkUserUuids[$item["pk_uuid"]][] = $item["user_uuid"];
+                if ($item["user_uuid"] == $user["uuid"]) {
+                    $myJoinList[$item["pk_uuid"]] = $item;
+                }
             }
 
             foreach ($pkList as $item) {
+
+                $webUseStatus = isset($myJoinList[$item["uuid"]]) ?
+                    $this->getWebUseStatus($item, $myJoinList[$item["uuid"]]) : $this->getWebUseStatus($item);
+
                 $returnData[] = [
                     "uuid" => $item["uuid"],
                     "name" => $item["name"],
@@ -301,7 +309,8 @@ class AthleticsService extends Base
                     "join_users" => $pkUserInfo[$item["uuid"]],
                     "type" => $item["type"],
                     "status" => $item["status"],
-                    "is_join" => (int) in_array($user["uuid"], $pkUserUuids[$item["uuid"]])
+                    "is_join" => (int) in_array($user["uuid"], $pkUserUuids[$item["uuid"]]),
+                    "web_use_status" => $webUseStatus,
                 ];
             }
         }
@@ -506,6 +515,47 @@ class AthleticsService extends Base
         return $returnData;
     }
 
+    private function getWebUseStatus($pk, $pkJoinInfo = [])
+    {
+        $returnData = [
+            "btn_text" => "",
+            "pk_status_url" => "",
+            "btn_action" => "",
+        ];
+        switch ($pk["status"]) {
+            case PkStatusEnum::AUDITING:
+                $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/audit.png";
+                break;
+            case PkStatusEnum::AUDIT_TIMEOUT:
+            case PkStatusEnum::AUDIT_FAIL:
+                $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/auditfail.png";
+                break;
+            case PkStatusEnum::WAIT_JOIN:
+                if ($pkJoinInfo) {
+                    $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/join.png";
+                } else {
+                    $returnData["btn_text"] = "开始报名";
+                    $returnData["btn_action"] = "join";
+                }
+                break;
+            case PkStatusEnum::WAIT_JOIN_TIMEOUT:
+                $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/timeout.png";
+                break;
+            case PkStatusEnum::UNDERWAY:
+                if ($pkJoinInfo && $pkJoinInfo["answers"]) {
+                    $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/underway.png";
+                } else {
+                    $returnData["btn_text"] = "开始答题";
+                    $returnData["btn_action"] = "answer";
+                }
+                break;
+            case PkStatusEnum::FINISH:
+                $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/finish.png";
+                break;
+        }
+        return $returnData;
+    }
+
     public function pkReportCard($user, $pageNum, $pageSize)
     {
         $pkJoinModel = new PkJoinModel();
@@ -548,7 +598,7 @@ class AthleticsService extends Base
                     "nickname" => getNickname($item["nickname"]),
                     "head_image_url" => getHeadImageUrl($item["head_image_url"])
                 ];
-                $pkUserUuids[$item["pk_uuid"]][] = $item["uuid"];
+                $pkUserUuids[$item["pk_uuid"]][] = $item["user_uuid"];
             }
 
             foreach ($pkList as $item) {
@@ -584,7 +634,7 @@ class AthleticsService extends Base
                     "nickname" => getNickname($item["nickname"]),
                     "head_image_url" => getHeadImageUrl($item["head_image_url"])
                 ];
-                $pkUserUuids[$item["pk_uuid"]][] = $item["uuid"];
+                $pkUserUuids[$item["pk_uuid"]][] = $item["user_uuid"];
             }
 
             foreach ($pkList as $item) {

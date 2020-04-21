@@ -25,7 +25,7 @@ class PkJoinModel extends Base
         return $this->alias("pj")
             ->leftJoin("user_base u", "pj.user_uuid=u.uuid")
             ->whereIn("pj.pk_uuid", $pkUuids)
-            ->field("pj.pk_uuid,u.uuid,u.nickname,u.head_image_url")
+            ->field("pj.answers,pj.pk_uuid,pj.user_uuid,u.nickname,u.head_image_url")
             ->order("pj.id", "asc")
             ->select();
     }
