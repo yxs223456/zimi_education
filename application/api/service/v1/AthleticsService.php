@@ -468,12 +468,16 @@ class AthleticsService extends Base
         $pkModel = new PkModel();
         $pkJoinModel = new PkJoinModel();
 
-        //只有pk处于进行中事，才可提交答案
+        //只有pk处于进行中或者报名人数到达3人，才可提交答案
         $pk = $pkModel->findByUuid($pkUuid);
         if ($pk == null) {
             throw AppException::factory(AppException::PK_NOT_EXISTS);
         }
-        if ($pk["status"] != PkStatusEnum::UNDERWAY || $pk["deadline"] < time()) {
+        if ($pk["deadline"] < time()) {
+            throw AppException::factory(AppException::PK_STATUS_NOT_UNDERWAY);
+        }
+        $pkJoinCount = $pkJoinModel->getJoinCountByPkUuid($pkUuid);
+        if ($pk["status"] != PkStatusEnum::UNDERWAY && $pkJoinCount < 3) {
             throw AppException::factory(AppException::PK_STATUS_NOT_UNDERWAY);
         }
 

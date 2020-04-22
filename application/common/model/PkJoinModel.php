@@ -20,6 +20,11 @@ class PkJoinModel extends Base
         return $this->where("pk_uuid", $pkUuid)->where("user_uuid", $userUuid)->find();
     }
 
+    public function getJoinCountByPkUuid($pkUuid)
+    {
+        return $this->where("pk_uuid", $pkUuid)->count();
+    }
+
     public function getListUserInfoByPkUuids(array $pkUuids)
     {
         return $this->alias("pj")
