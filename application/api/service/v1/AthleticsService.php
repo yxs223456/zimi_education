@@ -524,6 +524,7 @@ class AthleticsService extends Base
     {
         $returnData = [
             "btn_text" => "",
+            "step_text" => "",
             "pk_status_url" => "",
             "btn_action" => "",
         ];
@@ -537,15 +538,13 @@ class AthleticsService extends Base
                 break;
             case PkStatusEnum::WAIT_JOIN:
                 if ($pkJoinInfo) {
+                    $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/join.png";
                     if ($joinCount < 3) {
-                        $returnData["btn_text"] = "已报名";
-                        $returnData["btn_action"] = "join";
+                        $returnData["step_text"] = "已报名";
                     } else if ($pkJoinInfo["answers"]) {
-                        $returnData["btn_text"] = "已答题";
-                        $returnData["btn_action"] = "join";
+                        $returnData["step_text"] = "已答题";
                     } else  {
-                        $returnData["btn_text"] = "未答题";
-                        $returnData["btn_action"] = "join";
+                        $returnData["step_text"] = "未答题";
                     }
                 } else {
                     $returnData["btn_text"] = "开始报名";
@@ -556,16 +555,15 @@ class AthleticsService extends Base
                 $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/timeout.png";
                 break;
             case PkStatusEnum::UNDERWAY:
-                if ($pkJoinInfo && $pkJoinInfo["answers"]) {
+                if ($pkJoinInfo) {
                     if ($pkJoinInfo["answers"]) {
-                        $returnData["btn_text"] = "已答题";
-                        $returnData["btn_action"] = "answer";
+                        $returnData["step_text"] = "已答题";
                     } else {
-                        $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/underway.png";
+                        $returnData["btn_text"] = "开始答题";
+                        $returnData["btn_action"] = "answer";
                     }
                 } else {
-                    $returnData["btn_text"] = "开始答题";
-                    $returnData["btn_action"] = "answer";
+                    $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/underway.png";
                 }
                 break;
             case PkStatusEnum::FINISH:
