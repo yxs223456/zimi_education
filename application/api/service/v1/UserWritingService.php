@@ -34,10 +34,10 @@ class UserWritingService extends Base
                 "requirements" => json_decode($item["requirements"], true),
                 "contents" => $contents,
                 "is_comment" => $item["is_comment"],
-                "total_score" => (int) $item["total_score"],
-                "score" => (int) $item["score"],
+                "total_score" => (string) (int) $item["total_score"],
+                "score" => (string) (int) $item["score"],
                 "comment" => $item["comment"],
-                "comment_level" => $item["is_comment"]?$this->getCommentLevel($item["total_score"], $item["score"]):"",
+                "comment_level" => $item["is_comment"]?$this->getCommentLevel($item["total_score"], $item["score"]):0,
             ];
         }
 
@@ -51,27 +51,27 @@ class UserWritingService extends Base
         $commentLevel = "";
         if ($totalScore == 100) {
             if ($score >= 90) {
-                $commentLevel = "优秀";
+                $commentLevel = 5;
             } else if ($score >= 80) {
-                $commentLevel = "比较优秀";
+                $commentLevel = 4;
             } else if ($score >= 70) {
-                $commentLevel = "合格";
+                $commentLevel = 3;
             } else if ($score >= 60) {
-                $commentLevel = "一般";
+                $commentLevel = 2;
             } else {
-                $commentLevel = "不及格";
+                $commentLevel = 1;
             }
         } else if ($totalScore == 30) {
             if ($score >= 27) {
-                $commentLevel = "优秀";
+                $commentLevel = 5;
             } else if ($score >= 24) {
-                $commentLevel = "比较优秀";
+                $commentLevel = 4;
             } else if ($score >= 21) {
-                $commentLevel = "合格";
+                $commentLevel = 3;
             } else if ($score >= 18) {
-                $commentLevel = "一般";
+                $commentLevel = 2;
             } else {
-                $commentLevel = "不及格";
+                $commentLevel = 1;
             }
         }
 
