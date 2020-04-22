@@ -298,7 +298,8 @@ class AthleticsService extends Base
             foreach ($pkList as $item) {
 
                 $webUseStatus = isset($myJoinList[$item["uuid"]]) ?
-                    $this->getWebUseStatus($item, $myJoinList[$item["uuid"]]) : $this->getWebUseStatus($item);
+                    $this->getWebUseStatus($item, count($pkUserUuids[$item["uuid"]]), $myJoinList[$item["uuid"]]) :
+                    $this->getWebUseStatus($item, count($pkUserUuids[$item["uuid"]]));
 
                 $returnData[] = [
                     "uuid" => $item["uuid"],
@@ -515,7 +516,7 @@ class AthleticsService extends Base
         return $returnData;
     }
 
-    private function getWebUseStatus($pk, $pkJoinInfo = [])
+    private function getWebUseStatus($pk, $joinCount, $pkJoinInfo = [])
     {
         $returnData = [
             "btn_text" => "",
@@ -532,7 +533,16 @@ class AthleticsService extends Base
                 break;
             case PkStatusEnum::WAIT_JOIN:
                 if ($pkJoinInfo) {
-                    $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/join.png";
+                    if ($joinCount < 3) {
+                        $returnData["btn_text"] = "已报名";
+                        $returnData["btn_action"] = "join";
+                    } else if ($pkJoinInfo["answers"]) {
+                        $returnData["btn_text"] = "已答题";
+                        $returnData["btn_action"] = "join";
+                    } else  {
+                        $returnData["btn_text"] = "未答题";
+                        $returnData["btn_action"] = "join";
+                    }
                 } else {
                     $returnData["btn_text"] = "开始报名";
                     $returnData["btn_action"] = "join";
@@ -543,7 +553,12 @@ class AthleticsService extends Base
                 break;
             case PkStatusEnum::UNDERWAY:
                 if ($pkJoinInfo && $pkJoinInfo["answers"]) {
-                    $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/underway.png";
+                    if ($pkJoinInfo["answers"]) {
+                        $returnData["btn_text"] = "已答题";
+                        $returnData["btn_action"] = "answer";
+                    } else {
+                        $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/underway.png";
+                    }
                 } else {
                     $returnData["btn_text"] = "开始答题";
                     $returnData["btn_action"] = "answer";
