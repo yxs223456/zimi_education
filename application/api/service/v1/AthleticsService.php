@@ -338,6 +338,7 @@ class AthleticsService extends Base
             "name" => $pk["name"],
             "initiator_nickname" => $pkJoinInfo[0]["nickname"],
             "show_time" => $this->getPkShowTime($pk),
+            "total_num" => $pk["total_num"],
             "status" => $pk["status"],
             "status_msg" => PkStatusEnum::getEnumDescByValue($pk["status"]),
             "type" => $pk["type"],
