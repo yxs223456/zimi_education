@@ -348,6 +348,7 @@ class AthleticsService extends Base
             "audit_fail_reason" => $pk["audit_fail_reason"],
             "champion_nickname" => "",
             "my_performance" => "",
+            "remark" => "",
             "rule" => $this->getPkRule($pk),
         ];
 
