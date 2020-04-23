@@ -337,9 +337,7 @@ class AthleticsService extends Base
             "uuid" => $pk["uuid"],
             "name" => $pk["name"],
             "initiator_nickname" => $pkJoinInfo[0]["nickname"],
-            "join_deadline" => date("Y-m-d H:i", $pk["join_deadline"]),
-            "begin_time" => date("Y-m-d H:i", $pk["begin_time"]),
-            "deadline" => date("Y-m-d H:i", $pk["deadline"]),
+            "show_time" => $this->getPkShowTime($pk),
             "status" => PkStatusEnum::getEnumDescByValue($pk["status"]),
             "type" => $pk["type"],
             "is_initiator" => 0,
@@ -381,6 +379,64 @@ class AthleticsService extends Base
             }
         }
 
+        return $returnData;
+    }
+
+    private function getPkShowTime($pk)
+    {
+        switch ($pk["status"]) {
+            case PkStatusEnum::AUDITING:
+            case PkStatusEnum::AUDIT_TIMEOUT:
+            case PkStatusEnum::AUDIT_FAIL:
+                $returnData = [
+                    [
+                        "title" => "发起时间",
+                        "value" => $pk["create_time"],
+                    ]
+                ];
+                break;
+
+            case PkStatusEnum::WAIT_JOIN:
+            case PkStatusEnum::WAIT_JOIN_TIMEOUT:
+                $returnData = [
+                    [
+                        "title" => "审核通过时间",
+                        "value" => date("Y-m-d H:i:s", $pk["audit_time"]),
+                    ],
+                    [
+                        "title" => "报名截止时间",
+                        "value" => date("Y-m-d H:i:s", $pk["join_deadline"])
+                    ],
+                ];
+                break;
+            case PkStatusEnum::UNDERWAY:
+                $returnData = [
+                    [
+                        "title" => "审核通过时间",
+                        "value" => date("Y-m-d H:i:s", $pk["audit_time"]),
+                    ],
+                    [
+                        "title" => "报名截止时间",
+                        "value" => date("Y-m-d H:i:s", $pk["join_deadline"])
+                    ],
+                    [
+                        "title" => "答题截止时间",
+                        "value" => date("Y-m-d H:i:s", $pk["deadline"])
+                    ],
+                ];
+                break;
+            case PkStatusEnum::FINISH:
+                $returnData = [
+                    [
+                        "title" => "答题截止时间",
+                        "value" => date("Y-m-d H:i:s", $pk["deadline"])
+                    ],
+                ];
+                break;
+            default:
+                $returnData = [];
+                break;
+        }
         return $returnData;
     }
 
