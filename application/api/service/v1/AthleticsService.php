@@ -385,6 +385,9 @@ class AthleticsService extends Base
                 if ($item["rank"] == 1) {
                     $isChampion = true;
                 }
+                if ($item["answers"]) {
+                    $returnData["is_submit_answer"] = 1;
+                }
             }
             if ($item["rank"] == 1 && $pk["status"] == PkStatusEnum::FINISH) {
                 $championNickname = getNickname($item["nickname"]);
