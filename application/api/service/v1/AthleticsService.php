@@ -367,6 +367,7 @@ class AthleticsService extends Base
 
         $championNickname = "";
         $isChampion = false;
+        $myJoinInfo = [];
         foreach ($pkJoinInfo as $item) {
             $returnData["users"][] = [
                 "nickname" => getNickname($item["nickname"]),
@@ -374,6 +375,7 @@ class AthleticsService extends Base
             ];
 
             if ($item["user_uuid"] == $user["uuid"]) {
+                $myJoinInfo = $item;
                 $returnData["is_join"] = 1;
                 if ($item["is_initiator"] == PkIsInitiatorEnum::YES) {
                     $returnData["is_initiator"] = 1;
@@ -393,6 +395,7 @@ class AthleticsService extends Base
                 $championNickname = getNickname($item["nickname"]);
             }
         }
+        $returnData["web_use_status"] = $this->getWebUseStatus($pk, count($pkJoinInfo), $myJoinInfo);
         $returnData["remark"] = $this->getPkInfoRemark($pk, $championNickname, $isChampion);
 
         return $returnData;
