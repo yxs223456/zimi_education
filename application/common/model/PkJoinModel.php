@@ -71,7 +71,7 @@ class PkJoinModel extends Base
             ->leftJoin("pk", "pk.uuid=pkj.pk_uuid")
             ->where("pkj.user_uuid", $userUuid)
             ->where("pkj.is_initiator", PkIsInitiatorEnum::NO)
-            ->field("pk.uuid,pk.name,pk.status,pk.type")
+            ->field("pk.*")
             ->order("pkj.id", "desc")
             ->limit(($pageNum - 1) * $pageSize, $pageSize)
             ->select()

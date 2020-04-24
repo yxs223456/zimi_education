@@ -32,7 +32,6 @@ class PkModel extends Base
     public function myInitList($userUuid, $pageNum, $pageSize)
     {
         return $this->where("initiator_uuid", $userUuid)
-            ->field("uuid,name,type,status")
             ->order("id", "desc")
             ->limit(($pageNum-1) * $pageSize, $pageSize)
             ->select()->toArray();
