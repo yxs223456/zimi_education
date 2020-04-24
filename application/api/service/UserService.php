@@ -786,7 +786,7 @@ class UserService extends Base
                 "id" => $allMedals["level"][$level]["id"],
                 "name" => $allMedals["level"][$level]["name"],
                 "is_win" => $isWin,
-                "medal_url" => $noviceIsWin?getImageUrl($allMedals["level"][$level]["url1"]):
+                "medal_url" => $isWin?getImageUrl($allMedals["level"][$level]["url1"]):
                     getImageUrl($allMedals["level"][$level]["url2"]),
             ];
         }
