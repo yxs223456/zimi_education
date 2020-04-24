@@ -113,12 +113,14 @@ class QuestionService extends Base
         $user->novice_test_time = time();
         $user->novice_test_is_show = NoviceTestIsShowEnum::NO;
         //用户新手勋章
-        $medals = json_decode($user["medals"], true);
-        $selfMedals = json_decode($user["self_medals"], true);
-        $medals["novice_level"] = $noviceLevel;
-        $user->medals = json_encode($medals, JSON_UNESCAPED_UNICODE);
-        if (count($selfMedals) == 0) {
-            $user->self_medals = json_encode($medals, JSON_UNESCAPED_UNICODE);
+        if ($noviceLevel != 0) {
+            $medals = json_decode($user["medals"], true);
+            $selfMedals = json_decode($user["self_medals"], true);
+            $medals["novice_level"] = $noviceLevel;
+            $user->medals = json_encode($medals, JSON_UNESCAPED_UNICODE);
+            if (count($selfMedals) == 0) {
+                $user->self_medals = json_encode($medals, JSON_UNESCAPED_UNICODE);
+            }
         }
         $user->save();
 
