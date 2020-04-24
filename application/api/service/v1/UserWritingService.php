@@ -35,6 +35,9 @@ class UserWritingService extends Base
                 "contents" => $contents,
                 "is_comment" => $item["is_comment"],
                 "total_score" => (string) (int) $item["total_score"],
+                "tags" => [
+
+                ],
                 "score" => (string) (int) $item["score"],
                 "comment" => $item["comment"],
                 "comment_level" => $item["is_comment"]?$this->getCommentLevel($item["total_score"], $item["score"]):0,
