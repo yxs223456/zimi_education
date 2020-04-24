@@ -267,7 +267,7 @@ class AthleticsService extends Base
             throw $e;
         }
 
-        return new \stdClass();
+        return $this->pkInfo($user, $pkUuid);
     }
 
     public function pkList($user, $pkType, $pkStatus, $pageNum, $pageSize)
@@ -276,6 +276,13 @@ class AthleticsService extends Base
 
         $pkList = $pkModel->getListByType($pkType, $pkStatus, $pageNum, $pageSize)->toArray();
 
+        $returnData = $this->formatPkList($pkList, $user);
+
+        return $returnData;
+    }
+
+    private function formatPkList($pkList, $user)
+    {
         $returnData = [];
         if ($pkList) {
             $pkUuids = array_column($pkList, "uuid");
@@ -345,10 +352,7 @@ class AthleticsService extends Base
             "is_initiator" => 0,
             "is_join" => 0,
             "is_submit_answer" => 0,
-            "audit_fail_reason" => $pk["audit_fail_reason"],
-            "champion_nickname" => "",
             "my_performance" => "",
-            "remark" => "",
             "rule" => $this->getPkRule($pk),
         ];
 
@@ -361,10 +365,12 @@ class AthleticsService extends Base
             ];
         }
 
+        $championNickname = "";
+        $isChampion = false;
         foreach ($pkJoinInfo as $item) {
             $returnData["users"][] = [
-                "nickname" => $item["nickname"],
-                "head_image_url" => getImageUrl($item["head_image_url"]),
+                "nickname" => getNickname($item["nickname"]),
+                "head_image_url" => getHeadImageUrl($item["head_image_url"]),
             ];
 
             if ($item["user_uuid"] == $user["uuid"]) {
@@ -376,13 +382,52 @@ class AthleticsService extends Base
                     $returnData["my_performance"] = "亲爱的学员 ".$item["nickname"]." 你好 你的成绩为 第".$item["rank"]."名，
                     请继续努力加油，快去PK榜看看你有没有上榜吧";
                 }
+                if ($item["rank"] == 1) {
+                    $isChampion = true;
+                }
             }
-            if ($item["rank"] == 1) {
-                $returnData["champion_nickname"] = $item["nickname"];
+            if ($item["rank"] == 1 && $pk["status"] == PkStatusEnum::FINISH) {
+                $championNickname = getNickname($item["nickname"]);
             }
         }
+        $returnData["remark"] = $this->getPkInfoRemark($pk, $championNickname, $isChampion);
 
         return $returnData;
+    }
+
+    private function getPkInfoRemark($pk, $championNickname = "", $isChampion = false)
+    {
+        switch ($pk["status"]) {
+            case PkStatusEnum::AUDITING:
+                $remark = "待审核";
+                break;
+            case PkStatusEnum::AUDIT_FAIL:
+                $remark = "审核未通过 原因：" . $pk["audit_fail_reason"];
+                break;
+            case PkStatusEnum::AUDIT_TIMEOUT:
+                $remark = "审核时间超时";
+                break;
+            case PkStatusEnum::WAIT_JOIN:
+                $remark = "";
+                break;
+            case PkStatusEnum::WAIT_JOIN_TIMEOUT:
+                $remark = "由于报名人数不满3人，因此此次PK流局";
+                break;
+            case PkStatusEnum::UNDERWAY:
+                $remark = "";
+                break;
+            case PkStatusEnum::FINISH:
+                if ($isChampion) {
+                    $remark = "恭喜你获得本场PK赛的冠军，可以去PK榜看其他人的成绩哦。";
+                } else {
+                    $remark = "本场冠军为：($championNickname)，快去PK榜看看你的排名吧！";
+                }
+                break;
+            default:
+                $remark = "";
+                break;
+        }
+        return $remark;
     }
 
     private function getPkShowTime($pk)
@@ -536,7 +581,8 @@ class AthleticsService extends Base
             throw AppException::factory(AppException::PK_STATUS_NOT_UNDERWAY);
         }
         $pkJoinCount = $pkJoinModel->getJoinCountByPkUuid($pkUuid);
-        if ($pk["status"] != PkStatusEnum::UNDERWAY && $pkJoinCount < 3) {
+        if (!($pk["status"] == PkStatusEnum::UNDERWAY ||
+            ($pk["status"] == PkStatusEnum::WAIT_JOIN && $pkJoinCount >= 3))) {
             throw AppException::factory(AppException::PK_STATUS_NOT_UNDERWAY);
         }
 
@@ -567,7 +613,7 @@ class AthleticsService extends Base
         $pkJoin->save();
 
         //如果用户都答题完成，结算PK
-        $returnData = new \stdClass();
+        $returnData = $this->pkInfo($user, $pkUuid);
         $pkJoins = $pkJoinModel->getJoinInfoByPkUuid($pkUuid);
         foreach ($pkJoins as $item) {
             if ($item["answers"] == "") {
@@ -582,10 +628,8 @@ class AthleticsService extends Base
     private function getWebUseStatus($pk, $joinCount, $pkJoinInfo = [])
     {
         $returnData = [
-            "btn_text" => "",
             "step_text" => "",
             "pk_status_url" => "",
-            "btn_action" => "",
         ];
         switch ($pk["status"]) {
             case PkStatusEnum::AUDITING:
@@ -596,8 +640,8 @@ class AthleticsService extends Base
                 $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/auditfail.png";
                 break;
             case PkStatusEnum::WAIT_JOIN:
+                $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/join.png";
                 if ($pkJoinInfo) {
-                    $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/join.png";
                     if ($joinCount < 3) {
                         $returnData["step_text"] = "已报名";
                     } else if ($pkJoinInfo["answers"]) {
@@ -605,24 +649,19 @@ class AthleticsService extends Base
                     } else  {
                         $returnData["step_text"] = "未答题";
                     }
-                } else {
-                    $returnData["btn_text"] = "开始报名";
-                    $returnData["btn_action"] = "join";
                 }
                 break;
             case PkStatusEnum::WAIT_JOIN_TIMEOUT:
                 $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/timeout.png";
                 break;
             case PkStatusEnum::UNDERWAY:
+                $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/underway.png";
                 if ($pkJoinInfo) {
                     if ($pkJoinInfo["answers"]) {
                         $returnData["step_text"] = "已答题";
                     } else {
-                        $returnData["btn_text"] = "开始答题";
-                        $returnData["btn_action"] = "answer";
+                        $returnData["step_text"] = "未答题";
                     }
-                } else {
-                    $returnData["pk_status_url"] = config("web.self_domain")."/static/pk/underway.png";
                 }
                 break;
             case PkStatusEnum::FINISH:
@@ -662,33 +701,7 @@ class AthleticsService extends Base
 
         $pkList = $pkModel->myInitList($user["uuid"], $pageNum, $pageSize);
 
-        $returnData = [];
-        if ($pkList) {
-            $pkUuids = array_column($pkList, "uuid");
-            $pkJoinModel = new PkJoinModel();
-            $pkListUserInfo = $pkJoinModel->getListUserInfoByPkUuids($pkUuids);
-            $pkUserInfo = [];
-            $pkUserUuids = [];
-            foreach ($pkListUserInfo as $item) {
-                $pkUserInfo[$item["pk_uuid"]][] = [
-                    "nickname" => getNickname($item["nickname"]),
-                    "head_image_url" => getHeadImageUrl($item["head_image_url"])
-                ];
-                $pkUserUuids[$item["pk_uuid"]][] = $item["user_uuid"];
-            }
-
-            foreach ($pkList as $item) {
-                $returnData[] = [
-                    "uuid" => $item["uuid"],
-                    "name" => $item["name"],
-                    "initiator_head_image_url" => $pkUserInfo[$item["uuid"]][0]["head_image_url"],
-                    "initiator_nickname" => $pkUserInfo[$item["uuid"]][0]["nickname"],
-                    "join_users" => $pkUserInfo[$item["uuid"]],
-                    "type" => $item["type"],
-                    "status" => $item["status"],
-                ];
-            }
-        }
+        $returnData = $this->formatPkList($pkList, $user);
 
         return $returnData;
     }
@@ -699,32 +712,7 @@ class AthleticsService extends Base
 
         $pkList = $pkJoinModel->myJointPk($user["uuid"], $pageNum, $pageSize);
 
-        $returnData = [];
-        if ($pkList) {
-            $pkUuids = array_column($pkList, "uuid");
-            $pkListUserInfo = $pkJoinModel->getListUserInfoByPkUuids($pkUuids);
-            $pkUserInfo = [];
-            $pkUserUuids = [];
-            foreach ($pkListUserInfo as $item) {
-                $pkUserInfo[$item["pk_uuid"]][] = [
-                    "nickname" => getNickname($item["nickname"]),
-                    "head_image_url" => getHeadImageUrl($item["head_image_url"])
-                ];
-                $pkUserUuids[$item["pk_uuid"]][] = $item["user_uuid"];
-            }
-
-            foreach ($pkList as $item) {
-                $returnData[] = [
-                    "uuid" => $item["uuid"],
-                    "name" => $item["name"],
-                    "initiator_head_image_url" => $pkUserInfo[$item["uuid"]][0]["head_image_url"],
-                    "initiator_nickname" => $pkUserInfo[$item["uuid"]][0]["nickname"],
-                    "join_users" => $pkUserInfo[$item["uuid"]],
-                    "type" => $item["type"],
-                    "status" => $item["status"],
-                ];
-            }
-        }
+        $returnData = $this->formatPkList($pkList, $user);
 
         return $returnData;
     }
