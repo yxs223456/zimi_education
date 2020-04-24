@@ -589,7 +589,7 @@ class AthleticsService extends Base
         $pkJoinCount = $pkJoinModel->getJoinCountByPkUuid($pkUuid);
         if (!($pk["status"] == PkStatusEnum::UNDERWAY ||
             ($pk["status"] == PkStatusEnum::WAIT_JOIN && $pkJoinCount >= 3))) {
-            throw AppException::factory(AppException::PK_STATUS_NOT_UNDERWAY);
+//            throw AppException::factory(AppException::PK_STATUS_NOT_UNDERWAY);
         }
 
         //用户参与pk且还没有提交答案时才可提交答案
