@@ -31,8 +31,14 @@ class RankService extends Base
         $redis = Redis::factory();
         $todayLikeInfo = getSynthesizeRankLikeTodayInfo($user["uuid"], $difficultyLevel, $redis);
         $todayLikeInfo = array_column($todayLikeInfo, "user_uuid");
+        $myRankInfo = [];
         foreach ($rankList as $key=>$item) {
-            $rankList[$key]["user_uuid"] = $item["user_uuid"];
+            if ($item["user_uuid"] == $user["uuid"]) {
+                $myRankInfo = [
+                    "rank" => $key+1,
+                    "like_count" => $item["like_count"],
+                ];
+            }
             $rankList[$key]["nickname"] = getNickname($item["nickname"]);
             $rankList[$key]["head_image_url"] = getHeadImageUrl($item["head_image_url"]);
             $rankList[$key]["rank"] = $key+1;
@@ -40,7 +46,9 @@ class RankService extends Base
             $rankList[$key]["is_like"] = (int) in_array($item["user_uuid"], $todayLikeInfo);
         }
 
-        $myRankInfo = $userSynthesizeRankModel->getUserSynthesizeRank($user["uuid"], $difficultyLevel);
+        if (!$myRankInfo) {
+            $myRankInfo = $userSynthesizeRankModel->getUserSynthesizeRank($user["uuid"], $difficultyLevel);
+        }
         $myRank = [
             "head_image_url" => getHeadImageUrl($user["head_image_url"]),
             "nickname" => getNickname($user["nickname"]),
@@ -117,8 +125,15 @@ class RankService extends Base
         $redis = Redis::factory();
         $todayLikeInfo = getCompetitionRankLikeTodayInfo($user["uuid"], $redis);
         $todayLikeInfo = array_column($todayLikeInfo, "user_uuid");
+        $myRankInfo = [];
         foreach ($rankList as $key=>$item) {
-            $rankList[$key]["user_uuid"] = $item["user_uuid"];
+            if ($item["user_uuid"] == $user["uuid"]) {
+                $myRankInfo = [
+                    "rank" => $key+1,
+                    "like_count" => $item["like_count"],
+                    "total_talent_coin" => $item["total_talent_coin"],
+                ];
+            }
             $rankList[$key]["nickname"] = getNickname($item["nickname"]);
             $rankList[$key]["head_image_url"] = getHeadImageUrl($item["head_image_url"]);
             $rankList[$key]["rank"] = $key+1;
@@ -126,7 +141,9 @@ class RankService extends Base
             $rankList[$key]["is_like"] = (int) in_array($item["user_uuid"], $todayLikeInfo);;
         }
 
-        $myRankInfo = $internalCompetitionRankModel->getSelfRank($user["uuid"]);
+        if (empty($myRankInfo)) {
+            $myRankInfo = $internalCompetitionRankModel->getSelfRank($user["uuid"]);
+        }
         $myRank = [
             "head_image_url" => getHeadImageUrl($user["head_image_url"]),
             "nickname" => getNickname($user["nickname"]),
@@ -198,8 +215,15 @@ class RankService extends Base
         $redis = Redis::factory();
         $todayLikeInfo = getPkRankLikeTodayInfo($user["uuid"], $type, $redis);
         $todayLikeInfo = array_column($todayLikeInfo, "user_uuid");
+        $myRankInfo = [];
         foreach ($rankList as $key=>$item) {
-            $rankList[$key]["user_uuid"] = $item["user_uuid"];
+            if ($item["user_uuid"] == $user["uuid"]) {
+                $myRankInfo = [
+                    "rank" => $key+1,
+                    "like_count" => $item["like_count"],
+                    "total_pk_coin" => $item["total_pk_coin"],
+                ];
+            }
             $rankList[$key]["nickname"] = getNickname($item["nickname"]);
             $rankList[$key]["head_image_url"] = getHeadImageUrl($item["head_image_url"]);
             $rankList[$key]["rank"] = $key+1;
@@ -207,7 +231,9 @@ class RankService extends Base
             $rankList[$key]["is_like"] = (int) in_array($item["user_uuid"], $todayLikeInfo);
         }
 
-        $myRankInfo = $userPkRankModel->getUserPkRank($user["uuid"], $type);
+        if (empty($myRankInfo)) {
+            $myRankInfo = $userPkRankModel->getUserPkRank($user["uuid"], $type);
+        }
         $myRank = [
             "head_image_url" => getHeadImageUrl($user["head_image_url"]),
             "nickname" => getNickname($user["nickname"]),

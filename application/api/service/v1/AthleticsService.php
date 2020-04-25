@@ -583,15 +583,13 @@ class AthleticsService extends Base
         if ($pk == null) {
             throw AppException::factory(AppException::PK_NOT_EXISTS);
         }
-        if ($pk["deadline"] < time()) {
+        if ($pk["status"] == PkStatusEnum::UNDERWAY && $pk["deadline"] < time()) {
             throw AppException::factory(AppException::PK_STATUS_NOT_UNDERWAY);
         }
         $pkJoinCount = $pkJoinModel->getJoinCountByPkUuid($pkUuid);
-        if (!($pk["status"] == PkStatusEnum::UNDERWAY ||
-            ($pk["status"] == PkStatusEnum::WAIT_JOIN && $pkJoinCount >= 3))) {
-//            throw AppException::factory(AppException::PK_STATUS_NOT_UNDERWAY);
+        if ($pk["status"] == PkStatusEnum::WAIT_JOIN && $pkJoinCount < 3) {
+            throw AppException::factory(AppException::PK_STATUS_NOT_UNDERWAY);
         }
-
         //用户参与pk且还没有提交答案时才可提交答案
         $pkJoin = $pkJoinModel->findByUserAndPk($user["uuid"], $pkUuid);
         if ($pkJoin == null) {

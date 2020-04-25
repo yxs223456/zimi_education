@@ -75,8 +75,8 @@ class UserService extends Base
             }
 
             //手机号存在，没有绑定其他微信，进行绑定
-            $this->recordUserWeChatInfo($userByPhone, $userWeChatInfo);
-            $userInfo = $userByPhone->toArray();
+            $newUser = $this->recordUserWeChatInfo($userByPhone, $userWeChatInfo);
+            $userInfo = $newUser->toArray();
         } else {
             //手机号不存在，绑定手机号
             //验证密码格式是否正确
@@ -431,10 +431,10 @@ class UserService extends Base
         if (empty($user)) {
             throw AppException::factory(AppException::USER_NOT_EXISTS);
         }
-        $this->recordUserWeChatInfo($user, $userWeChatInfo);
+        $newUser = $this->recordUserWeChatInfo($user, $userWeChatInfo);
 
         //把用户信息记入缓存
-        $userInfo = $user->toArray();
+        $userInfo = $newUser->toArray();
         $redis = Redis::factory();
         cacheUserInfoByToken($userInfo, $redis);
 
@@ -468,12 +468,17 @@ class UserService extends Base
         }
 
         //纪录用户微信信息
-        $this->recordUserWeChatInfo($user, $userWeChatInfo);
+        $newUser = $this->recordUserWeChatInfo($user, $userWeChatInfo);
+        //替换token
+        $oldToken = $user["token"];
+        $token = getRandomString(32);
+        $user->save(["token"=>$token]);
 
         //把用户信息记入缓存
-        $userInfo = $user->toArray();
+        $userInfo = $newUser->toArray();
+        $userInfo["token"] = $token;
         $redis = Redis::factory();
-        cacheUserInfoByToken($userInfo, $redis);
+        cacheUserInfoByToken($userInfo, $redis, $oldToken);
 
         return [
             "user_exists" => 1,
@@ -867,16 +872,21 @@ class UserService extends Base
 
     private function recordUserWeChatInfo(Model $user, $userWeChatInfo)
     {
+        //用户有自定义头像时不用微信头像覆盖
+        $headImageUrl = $user["head_image_url"];
+        $headImageUrl = strpos($headImageUrl, "static")===0?$headImageUrl:$userWeChatInfo["headimgurl"];
+
         $user->unionid = $userWeChatInfo["unionid"];
         $user->mobile_openid = $userWeChatInfo["openid"];
         $user->nickname = $userWeChatInfo["nickname"];
-        $user->head_image_url = $userWeChatInfo["headimgurl"];
+        $user->head_image_url = $headImageUrl;
         $user->sex = $userWeChatInfo["sex"];
         $user->country = $userWeChatInfo["country"];
         $user->province = $userWeChatInfo["province"];
         $user->city = $userWeChatInfo["city"];
         $user->save();
 
+        return $user;
     }
 
     private function getAccessTokenForMobileApp($appId, $appSecret, $code)
