@@ -75,13 +75,13 @@ class CheckCompetition extends Base
             $requirements[]["requirement"] = $item;
         }
         $answer = json_decode($info["answer"], true);
-        $images = $answer["images"]??[];
+        $image = $answer["image"]??[];
         $text = $answer["text"]??[];
 
         $this->assign("info", $info);
         $this->assign("topic", $topic);
         $this->assign("requirements", json_encode($requirements));
-        $this->assign("images", $images);
+        $this->assign("image", $image);
         $this->assign("text", $text);
 
         return $this->fetch();
