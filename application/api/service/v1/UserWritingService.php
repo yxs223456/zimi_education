@@ -9,6 +9,7 @@
 namespace app\api\service\v1;
 
 use app\api\service\Base;
+use app\common\enum\UserWritingSourceTypeEnum;
 use app\common\model\UserWritingModel;
 
 class UserWritingService extends Base
@@ -21,10 +22,15 @@ class UserWritingService extends Base
         $returnData = [];
         foreach ($userWritingList as $item) {
             $contents = json_decode($item["content"], true);
-            if (isset($contents["images"])) {
-                foreach ($contents["images"] as $key=>$image) {
-                    $contents["images"][$key] = getImageUrl($image);
+            if (isset($contents["image"]["images"])) {
+                foreach ($contents["image"]["images"] as $key=>$image) {
+                    $contents["images"]["image"][$key] = getImageUrl($image);
                 }
+            }
+
+            $tags = [UserWritingSourceTypeEnum::getEnumDescByValue($item["score"])];
+            if (!empty($contents["text"]["content"])) {
+                $tags[] = mb_strlen($contents["text"]["content"]) . "字";
             }
 
             $returnData[] = [
@@ -35,9 +41,7 @@ class UserWritingService extends Base
                 "contents" => $contents,
                 "is_comment" => $item["is_comment"],
                 "total_score" => (string) (int) $item["total_score"],
-                "tags" => [
-
-                ],
+                "tags" => $tags,
                 "score" => (string) (int) $item["score"],
                 "comment" => $item["comment"],
                 "comment_level" => $item["is_comment"]?$this->getCommentLevel($item["total_score"], $item["score"]):0,

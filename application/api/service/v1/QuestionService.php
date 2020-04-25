@@ -531,7 +531,8 @@ class QuestionService extends Base
                     "uuid" => $randomWriting["uuid"],
                     "topic"=> $randomWriting["topic"],
                     "requirements" => json_decode($randomWriting["requirements"], true),
-                    "contents" => isset($writingAnswers[$randomWriting["uuid"]])?$writingAnswers[$randomWriting["uuid"]]:["text"=>["title"=>"","content"=>""],"images"=>[]],
+                    "contents" => isset($writingAnswers[$randomWriting["uuid"]])?$writingAnswers[$randomWriting["uuid"]]:
+                        ["text"=>["title"=>"","content"=>""],"image"=>["title"=>"","images"=>[]]],
                 ]
             ],
         ];

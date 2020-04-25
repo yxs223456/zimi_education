@@ -18,8 +18,8 @@ class UserWritingSourceTypeEnum
     use EnumTrait;
 
     const STUDY = 1;
-    const STUDY_DSC = "自我学习模块";
+    const STUDY_DSC = "专项测试";
 
     const SYNTHESIZE = 2;
-    const SYNTHESIZE_DSC = "综合练习模块";
+    const SYNTHESIZE_DSC = "综合测试";
 }
