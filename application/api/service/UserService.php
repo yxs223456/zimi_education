@@ -819,12 +819,14 @@ class UserService extends Base
         $userSelfMedal = [];
         $userAllMedal = [];
         $allMedals = Constant::MEDAL_CONFIG;
+        $medalUrls = [];
 
         if ($user["level"] == 0 && $user["novice_level"] > 0) {
             foreach ($allMedals["novice_level"] as $noviceLevel => $noviceLevelInfo) {
                 if (in_array($noviceLevelInfo["id"], $medalIds)) {
                     if ($user["novice_level"] == $noviceLevel) {
                         $userSelfMedal["novice_level"] = $noviceLevel;
+                        $medalUrls[] = getImageUrl($noviceLevelInfo["top_url"]);
                     } else {
                         throw AppException::factory(AppException::USER_NONE_MEDAL);
                     }
@@ -837,6 +839,7 @@ class UserService extends Base
                 if (in_array($levelInfo["id"], $medalIds)) {
                     if ($user["level"] == $level) {
                         $userSelfMedal["level"] = $level;
+                        $medalUrls[] = getImageUrl($levelInfo["top_url"]);
                     } else {
                         throw AppException::factory(AppException::USER_NONE_MEDAL);
                     }
@@ -848,6 +851,7 @@ class UserService extends Base
             if (in_array($pkLevelInfo["id"], $medalIds)) {
                 if (isset($userAllMedal["pk_level"]) && $userAllMedal["pk_level"] == $pkLevel) {
                     $userSelfMedal["pk_level"] = $pkLevel;
+                    $medalUrls[] = getImageUrl($pkLevelInfo["top_url"]);
                 } else {
                     throw AppException::factory(AppException::USER_NONE_MEDAL);
                 }
@@ -867,7 +871,7 @@ class UserService extends Base
         $redis = Redis::factory();
         cacheUserInfoByToken($newUser, $redis);
 
-        return new \stdClass();
+        return $medalUrls;
     }
 
     private function recordUserWeChatInfo(Model $user, $userWeChatInfo)
