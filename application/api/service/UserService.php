@@ -754,19 +754,19 @@ class UserService extends Base
             if (isset($userSelfMedals["novice_level"])) {
                 $returnData["current_medal"] = [
                     "name" => $allMedals["novice_level"][$userSelfMedals["novice_level"]]["name"],
-                    "medal_url" => getImageUrl($allMedals["novice_level"][$userSelfMedals["novice_level"]]["url1"]),
+                    "medal_url" => getImageUrl($allMedals["novice_level"][$userSelfMedals["novice_level"]]["top_url"]),
                 ];
             }
             if (isset($userSelfMedals["level"])) {
                 $returnData["current_medal"] = [
                     "name" => $allMedals["level"][$userSelfMedals["level"]]["name"],
-                    "medal_url" => getImageUrl($allMedals["level"][$userSelfMedals["level"]]["url1"]),
+                    "medal_url" => getImageUrl($allMedals["level"][$userSelfMedals["level"]]["top_url"]),
                 ];
             }
             if (isset($userSelfMedals["pk_level"])) {
                 $returnData["current_medal"] = [
                     "name" => $allMedals["pk_level"][$userSelfMedals["pk_level"]]["name"],
-                    "medal_url" => getImageUrl($allMedals["pk_level"][$userSelfMedals["pk_level"]]["url1"]),
+                    "medal_url" => getImageUrl($allMedals["pk_level"][$userSelfMedals["pk_level"]]["top_url"]),
                 ];
             }
         }
