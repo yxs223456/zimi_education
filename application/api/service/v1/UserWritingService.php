@@ -28,7 +28,7 @@ class UserWritingService extends Base
                 }
             }
 
-            $tags = [UserWritingSourceTypeEnum::getEnumDescByValue($item["score"])];
+            $tags = [UserWritingSourceTypeEnum::getEnumDescByValue($item["source_type"])];
             if (!empty($contents["text"]["content"])) {
                 $tags[] = mb_strlen($contents["text"]["content"]) . "字";
             }
