@@ -753,18 +753,24 @@ class UserService extends Base
         } else {
             if (isset($userSelfMedals["novice_level"])) {
                 $returnData["current_medal"] = [
+                    "width" => $allMedals["novice_level"][$userSelfMedals["novice_level"]]["top_width"],
+                    "height" => $allMedals["novice_level"][$userSelfMedals["novice_level"]]["top_height"],
                     "name" => $allMedals["novice_level"][$userSelfMedals["novice_level"]]["name"],
                     "medal_url" => getImageUrl($allMedals["novice_level"][$userSelfMedals["novice_level"]]["top_url"]),
                 ];
             }
             if (isset($userSelfMedals["level"])) {
                 $returnData["current_medal"] = [
+                    "width" => $allMedals["level"][$userSelfMedals["level"]]["top_width"],
+                    "height" => $allMedals["level"][$userSelfMedals["level"]]["top_height"],
                     "name" => $allMedals["level"][$userSelfMedals["level"]]["name"],
                     "medal_url" => getImageUrl($allMedals["level"][$userSelfMedals["level"]]["top_url"]),
                 ];
             }
             if (isset($userSelfMedals["pk_level"])) {
                 $returnData["current_medal"] = [
+                    "width" => $allMedals["pk_level"][$userSelfMedals["pk_level"]]["top_width"],
+                    "height" => $allMedals["pk_level"][$userSelfMedals["pk_level"]]["top_height"],
                     "name" => $allMedals["pk_level"][$userSelfMedals["pk_level"]]["name"],
                     "medal_url" => getImageUrl($allMedals["pk_level"][$userSelfMedals["pk_level"]]["top_url"]),
                 ];
@@ -781,6 +787,8 @@ class UserService extends Base
                 $noviceIsWin = 1;
             }
             $returnData["level_list"][] = [
+                "width" => $allMedals["novice_level"][$level]["width"],
+                "height" => $allMedals["novice_level"][$level]["height"],
                 "id" => $allMedals["novice_level"][$level]["id"],
                 "name" => $allMedals["novice_level"][$level]["name"],
                 "is_win" => $noviceIsWin,
@@ -788,6 +796,8 @@ class UserService extends Base
                     getImageUrl($allMedals["novice_level"][$level]["url2"]),
             ];
             $returnData["level_list"][] = [
+                "width" => $allMedals["level"][$level]["width"],
+                "height" => $allMedals["level"][$level]["height"],
                 "id" => $allMedals["level"][$level]["id"],
                 "name" => $allMedals["level"][$level]["name"],
                 "is_win" => $isWin,
@@ -803,6 +813,8 @@ class UserService extends Base
                 $isWin = 1;
             }
             $returnData["other_list"][] = [
+                "width" => $allMedals["pk_level"][$pkLevel]["width"],
+                "height" => $allMedals["pk_level"][$pkLevel]["height"],
                 "id" => $allMedals["pk_level"][$pkLevel]["id"],
                 "name" => $allMedals["pk_level"][$pkLevel]["name"],
                 "is_win" => $isWin,
