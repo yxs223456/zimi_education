@@ -256,16 +256,16 @@ class CheckWriting extends Base
                     if (isset($fillTheBlanksAnswer[$answerInfo["uuid"]])) {
                         $answer = json_decode($fillTheBlanksAnswer[$answerInfo["uuid"]]["answer"], true);
                         if ($fillTheBlanksAnswer[$answerInfo["uuid"]]["is_sequence"] == FillTheBlanksAnswerIsSequenceEnum::YES) {
-                            if ($answer == $answerInfo["answer"]) {
+                            if ($answer == $answerInfo["answers"]) {
                                 $isRight = 1;
                                 $userScore += 2;
                             }
                         } else {
-                            if (count($answerInfo["answer"]) == count($answer)) {
+                            if (count($answerInfo["answers"]) == count($answer)) {
                                 $isRight = 1;
                                 $userScore += 2;
                                 foreach ($answer as $value) {
-                                    if (!in_array($value, $answerInfo["answer"])) {
+                                    if (!in_array($value, $answerInfo["answers"])) {
                                         $isRight = 0;
                                         $userScore -= 2;
                                         break;
@@ -276,7 +276,7 @@ class CheckWriting extends Base
                         $scoreInfoData["list"][] = [
                             "uuid" => $answerInfo["uuid"],
                             "answer" => $answer,
-                            "user_answer" => $answerInfo["answer"],
+                            "user_answer" => $answerInfo["answers"],
                             "is_right" => $isRight,
                             "score" => 2,
                         ];
