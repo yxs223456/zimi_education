@@ -721,10 +721,10 @@ class AthleticsService extends Base
         return $returnData;
     }
 
-    public function competitionList($user, $pageNum, $pageSize)
+    public function competitionList($user, $pageNum, $pageSize, $sponsorId)
     {
         $internalCompetitionModel = new InternalCompetitionModel();
-        $internalCompetitions = $internalCompetitionModel->getList($pageNum, $pageSize);
+        $internalCompetitions = $internalCompetitionModel->getList($sponsorId, $pageNum, $pageSize);
 
         $returnData = [];
         foreach ($internalCompetitions as $item) {

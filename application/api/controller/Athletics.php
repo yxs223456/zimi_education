@@ -296,17 +296,33 @@ class Athletics extends Base
         return $this->jsonResponse($returnData);
     }
 
+    public function competitionSponsorList()
+    {
+        $returnData = [
+            [
+                "sponsor" => "内部大赛",
+                "id" => 1,
+            ]
+        ];
+
+        return $this->jsonResponse($returnData);
+    }
+
     public function competitionList()
     {
+        $sponsorId = input("sponsor_id", 1);
         $pageNum = input("page_num");
         $pageSize = input("page_size");
         if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
+        if (!checkInt($sponsorId, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
 
         $user = $this->query["user"];
         $athleticsService = new AthleticsService();
-        $returnData = $athleticsService->competitionList($user, $pageNum, $pageSize);
+        $returnData = $athleticsService->competitionList($user, $pageNum, $pageSize, $sponsorId);
 
         return $this->jsonResponse($returnData);
     }

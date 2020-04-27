@@ -143,6 +143,8 @@ Route::rule('athletics/competitionReportCardList', 'api/athletics/competitionRep
 Route::rule('athletics/competitionReportCardInfo', 'api/athletics/competitionReportCardInfo', 'post');
 //内部大赛成绩详情用户列表
 Route::rule('athletics/competitionReportCardUserList', 'api/athletics/competitionReportCardUserList', 'post');
+//DE大赛主办方列表
+Route::rule('athletics/competitionSponsorList', 'api/athletics/competitionSponsorList', 'post');
 
 
 //综合测试排行榜
