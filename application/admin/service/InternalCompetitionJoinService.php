@@ -31,4 +31,12 @@ class InternalCompetitionJoinService extends Base
 
         return $list;
     }
+
+    public function getTopThreeScoreInfo($cUuid)
+    {
+        return $this->currentModel->where("c_uuid", $cUuid)
+            ->order("score", "desc")
+            ->limit(0, 3)
+            ->select();
+    }
 }

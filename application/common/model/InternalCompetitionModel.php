@@ -12,9 +12,10 @@ class InternalCompetitionModel extends Base
 {
     protected $table = 'internal_competition';
 
-    public function getList($pageNum, $pageSize)
+    public function getList($sponsorId, $pageNum, $pageSize)
     {
         return $this
+            ->where("sponsor_id", $sponsorId)
             ->whereTime("online_time", "<=", time())
             ->order("id", "desc")
             ->limit(($pageNum-1)*$pageSize, $pageSize)

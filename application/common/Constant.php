@@ -123,13 +123,213 @@ class Constant
     //pk审核等待最长时间72小时，审核超时自动流局
     const PK_AUDIT_WAIT_TIME = 72 * 3600;
 
-    //pk等待加入最长时间72小时， 超过72小时人数不足自动流局
-    const PK_WAIT_JOIN_TIME = 72 * 3600;
-
     //参与DE大赛奖励
     const JOIN_INTERNAL_COMPETITION_REWARD = [
         "coin" => 10,
         "pk_coin" => 10,
         "talent_coin" => 1,
+    ];
+
+    //DE大赛答题限制
+    const INTERNAL_COMPETITION_SUBMIT_ANSWER_TIME_LIMIT = 3600;
+
+    //用户综合测试升级所需分数
+    const SYNTHESIZE_UPDATE_LEVEL_SCORE = 80;
+
+    //用户每日点赞次数上限，（各榜互不影响）
+    const RANK_LIKE_TIMES = 3;
+
+    //大赛状态图标
+    const COMPETITION_STATUS_ICON = [
+        1 => "static/competition/underway.png",
+        2 => "static/competition/underway.png",
+        3 => "",
+        4 => "static/competition/finish.png",
+    ];
+
+    //勋章配置
+    const MEDAL_CONFIG = [
+        "novice_level" => [
+            1 => [
+                "id" => 1,
+                "name" => "准一星学员",
+                "top_url" => "static/medal/topnovicelevel1.png",
+                "url1" => "static/medal/novicelevel1.png",
+                "url2" => "static/medal/novicelevel1gray.png",
+                "top_width" => 255,
+                "top_height" => 255,
+                "width" => 120,
+                "height" => 120,
+            ],
+            2 => [
+                "id" => 2,
+                "name" => "准二星学员",
+                "top_url" => "static/medal/topnovicelevel2.png",
+                "url1" => "static/medal/novicelevel2.png",
+                "url2" => "static/medal/novicelevel2gray.png",
+                "top_width" => 255,
+                "top_height" => 255,
+                "width" => 120,
+                "height" => 120,
+            ],
+            3 => [
+                "id" => 3,
+                "name" => "准三星学员",
+                "top_url" => "static/medal/topnovicelevel3.png",
+                "url1" => "static/medal/novicelevel3.png",
+                "url2" => "static/medal/novicelevel3gray.png",
+                "top_width" => 255,
+                "top_height" => 255,
+                "width" => 120,
+                "height" => 120,
+            ],
+            4 => [
+                "id" => 4,
+                "name" => "准四星学员",
+                "top_url" => "static/medal/topnovicelevel4.png",
+                "url1" => "static/medal/novicelevel4.png",
+                "url2" => "static/medal/novicelevel4gray.png",
+                "top_width" => 255,
+                "top_height" => 255,
+                "width" => 120,
+                "height" => 120,
+            ],
+            5 => [
+                "id" => 5,
+                "name" => "准五星学员",
+                "top_url" => "static/medal/topnovicelevel5.png",
+                "url1" => "static/medal/novicelevel5.png",
+                "url2" => "static/medal/novicelevel5gray.png",
+                "top_width" => 255,
+                "top_height" => 255,
+                "width" => 120,
+                "height" => 120,
+            ],
+            6 => [
+                "id" => 6,
+                "name" => "准六星学员",
+                "top_url" => "static/medal/topnovicelevel6.png",
+                "url1" => "static/medal/novicelevel6.png",
+                "url2" => "static/medal/novicelevel6gray.png",
+                "top_width" => 255,
+                "top_height" => 255,
+                "width" => 120,
+                "height" => 120,
+            ],
+        ],
+        "level" => [
+            1 => [
+                "id" => 7,
+                "name" => "一星学员",
+                "top_url" => "static/medal/toplevel1.png",
+                "url1" => "static/medal/level1.png",
+                "url2" => "static/medal/level1gray.png",
+                "top_width" => 255,
+                "top_height" => 255,
+                "width" => 120,
+                "height" => 120,
+            ],
+            2 => [
+                "id" => 8,
+                "name" => "二星学员",
+                "top_url" => "static/medal/toplevel2.png",
+                "url1" => "static/medal/level2.png",
+                "url2" => "static/medal/level2gray.png",
+                "top_width" => 255,
+                "top_height" => 255,
+                "width" => 120,
+                "height" => 120,
+            ],
+            3 => [
+                "id" => 9,
+                "name" => "三星学员",
+                "top_url" => "static/medal/toplevel3.png",
+                "url1" => "static/medal/level3.png",
+                "url2" => "static/medal/level3gray.png",
+                "top_width" => 255,
+                "top_height" => 255,
+                "width" => 120,
+                "height" => 120,
+            ],
+            4 => [
+                "id" => 10,
+                "name" => "四星学员",
+                "top_url" => "static/medal/toplevel4.png",
+                "url1" => "static/medal/level4.png",
+                "url2" => "static/medal/level4gray.png",
+                "top_width" => 255,
+                "top_height" => 255,
+                "width" => 120,
+                "height" => 120,
+            ],
+            5 => [
+                "id" => 11,
+                "name" => "五星学员",
+                "top_url" => "static/medal/toplevel5.png",
+                "url1" => "static/medal/level5.png",
+                "url2" => "static/medal/level5gray.png",
+                "top_width" => 255,
+                "top_height" => 255,
+                "width" => 120,
+                "height" => 120,
+            ],
+            6 => [
+                "id" => 12,
+                "name" => "六星学员",
+                "top_url" => "static/medal/toplevel6.png",
+                "url1" => "static/medal/level6.png",
+                "url2" => "static/medal/level6gray.png",
+                "top_width" => 255,
+                "top_height" => 255,
+                "width" => 120,
+                "height" => 120,
+            ],
+        ],
+        "pk_level" => [
+            1 => [
+                "id" => 13,
+                "name" => "新秀学员",
+                "top_url" => "static/medal/toppklevel1.png",
+                "url1" => "static/medal/pklevel1.png",
+                "url2" => "static/medal/graypklevel1.png",
+                "top_width" => 255,
+                "top_height" => 255,
+                "width" => 120,
+                "height" => 120,
+            ],
+            2 => [
+                "id" => 14,
+                "name" => "PK达人",
+                "top_url" => "static/medal/toppklevel2.png",
+                "url1" => "static/medal/pklevel2.png",
+                "url2" => "static/medal/graypklevel2.png",
+                "top_width" => 255,
+                "top_height" => 255,
+                "width" => 120,
+                "height" => 120,
+            ],
+            3 => [
+                "id" => 15,
+                "name" => "PK大师",
+                "top_url" => "static/medal/toppklevel3.png",
+                "url1" => "static/medal/pklevel3.png",
+                "url2" => "static/medal/graypklevel3.png",
+                "top_width" => 255,
+                "top_height" => 255,
+                "width" => 120,
+                "height" => 120,
+            ],
+            4 => [
+                "id" => 16,
+                "name" => "PK王",
+                "top_url" => "static/medal/toppklevel4.png",
+                "url1" => "static/medal/pklevel4.png",
+                "url2" => "static/medal/graypklevel4.png",
+                "top_width" => 255,
+                "top_height" => 255,
+                "width" => 120,
+                "height" => 120,
+            ],
+        ],
     ];
 }

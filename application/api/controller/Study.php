@@ -124,7 +124,7 @@ class Study extends Base
         if (empty($param["uuid"]) || empty($param["content"])) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
-        if (empty($param["content"]["text"]) && empty($param["content"]["images"])) {
+        if (empty($param["content"]["text"]) && empty($param["content"]["image"])) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 

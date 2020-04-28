@@ -1,0 +1,103 @@
+{include file="public/header" /}
+<style type="text/css">
+    /*强制table不换行*/
+    table td{word-break: keep-all;white-space:nowrap;}
+    table th{word-break: keep-all;white-space:nowrap;}
+    .tableWordVreakNone{
+        white-space: normal !important;word-break: normal !important;
+    }
+</style>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>商品规格列表</h5>
+        </div>
+        <div class="ibox-content">
+            <!--搜索框开始-->
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="col-sm-12">
+                        <form method="post" action="{:url('pkList')}" id="searchForm" class="form-inline">
+                            <label for="">规格名称</label>
+                            <input type="text" name="name" value="{$name|default=''}" class="form-control">
+
+                            <button class="btn btn-success btn-sm" type="submit" style="margin-bottom:0;margin-left:4px"><i class="fa fa-filter"></i> 筛选</button>
+                            <a class="btn btn-primary btn-sm"  style="margin-bottom:0" href="{:url('pkList')}"><i class="fa fa-filter"></i> 重置</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!--搜索框结束-->
+            <div class="hr-line-dashed"></div>
+
+            <div class="example-wrap">
+                <div class="example">
+                    <div style="overflow-x:scroll;width:100%;">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr class="long-tr">
+                                <th>名称</th>
+                                <th>类型</th>
+                                <th>状态</th>
+                                <th>审核失败原因</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody id="list-content">
+                            {foreach $list as $vo}
+                            <tr class="long-td">
+                                <td>{$vo.name}</td>
+                                <td>{$vo.typeDesc}</td>
+                                <td>{$vo.statusDesc}</td>
+                                <td>{$vo.audit_fail_reason}</td>
+                                <td>
+                                    {if condition="$vo.status eq 1"}
+                                        <a href="{:url('check',['uuid'=>$vo['uuid']])}" class="btn btn-primary btn-xs">
+                                        <i class="fa fa-paste"></i> 审核</a>&nbsp;&nbsp;
+                                    {/if}
+                                </td>
+                            </tr>
+                            {/foreach}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="laypage"></div>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+</div>
+<!-- End Panel Other -->
+</div>
+
+{include file="public/footer" /}
+<script type="text/javascript" src="/static/admin/js/laypage.js"></script>
+<script type="text/javascript">
+
+    layui.use(['laypage', 'layer'], function(){
+        var laypage = layui.laypage
+            ,layer = layui.layer;
+
+        //完整功能
+        laypage.render({
+            elem: 'laypage'
+            ,count: '{$list->total()}' // 总数据条数
+            ,curr: '{$list->currentPage()}' // 当前第几页
+            ,limit: '{$list->listRows()}'   // 每页显示条数
+            ,layout: ['count', 'prev', 'page', 'next', 'refresh', 'skip']
+            ,jump: function(obj, first){
+                //首次不执行
+                if(!first){
+                    $("#searchForm").attr('action', '{:url("pkList")}?page='+obj.curr+"name={$name|default=''}");
+                    $("#searchForm").submit();
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

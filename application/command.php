@@ -13,4 +13,8 @@ return [
     'app\command\AddCoinByFinishTask',
     'app\command\CacheQuestionLibrary',
     'app\command\ReceiveContinuousSignReward',
+    'app\command\InternalCompetitionFinish',
+    'app\command\PkJoinTimeout',
+    'app\command\PkFinish',
+    'app\command\PkTimeoutFinish',
 ];

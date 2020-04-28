@@ -894,7 +894,7 @@ function pushPkFinishList($pkUuid, Redis $redis) {
 }
 
 //弹出PK结算任务
-function getPkFinishList(\Redis $redis) {
+function popPkFinishList(\Redis $redis) {
     $key = "de_education:pkFinishList";
 
     $data = $redis->blPop([$key], 10);
@@ -934,4 +934,72 @@ function pushSynthesizeUpdateList($nickname, $difficultyLevel, \Redis $redis) {
 function getSynthesizeUpdateList($difficultyLevel, \Redis $redis) {
     $key = "de_education:synthesizeUpdateLis:$difficultyLevel";
     return $redis->lRange($key, 0, 4);
+}
+
+//纪录用户测试榜今日点赞信息
+function cacheSynthesizeRankLikeTodayInfo($userUuid, $difficultyLevel, array $info, \Redis $redis) {
+    $key = "de_education:synthesizeRankLikeInfo:$difficultyLevel:$userUuid:" . date("ymd");
+    $redis->setex($key, 86400, json_encode($info, JSON_UNESCAPED_UNICODE));
+}
+
+//用户测试榜今日点赞信息
+function getSynthesizeRankLikeTodayInfo($userUuid, $difficultyLevel, \Redis $redis) {
+    $key = "de_education:synthesizeRankLikeInfo:$difficultyLevel:$userUuid:" . date("ymd");
+    $info = $redis->get($key);
+    if ($info) {
+        return json_decode($info, true);
+    } else {
+        return [];
+    }
+}
+
+//纪录用户才情榜今日点赞信息
+function cacheCompetitionRankLikeTodayInfo($userUuid, array $info, \Redis $redis) {
+    $key = "de_education:competitionRankLikeInfo:$userUuid:" . date("ymd");
+    $redis->setex($key, 86400, json_encode($info, JSON_UNESCAPED_UNICODE));
+}
+
+//用户才情榜今日点赞信息
+function getCompetitionRankLikeTodayInfo($userUuid, \Redis $redis) {
+    $key = "de_education:competitionRankLikeInfo:$userUuid:" . date("ymd");
+    $info = $redis->get($key);
+    if ($info) {
+        return json_decode($info, true);
+    } else {
+        return [];
+    }
+}
+
+//缓存内部大赛获胜用户信息
+function cacheCompetitionWinUserInfo($competitionUuid, array $winUserInfo, \Redis $redis) {
+    $key = "de_education:competitionWinUserInfo:$competitionUuid";
+    $redis->setex($key, 86400 * 30, json_encode($winUserInfo, JSON_UNESCAPED_UNICODE));
+}
+
+//内部大赛获胜用户信息
+function getCompetitionWinUserInfo($competitionUuid, \Redis $redis) {
+    $key = "de_education:competitionWinUserInfo:$competitionUuid";
+    $data = $redis->get($key);
+    if ($data) {
+        return json_decode($data, true);
+    } else {
+        return $data;
+    }
+}
+
+//纪录用户pk榜今日点赞信息
+function cachePkRankLikeTodayInfo($userUuid, $type, array $info, \Redis $redis) {
+    $key = "de_education:pkRankLikeInfo:$type:$userUuid:" . date("ymd");
+    $redis->setex($key, 86400, json_encode($info, JSON_UNESCAPED_UNICODE));
+}
+
+//用户pk榜今日点赞信息
+function getPkRankLikeTodayInfo($userUuid, $type, \Redis $redis) {
+    $key = "de_education:pkRankLikeInfo:$type:$userUuid:" . date("ymd");
+    $info = $redis->get($key);
+    if ($info) {
+        return json_decode($info, true);
+    } else {
+        return [];
+    }
 }

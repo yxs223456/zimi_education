@@ -229,7 +229,7 @@ function createInviteCode($length = 10)
 
 function getImageUrl($imageUrl)
 {
-    return str_replace("static/api", config("web.self_domain") . "/static/api", $imageUrl);
+    return str_replace("static/", config("web.self_domain") . "/static/", $imageUrl);
 }
 
 function getHeadImageUrl($headImageUrl)

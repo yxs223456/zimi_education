@@ -52,7 +52,7 @@
                         </div>
                         <div class="hr-line-dashed"></div>
 
-                        {if empty($images)}
+                        {if empty($image.images)}
                         <div class="form-group">
                             <label class="col-sm-2 control-label">用户作品标题：</label>
                             <div class="input-group col-sm-5">
@@ -66,15 +66,21 @@
                             </div>
                         </div>
                         {else /}
-
                         <div class="form-group">
-                            <label class="col-sm-2 control-label">用户作品：</label>
+                            <label class="col-sm-2 control-label">用户作品标题：</label>
                             <div class="input-group col-sm-5">
-                                {foreach $images as $image}
-                                <img src="/{$image}" alt="" style="max-width:1000px;">
+                                <input type="text" class="form-control" value="{$image.title}" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">用户作品内容：</label>
+                            <div class="input-group col-sm-5">
+                                {foreach $image.images as $img}
+                                <img src="/{$img}" alt="" style="max-width:1000px;">
                                 {/foreach}
                             </div>
                         </div>
+
                         {/if}
 
                         <div class="hr-line-dashed"></div>

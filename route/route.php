@@ -51,6 +51,14 @@ Route::rule('user/signInfo', 'api/user/signInfo', 'post');
 Route::rule('user/sign', 'api/user/sign', 'post');
 //用户领取连续签到奖励
 Route::rule('user/receiveContinuousSignReward', 'api/user/receiveContinuousSignReward', 'post');
+//用户作文本
+Route::rule('user/writingList', 'api/user/writingList', 'post');
+//用户DE币流水
+Route::rule('user/coinFlowList', 'api/user/coinFlowList', 'post');
+//勋章墙
+Route::rule('user/medals', 'api/user/medals', 'post');
+//跟换个人勋章
+Route::rule('user/updateSelfMedal', 'api/user/updateSelfMedal', 'post');
 
 
 //任务中心首页
@@ -95,8 +103,12 @@ Route::rule('athletics/getSynthesize', 'api/athletics/getSynthesize', 'post');
 Route::rule('athletics/submitSynthesizeDraft', 'api/athletics/submitSynthesizeDraft', 'post');
 //综合练习模块，获取练习题答案
 Route::rule('athletics/submitSynthesize', 'api/athletics/submitSynthesize', 'post');
+//综合练习成绩单
+Route::rule('athletics/synthesizeReportCardList', 'api/athletics/synthesizeReportCardList', 'post');
 
 
+//发起pk规则
+Route::rule('athletics/initPkRule', 'api/athletics/initPkRule', 'post');
 //发起pk
 Route::rule('athletics/initPk', 'api/athletics/initPk', 'post');
 //参与pk
@@ -107,6 +119,12 @@ Route::rule('athletics/pkList', 'api/athletics/pkList', 'post');
 Route::rule('athletics/pkInfo', 'api/athletics/pkInfo', 'post');
 //提交pk答案
 Route::rule('athletics/submitPkAnswer', 'api/athletics/submitPkAnswer', 'post');
+//我的pk成绩单
+Route::rule('athletics/pkReportCard', 'api/athletics/pkReportCard', 'post');
+//我发起的pk
+Route::rule('athletics/myInitPk', 'api/athletics/myInitPk', 'post');
+//我参与的pk
+Route::rule('athletics/myJointPk', 'api/athletics/myJointPk', 'post');
 
 
 //内部大赛列表
@@ -119,10 +137,28 @@ Route::rule('athletics/joinCompetition', 'api/athletics/joinCompetition', 'post'
 Route::rule('athletics/submitCompetitionDraft', 'api/athletics/submitCompetitionDraft', 'post');
 //提交内部大赛作品
 Route::rule('athletics/submitCompetition', 'api/athletics/submitCompetition', 'post');
+//内部大赛成绩单
+Route::rule('athletics/competitionReportCardList', 'api/athletics/competitionReportCardList', 'post');
+//内部大赛成绩详情
+Route::rule('athletics/competitionReportCardInfo', 'api/athletics/competitionReportCardInfo', 'post');
+//内部大赛成绩详情用户列表
+Route::rule('athletics/competitionReportCardUserList', 'api/athletics/competitionReportCardUserList', 'post');
+//DE大赛主办方列表
+Route::rule('athletics/competitionSponsorList', 'api/athletics/competitionSponsorList', 'post');
 
 
 //综合测试排行榜
 Route::rule('rank/synthesizeRank', 'api/rank/synthesizeRank', 'post');
+//综合测试排行榜点赞
+Route::rule('rank/synthesizeLike', 'api/rank/synthesizeLike', 'post');
+//才情排行榜
+Route::rule('rank/competitionRank', 'api/rank/competitionRank', 'post');
+//才情排行榜点赞
+Route::rule('rank/competitionLike', 'api/rank/competitionLike', 'post');
+//pk排行榜
+Route::rule('rank/pkRank', 'api/rank/pkRank', 'post');
+//pk排行榜点赞
+Route::rule('rank/pkLike', 'api/rank/pkLike', 'post');
 
 return [
 

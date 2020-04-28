@@ -10,13 +10,13 @@ namespace app\admin\controller;
 
 use app\common\enum\FillTheBlanksAnswerIsSequenceEnum;
 use app\common\enum\QuestionTypeEnum;
+use app\common\enum\TrueFalseQuestionAnswerEnum;
 use app\common\enum\UserStudyWritingIsCommentEnum;
 use app\common\enum\UserSynthesizeScoreIsFinishEnum;
 use app\common\enum\UserWritingIsCommentEnum;
 use app\common\enum\UserWritingSourceTypeEnum;
 use app\common\helper\Redis;
 use think\Db;
-use think\response\Json;
 
 class CheckWriting extends Base
 {
@@ -77,12 +77,12 @@ class CheckWriting extends Base
         }
 
         $answer = json_decode($userWriting["content"], true);
-        $images = $answer["images"]??[];
+        $image = $answer["image"]??[];
         $text = $answer["text"]??[];
 
         $this->assign("info", $userWriting);
         $this->assign("requirements", json_encode($requirements));
-        $this->assign("images", $images);
+        $this->assign("image", $image);
         $this->assign("text", $text);
 
         return $this->fetch("checkStudyWriting");
@@ -157,12 +157,12 @@ class CheckWriting extends Base
         }
 
         $answer = json_decode($userWriting["content"], true);
-        $images = $answer["images"]??[];
+        $image = $answer["image"]??[];
         $text = $answer["text"]??[];
 
         $this->assign("info", $userWriting);
         $this->assign("requirements", json_encode($requirements));
-        $this->assign("images", $images);
+        $this->assign("image", $image);
         $this->assign("text", $text);
 
         return $this->fetch("checkSynthesizeWriting");
@@ -256,16 +256,16 @@ class CheckWriting extends Base
                     if (isset($fillTheBlanksAnswer[$answerInfo["uuid"]])) {
                         $answer = json_decode($fillTheBlanksAnswer[$answerInfo["uuid"]]["answer"], true);
                         if ($fillTheBlanksAnswer[$answerInfo["uuid"]]["is_sequence"] == FillTheBlanksAnswerIsSequenceEnum::YES) {
-                            if ($answer == $answerInfo["answer"]) {
+                            if ($answer == $answerInfo["answers"]) {
                                 $isRight = 1;
                                 $userScore += 2;
                             }
                         } else {
-                            if (count($answerInfo["answer"]) == count($answer)) {
+                            if (count($answerInfo["answers"]) == count($answer)) {
                                 $isRight = 1;
                                 $userScore += 2;
                                 foreach ($answer as $value) {
-                                    if (!in_array($value, $answerInfo["answer"])) {
+                                    if (!in_array($value, $answerInfo["answers"])) {
                                         $isRight = 0;
                                         $userScore -= 2;
                                         break;
@@ -276,7 +276,7 @@ class CheckWriting extends Base
                         $scoreInfoData["list"][] = [
                             "uuid" => $answerInfo["uuid"],
                             "answer" => $answer,
-                            "user_answer" => $answerInfo["answer"],
+                            "user_answer" => $answerInfo["answers"],
                             "is_right" => $isRight,
                             "score" => 2,
                         ];
@@ -285,15 +285,19 @@ class CheckWriting extends Base
             } else if ($item["type"] == QuestionTypeEnum::TRUE_FALSE_QUESTION) {
                 foreach ($item["list"] as $answerInfo) {
                     $isRight = 0;
-                    if (isset($trueFalseQuestionAnswer[$answerInfo["uuid"]]) &&
-                        $trueFalseQuestionAnswer[$answerInfo["uuid"]]["answer"] == $answerInfo["answer"]) {
-                        $isRight = 1;
-                        $userScore += 2;
+                    $userAnswer = 0;
+                    if (isset($trueFalseQuestionAnswer[$answerInfo["uuid"]])) {
+                        $userAnswer = $answerInfo["answer"]=="A"?TrueFalseQuestionAnswerEnum::DESC_TRUE:
+                            ($answerInfo["answer"]=="B"?TrueFalseQuestionAnswerEnum::DESC_FALSE:0);
+                        if ($trueFalseQuestionAnswer[$answerInfo["uuid"]]["answer"] == $userAnswer) {
+                            $isRight = 1;
+                            $userScore += 2;
+                        }
                     }
                     $scoreInfoData["list"][] = [
                         "uuid" => $answerInfo["uuid"],
                         "answer" => $trueFalseQuestionAnswer[$answerInfo["uuid"]]["answer"],
-                        "user_answer" => $answerInfo["answer"],
+                        "user_answer" => $userAnswer,
                         "is_right" => $isRight,
                         "score" => 2,
                     ];
@@ -320,6 +324,14 @@ class CheckWriting extends Base
             $isUpdate = false;
             if ($score >= 80 && $userSynthesize->difficulty_level > $user->level) {
                 $user->level = $userSynthesize->difficulty_level;
+                //用户等级勋章
+                $medals = json_decode($user["medals"], true);
+                $selfMedals = json_decode($user["self_medals"], true);
+                $medals["level"] = $userSynthesize->difficulty_level;
+                $user->medals = json_encode($medals, JSON_UNESCAPED_UNICODE);
+                if (count($selfMedals) == 0 || (count($selfMedals) == 1 && isset($selfMedals["novice_level"]))) {
+                    $user->self_medals = json_encode(["level"=>$userSynthesize->difficulty_level], JSON_UNESCAPED_UNICODE);
+                }
                 $user->save();
                 $isUpdate = true;
             }

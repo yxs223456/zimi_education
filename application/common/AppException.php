@@ -34,6 +34,8 @@ class AppException extends \Exception
     const USER_COIN_NOT_ENOUGH = [1014, "书币数量不足"];
     const USER_BIND_PHONE_KEY_TIMEOUT = [1015, "微信授权信息过期，请重新登录绑定手机号"];
     const USER_BIND_WE_CHAT_ALREADY = [1016, "该手机号已绑定其他微信账号"];
+    const USER_INVITE_CODE_SELF = [1017, "不要填自己的邀请码呦~"];
+    const USER_NONE_MEDAL = [1018, "你没有这个勋章，无法更换"];
 
     const WE_CHAT_GET_ACCESS_TOKEN_ERROR = [2000, "获取用户微信信息失败"];
     const WE_CHAT_NOT_BIND_USER = [2001, "当前微信号还没有绑定任何账号,请先使用手机号注册"];
@@ -45,7 +47,7 @@ class AppException extends \Exception
     const PK_NOT_EXISTS = [4001, "pk不存在"];
     const PK_JOIN_ALREADY = [4002, "你已经加入了当前PK请不要重复申请"];
     const PK_PEOPLE_ENOUGH = [4003, "PK人数已满请申请其他PK吧"];
-    const PK_STATUS_NOT_UNDERWAY = [4004, "PK状态不为进行中无法提交答案"];
+    const PK_STATUS_NOT_UNDERWAY = [4004, "PK状态不为进行中或参与人数不到3人时无法提交答案"];
     const PK_NOT_JOIN = [4005, "你没有参与当前PK"];
     const PK_SUBMIT_ANSWERS_ALREADY = [4006, "你已经提交过答案无法重复提交"];
 
@@ -57,9 +59,17 @@ class AppException extends \Exception
     const INTERNAL_COMPETITION_SUBMIT_ANSWER_ALREADY = [5005, "你已经提交了答案，不能再修改"];
     const INTERNAL_COMPETITION_SUBMIT_ANSWER_TIMEOUT = [5006, "本次大赛已过提交作品截止时间"];
     const INTERNAL_COMPETITION_ANSWER_EMPTY = [5007, "作品不能为空"];
+    const INTERNAL_COMPETITION_SUBMIT_ANSWER_TIME_LIMIT = [5008, "提交答案超时~"];
 
     const SYNTHESIZE_NOT_EXISTS = [6000, "综合测试不存在"];
     const SYNTHESIZE_SUBMIT_ANSWER_ALREADY = [6001, "综合测试答案已提交"];
+    const SYNTHESIZE_SUBMIT_ANSWER_EMPTY = [6002, "答案不能为空呦~"];
+    const SYNTHESIZE_SUBMIT_ANSWER_INVALID = [6003, "答案格式错误"];
+    const SYNTHESIZE_SUBMIT_ANSWER_JUMP = [6004, "不允许跳题作答"];
+
+    const RANK_LIKE_SELF = [7000, "不能给自己点赞呦~"];
+    const RANK_DAILY_LIKE_THREE_TIMES = [7001, "每日只能助力3次呦~"];
+    const RANK_DAILY_LIKE_SOMEONE_ONE_TIMES = [7002, "每天只能助力同一人一次"];
 
     public static function factory($errConst)
     {

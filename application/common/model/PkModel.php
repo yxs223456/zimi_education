@@ -14,15 +14,26 @@ class PkModel extends Base
 {
     protected $table = 'pk';
 
-    public function getListByType($pkType, $pageNum, $pageSize)
+    public function getListByType($pkType, $pkStatus, $pageNum, $pageSize)
     {
-        return $this->where("type", $pkType)
-            ->whereIn("status", [
+        $data = $this->where("type", $pkType);
+        if ($pkStatus != 0) {
+            $data->where("status", $pkStatus);
+        }
+        return $data->whereIn("status", [
                 PkStatusEnum::WAIT_JOIN,
                 PkStatusEnum::UNDERWAY,
                 PkStatusEnum::FINISH,
             ])->order("id", "desc")
             ->limit(($pageNum - 1) * $pageSize, $pageSize)
             ->select();
+    }
+
+    public function myInitList($userUuid, $pageNum, $pageSize)
+    {
+        return $this->where("initiator_uuid", $userUuid)
+            ->order("id", "desc")
+            ->limit(($pageNum-1) * $pageSize, $pageSize)
+            ->select()->toArray();
     }
 }

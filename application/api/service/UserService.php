@@ -13,6 +13,8 @@ use app\common\enum\PhoneVerificationCodeStatusEnum;
 use app\common\enum\PhoneVerificationCodeTypeEnum;
 use app\common\enum\UserCoinAddTypeEnum;
 use app\common\enum\UserIsBindWeChatEnum;
+use app\common\enum\UserLevelEnum;
+use app\common\enum\UserPkLevelEnum;
 use app\common\helper\MobTech;
 use app\common\helper\Pbkdf2;
 use app\common\helper\Redis;
@@ -73,8 +75,8 @@ class UserService extends Base
             }
 
             //手机号存在，没有绑定其他微信，进行绑定
-            $this->recordUserWeChatInfo($userByPhone, $userWeChatInfo);
-            $userInfo = $userByPhone->toArray();
+            $newUser = $this->recordUserWeChatInfo($userByPhone, $userWeChatInfo);
+            $userInfo = $newUser->toArray();
         } else {
             //手机号不存在，绑定手机号
             //验证密码格式是否正确
@@ -248,6 +250,7 @@ class UserService extends Base
             "phone" => $phone,
             "password" => $encryptPassword,
             "token" => $token,
+            "nickname" => "学员" . $inviteCode,
             "invite_code" => $inviteCode,
             "parent_uuid" => $parentUuid,
             "parent_invite_code" => $parentInviteCode,
@@ -278,7 +281,7 @@ class UserService extends Base
             "password" => $encryptPassword,
             "unionid" => $userWeChatInfo["unionid"],
             "mobile_openid" => $userWeChatInfo["openid"],
-            "nickname" => $userWeChatInfo["nickname"],
+            "nickname" => $userWeChatInfo["nickname"]?$userWeChatInfo["nickname"]:"学员".$inviteCode,
             "head_image_url" => $userWeChatInfo["headimgurl"],
             "sex" => $userWeChatInfo["sex"],
             "country" => $userWeChatInfo["country"],
@@ -429,10 +432,10 @@ class UserService extends Base
         if (empty($user)) {
             throw AppException::factory(AppException::USER_NOT_EXISTS);
         }
-        $this->recordUserWeChatInfo($user, $userWeChatInfo);
+        $newUser = $this->recordUserWeChatInfo($user, $userWeChatInfo);
 
         //把用户信息记入缓存
-        $userInfo = $user->toArray();
+        $userInfo = $newUser->toArray();
         $redis = Redis::factory();
         cacheUserInfoByToken($userInfo, $redis);
 
@@ -466,12 +469,17 @@ class UserService extends Base
         }
 
         //纪录用户微信信息
-        $this->recordUserWeChatInfo($user, $userWeChatInfo);
+        $newUser = $this->recordUserWeChatInfo($user, $userWeChatInfo);
+        //替换token
+        $oldToken = $user["token"];
+        $token = getRandomString(32);
+        $user->save(["token"=>$token]);
 
         //把用户信息记入缓存
-        $userInfo = $user->toArray();
+        $userInfo = $newUser->toArray();
+        $userInfo["token"] = $token;
         $redis = Redis::factory();
-        cacheUserInfoByToken($userInfo, $redis);
+        cacheUserInfoByToken($userInfo, $redis, $oldToken);
 
         return [
             "user_exists" => 1,
@@ -493,7 +501,7 @@ class UserService extends Base
             throw AppException::factory(AppException::USER_NOT_EXISTS);
         }
 
-        //1.邀请用户不可改变 2.只要没有邀请人即可添加任意用户为邀请人
+        //1.邀请用户不可改变 2.只要没有邀请人即可添加任意用户为邀请人3.不能填自己的邀请码
         if (isset($modifyUserInfo["parent_invite_code"])) {
             if ($userInfo["parent_invite_code"]) {
                 throw AppException::factory(AppException::USER_PARENT_NOT_ALLOW_MODIFY);
@@ -501,7 +509,10 @@ class UserService extends Base
             if (empty($modifyUserInfo["parent_invite_code"])) {
                 throw AppException::factory(AppException::COM_PARAMS_ERR);
             }
-
+            $modifyUserInfo["parent_invite_code"] = strtoupper($modifyUserInfo["parent_invite_code"]);
+            if ($user["invite_code"] == $modifyUserInfo["parent_invite_code"]) {
+                throw AppException::factory(AppException::USER_INVITE_CODE_SELF);
+            }
             $inviteUser = $userModel->getUserByInviteCode($modifyUserInfo["parent_invite_code"]);
             if (!$inviteUser) {
                 throw AppException::factory(AppException::USER_INVITE_CODE_NOT_EXISTS);
@@ -708,18 +719,191 @@ class UserService extends Base
         return new \stdClass();
     }
 
+    public function coinFlowList($user, $pageNum, $pageSize)
+    {
+        $userCoinLogModel = new UserCoinLogModel();
+        $coinFlowList = $userCoinLogModel->getList($user["uuid"], $pageNum, $pageSize);
+
+        $returnData = [];
+        foreach ($coinFlowList as $item) {
+            $returnData[] = [
+                "type" => $item["type"],
+                "add_type" => $item["add_type"],
+                "reduce_type" => $item["reduce_type"],
+                "num" => $item["num"],
+                "before_num" => $item["before_num"],
+                "after_num" => $item["after_num"],
+                "detail_note" => $item["detail_note"],
+                "create_time" => $item["create_time"],
+            ];
+        }
+
+        return $returnData;
+    }
+
+    public function medals($user)
+    {
+        $allMedals = Constant::MEDAL_CONFIG;
+        $userAllMedals = json_decode($user["medals"], true);
+        $userSelfMedals = json_decode($user["self_medals"], true);
+
+        $returnData = [];
+
+        if (count($userSelfMedals) == 0) {
+            $returnData["current_medal"] = new \stdClass();
+        } else {
+            if (isset($userSelfMedals["novice_level"])) {
+                $returnData["current_medal"] = [
+                    "width" => $allMedals["novice_level"][$userSelfMedals["novice_level"]]["top_width"],
+                    "height" => $allMedals["novice_level"][$userSelfMedals["novice_level"]]["top_height"],
+                    "name" => $allMedals["novice_level"][$userSelfMedals["novice_level"]]["name"],
+                    "medal_url" => getImageUrl($allMedals["novice_level"][$userSelfMedals["novice_level"]]["top_url"]),
+                ];
+            }
+            if (isset($userSelfMedals["level"])) {
+                $returnData["current_medal"] = [
+                    "width" => $allMedals["level"][$userSelfMedals["level"]]["top_width"],
+                    "height" => $allMedals["level"][$userSelfMedals["level"]]["top_height"],
+                    "name" => $allMedals["level"][$userSelfMedals["level"]]["name"],
+                    "medal_url" => getImageUrl($allMedals["level"][$userSelfMedals["level"]]["top_url"]),
+                ];
+            }
+            if (isset($userSelfMedals["pk_level"])) {
+                $returnData["current_medal"] = [
+                    "width" => $allMedals["pk_level"][$userSelfMedals["pk_level"]]["top_width"],
+                    "height" => $allMedals["pk_level"][$userSelfMedals["pk_level"]]["top_height"],
+                    "name" => $allMedals["pk_level"][$userSelfMedals["pk_level"]]["name"],
+                    "medal_url" => getImageUrl($allMedals["pk_level"][$userSelfMedals["pk_level"]]["top_url"]),
+                ];
+            }
+        }
+
+        $levelRange = UserLevelEnum::getAllValues();
+        foreach ($levelRange as $level) {
+            $noviceIsWin = 0;
+            $isWin = 0;
+            if ($user["level"] == $level) {
+                $isWin = 1;
+            } else if ($user["level"] == 0 && $user["novice_level"] == $level) {
+                $noviceIsWin = 1;
+            }
+            $returnData["level_list"][] = [
+                "width" => $allMedals["novice_level"][$level]["width"],
+                "height" => $allMedals["novice_level"][$level]["height"],
+                "id" => $allMedals["novice_level"][$level]["id"],
+                "name" => $allMedals["novice_level"][$level]["name"],
+                "is_win" => $noviceIsWin,
+                "medal_url" => $noviceIsWin?getImageUrl($allMedals["novice_level"][$level]["url1"]):
+                    getImageUrl($allMedals["novice_level"][$level]["url2"]),
+            ];
+            $returnData["level_list"][] = [
+                "width" => $allMedals["level"][$level]["width"],
+                "height" => $allMedals["level"][$level]["height"],
+                "id" => $allMedals["level"][$level]["id"],
+                "name" => $allMedals["level"][$level]["name"],
+                "is_win" => $isWin,
+                "medal_url" => $isWin?getImageUrl($allMedals["level"][$level]["url1"]):
+                    getImageUrl($allMedals["level"][$level]["url2"]),
+            ];
+        }
+
+        $pkLevelRange = UserPkLevelEnum::getAllValues();
+        foreach ($pkLevelRange as $pkLevel) {
+            $isWin = 0;
+            if (isset($userAllMedals[$pkLevel]) && $userAllMedals[$pkLevel] == $pkLevel) {
+                $isWin = 1;
+            }
+            $returnData["other_list"][] = [
+                "width" => $allMedals["pk_level"][$pkLevel]["width"],
+                "height" => $allMedals["pk_level"][$pkLevel]["height"],
+                "id" => $allMedals["pk_level"][$pkLevel]["id"],
+                "name" => $allMedals["pk_level"][$pkLevel]["name"],
+                "is_win" => $isWin,
+                "medal_url" => $isWin?getImageUrl($allMedals["pk_level"][$pkLevel]["url1"]):
+                    getImageUrl($allMedals["pk_level"][$pkLevel]["url2"]),
+            ];
+        }
+
+        return $returnData;
+    }
+
+    public function updateSelfMedal($user, $medalIds)
+    {
+        $userSelfMedal = [];
+        $userAllMedal = [];
+        $allMedals = Constant::MEDAL_CONFIG;
+        $medalUrls = [];
+
+        if ($user["level"] == 0 && $user["novice_level"] > 0) {
+            foreach ($allMedals["novice_level"] as $noviceLevel => $noviceLevelInfo) {
+                if (in_array($noviceLevelInfo["id"], $medalIds)) {
+                    if ($user["novice_level"] == $noviceLevel) {
+                        $userSelfMedal["novice_level"] = $noviceLevel;
+                        $medalUrls[] = getImageUrl($noviceLevelInfo["top_url"]);
+                    } else {
+                        throw AppException::factory(AppException::USER_NONE_MEDAL);
+                    }
+                }
+            }
+        }
+
+        if ($user["level"] > 0) {
+            foreach ($allMedals["level"] as $level => $levelInfo) {
+                if (in_array($levelInfo["id"], $medalIds)) {
+                    if ($user["level"] == $level) {
+                        $userSelfMedal["level"] = $level;
+                        $medalUrls[] = getImageUrl($levelInfo["top_url"]);
+                    } else {
+                        throw AppException::factory(AppException::USER_NONE_MEDAL);
+                    }
+                }
+            }
+        }
+
+        foreach ($allMedals["pk_level"] as $pkLevel => $pkLevelInfo) {
+            if (in_array($pkLevelInfo["id"], $medalIds)) {
+                if (isset($userAllMedal["pk_level"]) && $userAllMedal["pk_level"] == $pkLevel) {
+                    $userSelfMedal["pk_level"] = $pkLevel;
+                    $medalUrls[] = getImageUrl($pkLevelInfo["top_url"]);
+                } else {
+                    throw AppException::factory(AppException::USER_NONE_MEDAL);
+                }
+            }
+        }
+
+        $userModel = new UserBaseModel();
+        Db::name($userModel->getTable())
+            ->where("uuid", $user["uuid"])
+            ->update(
+                [
+                    "self_medals" => json_encode($userSelfMedal, JSON_UNESCAPED_UNICODE),
+                    "update_time" => time(),
+                ]
+            );
+        $newUser = Db::name($userModel->getTable())->where("uuid", $user["uuid"])->find();
+        $redis = Redis::factory();
+        cacheUserInfoByToken($newUser, $redis);
+
+        return $medalUrls;
+    }
+
     private function recordUserWeChatInfo(Model $user, $userWeChatInfo)
     {
+        //用户有自定义头像时不用微信头像覆盖
+        $headImageUrl = $user["head_image_url"];
+        $headImageUrl = strpos($headImageUrl, "static")===0?$headImageUrl:$userWeChatInfo["headimgurl"];
+
         $user->unionid = $userWeChatInfo["unionid"];
         $user->mobile_openid = $userWeChatInfo["openid"];
         $user->nickname = $userWeChatInfo["nickname"];
-        $user->head_image_url = $userWeChatInfo["headimgurl"];
+        $user->head_image_url = $headImageUrl;
         $user->sex = $userWeChatInfo["sex"];
         $user->country = $userWeChatInfo["country"];
         $user->province = $userWeChatInfo["province"];
         $user->city = $userWeChatInfo["city"];
         $user->save();
 
+        return $user;
     }
 
     private function getAccessTokenForMobileApp($appId, $appSecret, $code)
@@ -808,5 +992,32 @@ class UserService extends Base
         }
 
         return true;
+    }
+
+    public function userSelfMedals($userSelfMedals)
+    {
+        $returnData = [];
+        foreach ($userSelfMedals as $key=>$value) {
+            $returnData[] = getImageUrl(Constant::MEDAL_CONFIG[$key][$value]["url1"]);
+        }
+        return $returnData;
+    }
+
+    public function userPkLevel($userInfo)
+    {
+        //pk值达到100点时获得PK新秀称号、300点获得PK达人、800点获得PK大师、1500点获得PK王
+        if ($userInfo["pk_coin"] >= 1500) {
+            $pkLevel = UserPkLevelEnum::FOUR;
+        } else if ($userInfo["pk_coin"] >= 800) {
+            $pkLevel = UserPkLevelEnum::THREE;
+        } else if ($userInfo["pk_coin"] >= 300) {
+            $pkLevel = UserPkLevelEnum::TWO;
+        } else if ($userInfo["pk_coin"] >= 100) {
+            $pkLevel = UserPkLevelEnum::ONE;
+        } else {
+            $pkLevel = 0;
+        }
+
+        return $pkLevel;
     }
 }

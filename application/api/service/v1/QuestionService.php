@@ -14,6 +14,7 @@ use app\common\Constant;
 use app\common\enum\NoviceTestIsShowEnum;
 use app\common\enum\QuestionDifficultyLevelEnum;
 use app\common\enum\QuestionTypeEnum;
+use app\common\enum\TrueFalseQuestionAnswerEnum;
 use app\common\enum\UserSynthesizeIsFinishEnum;
 use app\common\enum\UserWritingSourceTypeEnum;
 use app\common\helper\Redis;
@@ -111,7 +112,16 @@ class QuestionService extends Base
         $user->novice_level = $noviceLevel;
         $user->novice_test_time = time();
         $user->novice_test_is_show = NoviceTestIsShowEnum::NO;
-        $user->update_time = time();
+        //用户新手勋章
+        if ($noviceLevel != 0) {
+            $medals = json_decode($user["medals"], true);
+            $selfMedals = json_decode($user["self_medals"], true);
+            $medals["novice_level"] = $noviceLevel;
+            $user->medals = json_encode($medals, JSON_UNESCAPED_UNICODE);
+            if (count($selfMedals) == 0) {
+                $user->self_medals = json_encode($medals, JSON_UNESCAPED_UNICODE);
+            }
+        }
         $user->save();
 
         cacheUserInfoByToken($user->toArray(), Redis::factory());
@@ -203,7 +213,7 @@ class QuestionService extends Base
             $returnData[] = [
                 "uuid" => $question["uuid"],
                 "question" => $question["question"],
-                "answer" => [$question["answer"]],
+                "answer" => [$question["answer"]==TrueFalseQuestionAnswerEnum::DESC_TRUE?"A":"B"],
             ];
         }
 
@@ -397,13 +407,16 @@ class QuestionService extends Base
             foreach ($questions as $item) {
                 switch($item["type"]) {
                     case QuestionTypeEnum::SINGLE_CHOICE:
-                        $randomSingleChoice = $singleChoiceModel->getByUuids($item["uuids"]);
+                        $randomSingleChoice = $singleChoiceModel->getByUuids($item["uuids"])->toArray();
+                        $randomSingleChoice = $this->questionOrderByUuid($item["uuids"], $randomSingleChoice);
                         break;
                     case QuestionTypeEnum::FILL_THE_BLANKS:
-                        $randomFillTheBlanks = $fillTheBlanksModel->getByUuids($item["uuids"]);
+                        $randomFillTheBlanks = $fillTheBlanksModel->getByUuids($item["uuids"])->toArray();
+                        $randomFillTheBlanks = $this->questionOrderByUuid($item["uuids"], $randomFillTheBlanks);
                         break;
                     case QuestionTypeEnum::TRUE_FALSE_QUESTION:
-                        $randomTrueFalseQuestion = $trueFalseQuestionModel->getByUuids($item["uuids"]);
+                        $randomTrueFalseQuestion = $trueFalseQuestionModel->getByUuids($item["uuids"])->toArray();
+                        $randomTrueFalseQuestion = $this->questionOrderByUuid($item["uuids"], $randomTrueFalseQuestion);
                         break;
                     case QuestionTypeEnum::WRITING:
                         $randomWriting = $writingModel->getByUuid($item["uuids"][0]);
@@ -428,7 +441,7 @@ class QuestionService extends Base
                         $trueFalseQuestionAnswers = array_column($item["list"], "answer", "uuid");
                         break;
                     case QuestionTypeEnum::WRITING:
-                        $writingAnswers = array_column($item["list"], "content", "uuid");
+                        $writingAnswers = array_column($item["list"], "contents", "uuid");
                         break;
                 }
             }
@@ -503,7 +516,7 @@ class QuestionService extends Base
                     $returnData["location"]["index"] = $key+1;
                 }
             } else {
-                $userAnswer = 0;
+                $userAnswer = "";
             }
             $returnData["exercises"]["trueFalseQuestion"]["list"][] = [
                 "uuid" => $trueFalseQuestion["uuid"],
@@ -518,7 +531,8 @@ class QuestionService extends Base
                     "uuid" => $randomWriting["uuid"],
                     "topic"=> $randomWriting["topic"],
                     "requirements" => json_decode($randomWriting["requirements"], true),
-                    "contents" => isset($writingAnswers[$randomWriting["uuid"]])?$writingAnswers[$randomWriting["uuid"]]:["text"=>["title"=>"","content"=>""],"images"=>[]],
+                    "contents" => isset($writingAnswers[$randomWriting["uuid"]])?$writingAnswers[$randomWriting["uuid"]]:
+                        ["text"=>["title"=>"","content"=>""],"image"=>["title"=>"","images"=>[]]],
                 ]
             ],
         ];
@@ -540,6 +554,68 @@ class QuestionService extends Base
             throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_ALREADY);
         }
 
+        //验证答案格式，不允许跳题回答，不允许有空答案
+        $questions = json_decode($synthesize["questions"], true);
+        foreach ($answers as $key=>$item) {
+
+            if (!isset($item["type"]) || !isset($item["list"]) || !is_array($item["list"])) {
+                throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_INVALID);
+            }
+            if ($item["type"] != $questions[$key]["type"]) {
+                throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_JUMP);
+            }
+
+            if ($item["type"] == QuestionTypeEnum::SINGLE_CHOICE) {
+                foreach ($item["list"] as $listKey => $value) {
+                    if (!isset($value["uuid"]) || !isset($value["answer"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_INVALID);
+                    }
+                    if ($value["uuid"] != $questions[$key]["uuids"][$listKey]) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_JUMP);
+                    }
+                    if (empty($value["answer"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_EMPTY);
+                    }
+                }
+            } else if ($item["type"] == QuestionTypeEnum::FILL_THE_BLANKS) {
+                foreach ($item["list"] as $listKey => $value) {
+                    if (!isset($value["uuid"]) || !isset($value["answers"]) || !is_array($value["answers"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_INVALID);
+                    }
+                    if ($value["uuid"] != $questions[$key]["uuids"][$listKey]) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_JUMP);
+                    }
+                    if (empty($value["answers"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_EMPTY);
+                    }
+                }
+            } else if ($item["type"] == QuestionTypeEnum::TRUE_FALSE_QUESTION) {
+                foreach ($item["list"] as $listKey => $value) {
+                    if (!isset($value["uuid"]) || !isset($value["answer"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_INVALID);
+                    }
+                    if ($value["uuid"] != $questions[$key]["uuids"][$listKey]) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_JUMP);
+                    }
+                    if (empty($value["answer"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_EMPTY);
+                    }
+                }
+            } else if ($item["type"] == QuestionTypeEnum::WRITING) {
+                foreach ($item["list"] as $listKey => $value) {
+                    if (!isset($value["uuid"]) || !isset($value["contents"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_INVALID);
+                    }
+                    if ($value["uuid"] != $questions[$key]["uuids"][$listKey]) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_JUMP);
+                    }
+                    if (empty($value["contents"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_EMPTY);
+                    }
+                }
+            }
+        }
+
         $synthesize->answers = json_encode($answers, JSON_UNESCAPED_UNICODE);
         $synthesize->save();
 
@@ -559,6 +635,68 @@ class QuestionService extends Base
             throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_ALREADY);
         }
 
+        //验证答案格式，不允许跳题回答，不允许有空答案
+        $questions = json_decode($synthesize["questions"], true);
+        foreach ($answers as $key=>$item) {
+
+            if (!isset($item["type"]) || !isset($item["list"]) || !is_array($item["list"])) {
+                throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_INVALID);
+            }
+            if ($item["type"] != $questions[$key]["type"]) {
+                throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_JUMP);
+            }
+
+            if ($item["type"] == QuestionTypeEnum::SINGLE_CHOICE) {
+                foreach ($item["list"] as $listKey => $value) {
+                    if (!isset($value["uuid"]) || !isset($value["answer"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_INVALID);
+                    }
+                    if ($value["uuid"] != $questions[$key]["uuids"][$listKey]) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_JUMP);
+                    }
+                    if (empty($value["answer"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_EMPTY);
+                    }
+                }
+            } else if ($item["type"] == QuestionTypeEnum::FILL_THE_BLANKS) {
+                foreach ($item["list"] as $listKey => $value) {
+                    if (!isset($value["uuid"]) || !isset($value["answers"]) || !is_array($value["answers"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_INVALID);
+                    }
+                    if ($value["uuid"] != $questions[$key]["uuids"][$listKey]) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_JUMP);
+                    }
+                    if (empty($value["answers"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_EMPTY);
+                    }
+                }
+            } else if ($item["type"] == QuestionTypeEnum::TRUE_FALSE_QUESTION) {
+                foreach ($item["list"] as $listKey => $value) {
+                    if (!isset($value["uuid"]) || !isset($value["answer"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_INVALID);
+                    }
+                    if ($value["uuid"] != $questions[$key]["uuids"][$listKey]) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_JUMP);
+                    }
+                    if (empty($value["answer"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_EMPTY);
+                    }
+                }
+            } else if ($item["type"] == QuestionTypeEnum::WRITING) {
+                foreach ($item["list"] as $listKey => $value) {
+                    if (!isset($value["uuid"]) || !isset($value["contents"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_INVALID);
+                    }
+                    if ($value["uuid"] != $questions[$key]["uuids"][$listKey]) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_JUMP);
+                    }
+                    if (empty($value["contents"])) {
+                        throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_EMPTY);
+                    }
+                }
+            }
+        }
+
         $writingModel = new WritingModel();
         $userWritingModel = new UserWritingModel();
 
@@ -567,6 +705,7 @@ class QuestionService extends Base
             //纪录用户答案
             $synthesize->answers = json_encode($answers, JSON_UNESCAPED_UNICODE);
             $synthesize->is_finish = UserSynthesizeIsFinishEnum::YES;
+            $synthesize->finish_time = time();
             $synthesize->save();
 
             //同步作文内容以便统一审核

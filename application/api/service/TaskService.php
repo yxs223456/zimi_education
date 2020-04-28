@@ -87,7 +87,13 @@ class TaskService extends Base
                 $reward = Constant::TASK_COIN_NUM["bind_we_chat"];
                 break;
             case UserCoinAddTypeEnum::SHARE:
-                $reward = Constant::TASK_COIN_NUM["share"];
+                $userCoinLogModel = new UserCoinLogModel();
+                $finishCount = $userCoinLogModel->todayCountFromShare($user["uuid"]);
+                if ($finishCount >= Constant::TASK_SHARE_DAILY_TIMES) {
+                    $reward = 0;
+                } else {
+                    $reward = Constant::TASK_COIN_NUM["share"];
+                }
                 break;
             default:
                 $reward = 0;

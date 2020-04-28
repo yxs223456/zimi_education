@@ -45,8 +45,20 @@ class UserCoinAddTypeEnum
     const CONTINUOUS_SIGN_30_DAY_DESC = "连续签到30天";
 
     const JOIN_INTERNAL_COMPETITION = 10;
-    const JOIN_INTERNAL_COMPETITION_DSC = "参与DE内部大赛";
+    const JOIN_INTERNAL_COMPETITION_DESC = "参与DE内部大赛";
 
     const INTERNAL_COMPETITION_WIN = 11;
-    const INTERNAL_COMPETITION_WIN_DSC = "DE内部大赛取得名次";
+    const INTERNAL_COMPETITION_WIN_DESC = "DE内部大赛取得名次";
+
+    const PK_GROUP_FAIL = 12;
+    const PK_GROUP_FAIL_DESC = "PK成团失败退还";
+
+    const PK_WIN = 13;
+    const PK_WIN_DESC = "PK获得名次";
+
+    const PK_INITIATOR_WIN = 14;
+    const PK_INITIATOR_WIN_DESC = "PK团长获得pk冠军奖励";
+
+    const PK_AUDIT_FAIL = 15;
+    const PK_AUDIT_FAIL_DESC = "PK标题审核不通过退还";
 }

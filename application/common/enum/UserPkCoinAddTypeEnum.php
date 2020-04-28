@@ -18,8 +18,11 @@ class UserPkCoinAddTypeEnum
     use EnumTrait;
 
     const JOIN_INTERNAL_COMPETITION = 1;
-    const JOIN_INTERNAL_COMPETITION_DSC = "参与DE内部大赛";
+    const JOIN_INTERNAL_COMPETITION_DESC = "参与DE内部大赛";
 
-    const INTERNAL_COMPETITION_WIN = 1;
-    const INTERNAL_COMPETITION_WIN_DSC = "DE内部大赛取得名次";
+    const INTERNAL_COMPETITION_WIN = 2;
+    const INTERNAL_COMPETITION_WIN_DESC = "DE内部大赛取得名次";
+
+    const PK_WIN = 3;
+    const PK_WIN_DESC = "PK获得名次";
 }
