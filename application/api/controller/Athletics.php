@@ -302,7 +302,15 @@ class Athletics extends Base
             [
                 "sponsor" => "内部大赛",
                 "id" => 1,
-            ]
+            ],
+            [
+                "sponsor" => "机构1大赛",
+                "id" => 0,
+            ],
+            [
+                "sponsor" => "机构2大赛",
+                "id" => 0,
+            ],
         ];
 
         return $this->jsonResponse($returnData);
