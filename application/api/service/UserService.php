@@ -967,6 +967,7 @@ class UserService extends Base
             "bind_wechat" => empty($userInfo["mobile_openid"]) ? UserIsBindWeChatEnum::NO : UserIsBindWeChatEnum::YES,
             "novice_test_is_show" => (int) $userInfo["novice_test_is_show"],
             "novice_level" => (int) $userInfo["novice_level"],
+            "current_medal_name" => $this->userSelfMedalName(json_decode($userInfo["self_medals"], true)),
         ];
     }
 
@@ -992,6 +993,15 @@ class UserService extends Base
         }
 
         return true;
+    }
+
+    public function userSelfMedalName($userSelfMedals)
+    {
+        $returnData = "";
+        foreach ($userSelfMedals as $key=>$value) {
+            $returnData = Constant::MEDAL_CONFIG[$key][$value]["name"];
+        }
+        return $returnData;
     }
 
     public function userSelfMedals($userSelfMedals)

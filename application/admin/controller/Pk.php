@@ -34,8 +34,12 @@ class Pk extends Base
 
             switch ($key) {
 
-                case "is_comment":
-                    $whereSql .= " and is_comment = $value";
+                case "name":
+                    $whereSql .= " and name like '%$value%'";
+                    break;
+
+                case "status":
+                    $whereSql .= " and status = $value";
                     break;
 
             }

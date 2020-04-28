@@ -12,7 +12,7 @@
     <!-- Panel Other -->
     <div class="ibox float-e-margins">
         <div class="ibox-title">
-            <h5>商品规格列表</h5>
+            <h5>pk列表</h5>
         </div>
         <div class="ibox-content">
             <!--搜索框开始-->
@@ -20,8 +20,11 @@
                 <div class="col-sm-12">
                     <div class="col-sm-12">
                         <form method="post" action="{:url('pkList')}" id="searchForm" class="form-inline">
-                            <label for="">规格名称</label>
+                            <label for="">pk名称</label>
                             <input type="text" name="name" value="{$name|default=''}" class="form-control">
+
+                            <label for="">状态</label>
+                            {:getEnumSelectWidget($pkStatus, 'status', '-全部-', isset($status) ? $status : -999, 1)}
 
                             <button class="btn btn-success btn-sm" type="submit" style="margin-bottom:0;margin-left:4px"><i class="fa fa-filter"></i> 筛选</button>
                             <a class="btn btn-primary btn-sm"  style="margin-bottom:0" href="{:url('pkList')}"><i class="fa fa-filter"></i> 重置</a>
@@ -91,7 +94,8 @@
             ,jump: function(obj, first){
                 //首次不执行
                 if(!first){
-                    $("#searchForm").attr('action', '{:url("pkList")}?page='+obj.curr+"name={$name|default=''}");
+                    $("#searchForm").attr('action', '{:url("pkList")}?page='+obj.curr+
+                        "&name={$name|default=''}&status={$status|default=''}");
                     $("#searchForm").submit();
                 }
             }
