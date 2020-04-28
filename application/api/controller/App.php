@@ -121,4 +121,13 @@ class App extends Base
     {
         return $this->jsonResponse(new \stdClass());
     }
+
+    public function share()
+    {
+        $returnData = [
+            "url" => "https://www.quwan.org.cn/",
+        ];
+
+        return $this->jsonResponse($returnData);
+    }
 }

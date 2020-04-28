@@ -32,8 +32,11 @@ class TestLibrary extends Common
 
             switch ($key) {
 
+                case "topic":
+                    $whereSql .= " and topic LIKE '%".$value."%'";
+                    break;
                 case "question":
-                    $whereSql .= " and question LIKE '%".$value."%'";
+                    $whereSql .= " and question LIKE '%$value%'";
                     break;
                 case "difficulty_level":
                     $whereSql .= " and difficulty_level = '$value'";
@@ -62,6 +65,10 @@ class TestLibrary extends Common
         $condition = $this->convertRequestToWhereSql();
 
         $list = $this->fillTheBlanksService->getListByCondition($condition);
+
+        foreach ($list as $item) {
+            $item["question"] = str_replace('${value}', "____", $item["question"]);
+        }
 
         $countArr = [
             "one" => 0,

@@ -302,7 +302,15 @@ class Athletics extends Base
             [
                 "sponsor" => "内部大赛",
                 "id" => 1,
-            ]
+            ],
+            [
+                "sponsor" => "机构1大赛",
+                "id" => 0,
+            ],
+            [
+                "sponsor" => "机构2大赛",
+                "id" => 0,
+            ],
         ];
 
         return $this->jsonResponse($returnData);
@@ -316,7 +324,7 @@ class Athletics extends Base
         if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
-        if (!checkInt($sponsorId, false)) {
+        if (!checkInt($sponsorId)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 

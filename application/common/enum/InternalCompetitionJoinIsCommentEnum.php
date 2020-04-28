@@ -18,8 +18,8 @@ class InternalCompetitionJoinIsCommentEnum
     use EnumTrait;
 
     const YES = 1;
-    const YES_DSC = "已评论";
+    const YES_DSC = "已批改";
 
     const NO = 0;
-    const NO_DESC = "未评论";
+    const NO_DESC = "未批改";
 }
