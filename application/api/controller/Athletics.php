@@ -304,11 +304,7 @@ class Athletics extends Base
                 "id" => 1,
             ],
             [
-                "sponsor" => "机构1大赛",
-                "id" => 0,
-            ],
-            [
-                "sponsor" => "机构2大赛",
+                "sponsor" => "敬请期待",
                 "id" => 0,
             ],
         ];
