@@ -139,6 +139,14 @@ class Constant
     //用户每日点赞次数上限，（各榜互不影响）
     const RANK_LIKE_TIMES = 3;
 
+    //大赛状态图标
+    const COMPETITION_STATUS_ICON = [
+        1 => "static/competition/underway.png",
+        2 => "static/competition/underway.png",
+        3 => "",
+        4 => "static/competition/finish.png",
+    ];
+
     //勋章配置
     const MEDAL_CONFIG = [
         "novice_level" => [

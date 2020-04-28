@@ -728,11 +728,16 @@ class AthleticsService extends Base
 
         $returnData = [];
         foreach ($internalCompetitions as $item) {
+            $status = $this->getInternalCompetitionStatus($item);
+            $iconUrl = Constant::COMPETITION_STATUS_ICON[$status]?
+                config("web.self_domain")."/".Constant::COMPETITION_STATUS_ICON[$status]:"";
+
             $returnData[] = [
                 "uuid" => $item["uuid"],
                 "image_url" => getImageUrl($item["image_url"]),
                 "name" => $item["name"],
-                "status" => $this->getInternalCompetitionStatus($item),
+                "status" => $status,
+                "competition_status_url" => $iconUrl,
             ];
         }
 
