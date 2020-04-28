@@ -324,7 +324,7 @@ class Athletics extends Base
         if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
-        if (!checkInt($sponsorId, false)) {
+        if (!checkInt($sponsorId)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
