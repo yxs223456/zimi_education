@@ -10,6 +10,7 @@ namespace app\api\controller;
 
 use app\common\AppException;
 use app\common\enum\OperatingSystemEnum;
+use app\common\model\DeviceFirstOpenLogModel;
 use app\common\model\PackageConfigModel;
 use think\facade\Env;
 
@@ -129,5 +130,26 @@ class App extends Base
         ];
 
         return $this->jsonResponse($returnData);
+    }
+
+    public function firstOpen()
+    {
+        $v = $this->request->header("v");
+        $os = $this->request->header("os");
+        $deviceId = $this->request->header("device_id");
+        $channel = $this->request->header("channel");
+
+        if (!empty($v) && !empty($os) && !empty($deviceId) && !empty($channel)) {
+            $deviceFirstOpenModel = new DeviceFirstOpenLogModel();
+            $log = [
+                "device_id" => $deviceId,
+                "channel" => $channel,
+                "version" => $v,
+                "os" => $os,
+            ];
+            $deviceFirstOpenModel->save($log);
+        }
+
+        return $this->jsonResponse(new \stdClass());
     }
 }
