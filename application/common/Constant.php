@@ -145,6 +145,7 @@ class Constant
         2 => "static/competition/underway.png",
         3 => "",
         4 => "static/competition/finish.png",
+        5 => "static/competition/waitbegin.png",
     ];
 
     //勋章配置
