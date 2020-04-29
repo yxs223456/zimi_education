@@ -28,4 +28,7 @@ class InternalCompetitionStatusEnum
 
     const FINISH = 4;
     const FINISH_DESC = "评分结束";
+
+    const WAIT = 5;
+    const WAIT_DESC = "未开始";
 }

@@ -960,8 +960,10 @@ class AthleticsService extends Base
             $status = InternalCompetitionStatusEnum::SUBMIT_ANSWER_FINISH;
         } else if ($competition["apply_deadline"] <= time()) {
             $status = InternalCompetitionStatusEnum::UNDERWAY;
-        } else {
+        } else if ($competition["online_time"] <= time()) {
             $status = InternalCompetitionStatusEnum::APPLYING;
+        } else {
+            $status = InternalCompetitionStatusEnum::WAIT;
         }
 
         return $status;

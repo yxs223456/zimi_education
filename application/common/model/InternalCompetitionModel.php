@@ -16,7 +16,6 @@ class InternalCompetitionModel extends Base
     {
         return $this
             ->where("sponsor_id", $sponsorId)
-            ->whereTime("online_time", "<=", time())
             ->order("id", "desc")
             ->limit(($pageNum-1)*$pageSize, $pageSize)
             ->select();
