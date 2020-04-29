@@ -137,7 +137,7 @@ class App extends Base
         $header = $this->request->header();
         $v = $header["v"]??"";
         $os = $header["os"]??"";;
-        $deviceId = $header["device_id"]??"";;
+        $deviceId = $header["device-id"]??"";;
         $channel = $header["channel"]??"";;
 
         if (!empty($v) && !empty($os) && !empty($deviceId)) {
