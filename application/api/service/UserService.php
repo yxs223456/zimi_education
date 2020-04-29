@@ -997,7 +997,7 @@ class UserService extends Base
 
     public function userSelfMedalName($userSelfMedals)
     {
-        $returnData = "";
+        $returnData = "暂无称号";
         foreach ($userSelfMedals as $key=>$value) {
             $returnData = Constant::MEDAL_CONFIG[$key][$value]["name"];
         }
