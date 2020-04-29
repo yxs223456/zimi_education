@@ -16,7 +16,7 @@ use app\common\helper\Redis;
 use think\Db;
 use think\exception\PDOException;
 
-class Pk extends Base
+class CompetitionSponsor extends Base
 {
     public function convertRequestToWhereSql()
     {
