@@ -1310,7 +1310,6 @@ class Request
         }
 
         $name = str_replace('_', '-', strtolower($name));
-
         return isset($this->header[$name]) ? $this->header[$name] : $default;
     }
 

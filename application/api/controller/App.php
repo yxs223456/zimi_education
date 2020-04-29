@@ -134,12 +134,13 @@ class App extends Base
 
     public function firstOpen()
     {
-        $v = $this->request->header("v");
-        $os = $this->request->header("os");
-        $deviceId = $this->request->header("device_id");
-        $channel = $this->request->header("channel");
+        $header = $this->request->header();
+        $v = $header["v"]??"";
+        $os = $header["os"]??"";;
+        $deviceId = $header["device_id"]??"";;
+        $channel = $header["channel"]??"";;
 
-        if (!empty($v) && !empty($os) && !empty($deviceId) && !empty($channel)) {
+        if (!empty($v) && !empty($os) && !empty($deviceId)) {
             $deviceFirstOpenModel = new DeviceFirstOpenLogModel();
             $log = [
                 "device_id" => $deviceId,
