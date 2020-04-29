@@ -18,7 +18,7 @@ class App extends Base
 {
     protected $beforeActionList = [
         'checkAuth' => [
-            'except' => 'submitPackage,checkUpdate,feedback',
+            'except' => 'submitPackage,checkUpdate,feedback,firstOpen',
         ],
     ];
 
