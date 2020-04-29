@@ -1,0 +1,89 @@
+{include file="public/header" /}
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>编辑管理员</h5>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" name="edit" id="edit" method="post" action="{:url('editPost')}">
+                        <input type="hidden" name="id" value="{$info.id}">
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">账号：</label>
+                            <div class="input-group col-sm-4">
+                                <input id="username" type="text" class="form-control" name="username" value="{$info.username}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">密码：</label>
+                            <div class="input-group col-sm-4">
+                                <input type="text" name="password" id="password" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">所属组：</label>
+                            <div class="input-group col-sm-4">
+                                <select name="group_id" id="group_id" class="form-control">
+                                    {foreach $groups as $vo}
+                                    <option value="{$vo.id}" {if condition="$vo['id'] eq $info['group_id']"}selected="selected"{/if}>{$vo.title}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-3">
+                                <button id="formSubmit" type="button" class="btn btn-primary"><i class="fa fa-save"></i> 保存</button>&nbsp;&nbsp;&nbsp;
+                                <a class="btn btn-danger" href="javascript:history.go(-1);"><i class="fa fa-close"></i> 返回</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{include file="public/footer" /}
+<script type="text/javascript">
+
+    $(function() {
+
+
+        $('#formSubmit').click(function () {
+            if (common.isNullOrEmpty($('#username').val())) {
+                layer.msg('请输入账号', {icon: 2, time: 1500, shade: 0.1}, function (index) {
+                    layer.close(index);
+                });
+                return false;
+            }
+            if (common.isNullOrEmpty($('#password').val())) {
+                layer.msg('请输入密码', {icon: 2, time: 1500, shade: 0.1}, function (index) {
+                    layer.close(index);
+                });
+                return false;
+            }
+            if (common.isNullOrEmpty($('#group_id').val())) {
+                layer.msg('请选择所属组', {icon: 2, time: 1500, shade: 0.1}, function (index) {
+                    layer.close(index);
+                });
+                return false;
+            }
+            $("form#edit").submit();
+        });
+
+    });
+
+
+
+
+</script>
+</body>
+</html>

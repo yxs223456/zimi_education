@@ -17,7 +17,7 @@ class Admin extends Base {
     {
 
         $list = $this->currentModel->alias("a")
-            ->leftJoin("auth_group ag", 'g.group_id=ag.id')
+            ->leftJoin("auth_group ag", 'a.group_id=ag.id')
             ->where($condition['whereSql'])
             ->field("a.*,ag.title")
             ->order('a.id desc')
