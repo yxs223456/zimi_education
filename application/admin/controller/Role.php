@@ -16,6 +16,11 @@ class Role extends Common {
 
         $list = $this->authGroupService->paginateList($requestMap);
 
+        foreach ($list as $item) {
+            $item["create_time"] = date("Y-m-d H:i:s", $item["create_time"]);
+            $item["update_time"] = date("Y-m-d H:i:s", $item["update_time"]);
+        }
+
         $this->assign('list',$list);
 
         return $this->fetch();
@@ -36,7 +41,7 @@ class Role extends Common {
     public function addPost() {
 
         $param = input('post.');
-
+        $param["create_time"] = $param["update_time"] = time();
         //数据校验
         $validate = validate("authGroupValidate");
         if(false === $validate->scene($this->request->action(true))

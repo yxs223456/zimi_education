@@ -13,6 +13,20 @@ class Admin extends Base {
          $this->currentModel = new AdminModel();
      }
 
+    public function getListByCondition($condition)
+    {
+
+        $list = $this->currentModel->alias("a")
+            ->leftJoin("auth_group ag", 'g.group_id=ag.id')
+            ->where($condition['whereSql'])
+            ->field("a.*,ag.title")
+            ->order('a.id desc')
+            ->paginate(\config("paginate.list_rows"), false,
+                ["query" => $condition['pageMap']]);
+
+        return $list;
+    }
+
     /**
      * 多账号登录
      * @param $account
