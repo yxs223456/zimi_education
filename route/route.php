@@ -73,6 +73,8 @@ Route::rule('app/checkUpdate', 'api/app/checkUpdate', 'post');
 Route::rule('app/feedback', 'api/app/feedback', 'post');
 //分享信息
 Route::rule('app/share', 'api/app/share', 'post');
+//设备首次打开纪录
+Route::rule('app/firstOpen', 'api/app/firstOpen', 'post');
 
 
 //获取新手测试题
