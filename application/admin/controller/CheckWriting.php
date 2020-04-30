@@ -326,7 +326,7 @@ class CheckWriting extends Base
 
             //当前星级题大于80分即可获得当前星级称
             $isUpdate = false;
-            if ($score >= 80 && $userSynthesize->difficulty_level > $user->level) {
+            if ($userScore >= 80 && $userSynthesize["difficulty_level"] > $user["level"]) {
                 $user->level = $userSynthesize->difficulty_level;
                 //用户等级勋章
                 $medals = json_decode($user["medals"], true);
@@ -341,16 +341,16 @@ class CheckWriting extends Base
 
                 //发放DE币
                 Db::name("user_base")->where("uuid", $userSynthesize["user_uuid"])
-                    ->inc("coin", $userSynthesize->difficulty_level * 10)
+                    ->inc("coin", $userSynthesize["difficulty_level"] * 10)
                     ->update(["update_time"=>time()]);
 
                 //纪录书币流水
                 $userCoinLogModel->recordAddLog(
                     $userSynthesize["user_uuid"],
                     UserCoinAddTypeEnum::LEVEL_UP,
-                    $userSynthesize->difficulty_level * 10,
+                    $userSynthesize["difficulty_level"] * 10,
                     $user["coin"],
-                    $user["coin"]+($userSynthesize->difficulty_level * 10),
+                    $user["coin"]+($userSynthesize["difficulty_level"] * 10),
                     UserCoinAddTypeEnum::LEVEL_UP_DESC);
             }
 
