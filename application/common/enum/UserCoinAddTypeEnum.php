@@ -61,4 +61,10 @@ class UserCoinAddTypeEnum
 
     const PK_AUDIT_FAIL = 15;
     const PK_AUDIT_FAIL_DESC = "PK标题审核不通过退还";
+
+    const NOVICE_LEVEL_UP = 16;
+    const NOVICE_LEVEL_UP_DESC = "摸底测试获得等级";
+
+    const LEVEL_UP = 17;
+    const LEVEL_UP_DESC = "获得星级称号";
 }

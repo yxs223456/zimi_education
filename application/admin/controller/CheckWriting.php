@@ -11,11 +11,13 @@ namespace app\admin\controller;
 use app\common\enum\FillTheBlanksAnswerIsSequenceEnum;
 use app\common\enum\QuestionTypeEnum;
 use app\common\enum\TrueFalseQuestionAnswerEnum;
+use app\common\enum\UserCoinAddTypeEnum;
 use app\common\enum\UserStudyWritingIsCommentEnum;
 use app\common\enum\UserSynthesizeScoreIsFinishEnum;
 use app\common\enum\UserWritingIsCommentEnum;
 use app\common\enum\UserWritingSourceTypeEnum;
 use app\common\helper\Redis;
+use app\common\model\UserCoinLogModel;
 use think\Db;
 
 class CheckWriting extends Base
@@ -307,6 +309,8 @@ class CheckWriting extends Base
             $scoreInfo[] = $scoreInfoData;
         }
 
+        $userCoinLogModel = new UserCoinLogModel();
+
         Db::startTrans();
         try {
             $userWriting->score = $score;
@@ -334,6 +338,20 @@ class CheckWriting extends Base
                 }
                 $user->save();
                 $isUpdate = true;
+
+                //发放DE币
+                Db::name("user_base")->where("uuid", $userSynthesize["user_uuid"])
+                    ->inc("coin", $userSynthesize->difficulty_level * 10)
+                    ->update(["update_time"=>time()]);
+
+                //纪录书币流水
+                $userCoinLogModel->recordAddLog(
+                    $userSynthesize["user_uuid"],
+                    UserCoinAddTypeEnum::LEVEL_UP,
+                    $userSynthesize->difficulty_level * 10,
+                    $user["coin"],
+                    $user["coin"]+($userSynthesize->difficulty_level * 10),
+                    UserCoinAddTypeEnum::LEVEL_UP_DESC);
             }
 
             $userSynthesizeRank = $this->userSynthesizeRankService
@@ -354,7 +372,7 @@ class CheckWriting extends Base
 
             if ($isUpdate == true) {
                 $redis = Redis::factory();
-                $userInfo = $user->toArray();
+                $userInfo = $user = $this->userBaseService->findByMap(["uuid"=>$userSynthesize["user_uuid"]])->toArray();
                 cacheUserInfoByToken($userInfo, $redis);
                 pushSynthesizeUpdateList($userInfo["nickname"], $userSynthesize["difficulty_level"], $redis);
             }
