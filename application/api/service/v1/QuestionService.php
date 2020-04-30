@@ -15,6 +15,7 @@ use app\common\enum\NoviceTestIsShowEnum;
 use app\common\enum\QuestionDifficultyLevelEnum;
 use app\common\enum\QuestionTypeEnum;
 use app\common\enum\TrueFalseQuestionAnswerEnum;
+use app\common\enum\UserCoinAddTypeEnum;
 use app\common\enum\UserSynthesizeIsFinishEnum;
 use app\common\enum\UserWritingSourceTypeEnum;
 use app\common\helper\Redis;
@@ -22,6 +23,7 @@ use app\common\model\FillTheBlanksModel;
 use app\common\model\SingleChoiceModel;
 use app\common\model\TrueFalseQuestionModel;
 use app\common\model\UserBaseModel;
+use app\common\model\UserCoinLogModel;
 use app\common\model\UserStudyWritingModel;
 use app\common\model\UserSynthesizeModel;
 use app\common\model\UserWritingModel;
@@ -108,23 +110,52 @@ class QuestionService extends Base
             throw AppException::factory(AppException::USER_NOVICE_TEST_ALREADY);
         }
 
-        //保存用户信息
-        $user->novice_level = $noviceLevel;
-        $user->novice_test_time = time();
-        $user->novice_test_is_show = NoviceTestIsShowEnum::NO;
-        //用户新手勋章
-        if ($noviceLevel != 0) {
-            $medals = json_decode($user["medals"], true);
-            $selfMedals = json_decode($user["self_medals"], true);
-            $medals["novice_level"] = $noviceLevel;
-            $user->medals = json_encode($medals, JSON_UNESCAPED_UNICODE);
-            if (count($selfMedals) == 0) {
-                $user->self_medals = json_encode($medals, JSON_UNESCAPED_UNICODE);
-            }
-        }
-        $user->save();
+        $userCoinLogModel = new UserCoinLogModel();
 
-        cacheUserInfoByToken($user->toArray(), Redis::factory());
+        Db::startTrans();
+        try {
+            //保存用户信息
+            $user->novice_level = $noviceLevel;
+            $user->novice_test_time = time();
+            $user->novice_test_is_show = NoviceTestIsShowEnum::NO;
+            //用户新手勋章
+            if ($noviceLevel != 0) {
+                $medals = json_decode($user["medals"], true);
+                $selfMedals = json_decode($user["self_medals"], true);
+                $medals["novice_level"] = $noviceLevel;
+                $user->medals = json_encode($medals, JSON_UNESCAPED_UNICODE);
+                if (count($selfMedals) == 0) {
+                    $user->self_medals = json_encode($medals, JSON_UNESCAPED_UNICODE);
+                }
+            }
+            $user->save();
+
+            //发放DE币奖励
+            if ($noviceLevel > 0) {
+                Db::name($userModel->getTable())->where("uuid", $userInfo["uuid"])
+                    ->inc("coin", $noviceLevel)
+                    ->update(["update_time"=>time()]);
+
+                //纪录书币流水
+                $userCoinLogModel->recordAddLog(
+                    $userInfo["uuid"],
+                    UserCoinAddTypeEnum::NOVICE_LEVEL_UP,
+                    $noviceLevel,
+                    $user["coin"],
+                    $user["coin"]+$noviceLevel,
+                    UserCoinAddTypeEnum::NOVICE_LEVEL_UP_DESC);
+            }
+
+            Db::commit();
+
+            $newUser = $userModel->findByUuid($userInfo["uuid"])->toArray();
+            cacheUserInfoByToken($newUser, Redis::factory());
+
+        } catch (\Throwable $e) {
+            Db::rollback();
+            throw $e;
+        }
+
         return new \stdClass();
     }
 
