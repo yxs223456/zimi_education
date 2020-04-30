@@ -18,7 +18,7 @@ class App extends Base
 {
     protected $beforeActionList = [
         'checkAuth' => [
-            'except' => 'submitPackage,checkUpdate,feedback,firstOpen',
+            'except' => 'submitPackage,checkUpdate,feedback,firstOpen,coinDescription',
         ],
     ];
 
@@ -152,5 +152,24 @@ class App extends Base
         }
 
         return $this->jsonResponse(new \stdClass());
+    }
+
+    public function coinDescription()
+    {
+        $returnData["description"] = <<<DESC
+DE是DE教育旗下的通用学习积分单位，用于参加各种竞技及大赛，是衡量学员能力的一种价值体现。DE教育后面会开创更多关于DE的价值。
+DE的主要获取方式如下：
+1、学员可以邀请成员，即新学员注册是填入邀请人的学员号即可建立邀请关系，邀请人获得20DE，被邀请人获得10DE，后续在个人信息补填有效。
+2、学员通过准星级等级测试，通过不同关卡给予不同DE奖励，第一级为1DE，每级递增1DE，最高给6DE奖励。
+3、学员通过综合测试获得对应称号，一星为10DE，依次递增最高奖励60DE。
+4、学员参加PK获得优异成绩奖励DE，数量根据PK难度和成绩排名而定，获取PK特殊称号有额外DE奖励。
+5、学员参加DE大赛获取不同数量DE奖励，获取大赛特殊称号有额外DE奖励。
+6、学员通过分享DE教育每次奖励1DE上线每天5次。
+7、学员通过每日签到获取DE奖励。
+8、学员通过完善所有个人信息一次性奖励10DE。
+9、学员参加官方举办的活动和完成各种任务奖励不同数量DE。
+DESC;
+
+        return $this->jsonResponse($returnData);
     }
 }

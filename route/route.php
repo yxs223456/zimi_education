@@ -75,6 +75,8 @@ Route::rule('app/feedback', 'api/app/feedback', 'post');
 Route::rule('app/share', 'api/app/share', 'post');
 //设备首次打开纪录
 Route::rule('app/firstOpen', 'api/app/firstOpen', 'post');
+//de币说明
+Route::rule('app/coinDescription', 'api/app/coinDescription', 'post');
 
 
 //获取新手测试题
