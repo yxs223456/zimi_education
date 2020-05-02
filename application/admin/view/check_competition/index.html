@@ -58,7 +58,7 @@
                                 <td>{$vo.score}</td>
                                 <td>{$vo.is_comment_desc}</td>
                                 <td>
-                                    {if $vo.is_finish == 0}
+                                    {if $vo.is_finish == 0 && $vo.is_submit_answer==1}
                                         <a href="{:url('check',['uuid'=>$vo['uuid']])}" class="btn btn-primary btn-xs">
                                             <i class="fa fa-paste"></i> 批改</a>&nbsp;
                                     {/if}
