@@ -23,8 +23,10 @@ class InternalCompetitionJoinService extends Base
     {
         $list = $this->currentModel->alias("icj")
             ->leftJoin("internal_competition ic", "ic.uuid=icj.c_uuid")
+            ->leftJoin("user_base u", "u.uuid=icj.user_uuid")
             ->where($condition['whereSql'])
-            ->field("icj.uuid,icj.question,icj.submit_answer_time,icj.is_comment,icj.score,icj.comment_time,ic.name")
+            ->field("u.invite_code,icj.uuid,icj.question,icj.submit_answer_time,icj.is_submit_answer,
+            icj.is_comment,icj.is_comment,icj.score,icj.comment_time,ic.name,ic.is_finish")
             ->order(['icj.is_comment'=>'asc', 'icj.submit_answer_time'=>'asc'])
             ->paginate(\config("paginate.list_rows"), false,
                 ["query" => $condition['pageMap']]);

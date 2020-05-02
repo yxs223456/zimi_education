@@ -11,21 +11,22 @@
 <div class="wrapper wrapper-content animated fadeInRight">
     <!-- Panel Other -->
     <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>学员列表</h5>
+        </div>
         <div class="ibox-content">
             <!--搜索框开始-->
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="col-sm-10">
-                        <form method="post" action="{:url('index')}" id="searchForm" class="form-inline">
+                    <div class="col-sm-12">
+                        <form method="post" action="{:url('userList')}" id="searchForm" class="form-inline">
 
-                            <label for="">学员号</label>
-                            <input type="text" name="invite_code" value="{$invite_code|default=''}" class="form-control">
 
-                            <label for="">是否批改</label>
-                            {:getEnumSelectWidget($internalCompetitionJoinIsComment, 'is_comment', '-全部-', isset($is_comment) ? $is_comment : -999, 1)}
+                            <label for="">学员渠道</label>
+                            {:getEnumSelectWidget($userChannel, 'channel', '-全部-', isset($channel) ? $channel : -999, 1)}
 
                             <button class="btn btn-success btn-sm" type="submit" style="margin-bottom:0;margin-left:4px"><i class="fa fa-filter"></i> 筛选</button>
-                            <a class="btn btn-primary btn-sm"  style="margin-bottom:0" href="{:url('index')}"><i class="fa fa-filter"></i> 重置</a>
+                            <a class="btn btn-primary btn-sm"  style="margin-bottom:0" href="{:url('userList')}"><i class="fa fa-filter"></i> 重置</a>
                         </form>
                     </div>
                 </div>
@@ -39,31 +40,19 @@
                         <table class="table table-bordered table-hover">
                             <thead>
                             <tr class="long-tr">
-                                <th>学员号</th>
-                                <th>比赛</th>
-                                <th>提交时间</th>
-                                <th>批改时间</th>
-                                <th>评分</th>
-                                <th>是否评价</th>
-                                <th>操作</th>
+                                <th>学号</th>
+                                <th>昵称</th>
+                                <th>渠道</th>
+                                <th>星级</th>
                             </tr>
                             </thead>
                             <tbody id="list-content">
                             {foreach $list as $vo}
                             <tr class="long-td">
                                 <td>{$vo.invite_code}</td>
-                                <td>{$vo.name}</td>
-                                <td>{$vo.submit_answer_time}</td>
-                                <td>{$vo.comment_time}</td>
-                                <td>{$vo.score}</td>
-                                <td>{$vo.is_comment_desc}</td>
-                                <td>
-                                    {if $vo.is_finish == 0}
-                                        <a href="{:url('check',['uuid'=>$vo['uuid']])}" class="btn btn-primary btn-xs">
-                                            <i class="fa fa-paste"></i> 批改</a>&nbsp;
-                                    {/if}
-                                </td>
-
+                                <td>{$vo.nickname}</td>
+                                <td>{$vo.channel}</td>
+                                <td>{$vo.level}</td>
                             </tr>
                             {/foreach}
                             </tbody>
@@ -82,10 +71,6 @@
 {include file="public/footer" /}
 <script type="text/javascript" src="/static/admin/js/laypage.js"></script>
 <script type="text/javascript">
-    layer.photos({
-        photos: '.layer-photos-demo'
-//  ,anim: 5 //0-6的选择，指定弹出图片动画类型，默认随机（请注意，3.0之前的版本用shift参数）
-    });
 
     layui.use(['laypage', 'layer'], function(){
         var laypage = layui.laypage
@@ -101,10 +86,8 @@
             ,jump: function(obj, first){
                 //首次不执行
                 if(!first){
-                    $("#searchForm").attr('action', '{:url("index")}?page='+obj.curr +
-                        "&is_comment={$is_comment|default=-999}"+
-                        "&invite_code={$invite_code|default=''}"
-                    );
+                    $("#searchForm").attr('action', '{:url("userList")}?page='+obj.curr+
+                        "&channel={$channel|default=''}");
                     $("#searchForm").submit();
                 }
             }

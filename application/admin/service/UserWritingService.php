@@ -21,9 +21,11 @@ class UserWritingService extends Base
 
     public function getListByCondition($condition)
     {
-        $list = $this->currentModel
+        $list = $this->currentModel->alias("uw")
+            ->leftJoin("user_base u", 'uw.user_uuid=u.uuid')
             ->where($condition['whereSql'])
-            ->order(['is_comment'=>'asc', 'id'=>'asc'])
+            ->field("uw.*,u.invite_code")
+            ->order(['uw.is_comment'=>'asc', 'uw.id'=>'asc'])
             ->paginate(\config("paginate.list_rows"), false,
                 ["query" => $condition['pageMap']]);
 

@@ -14,7 +14,7 @@ class CheckCompetition extends Base
 {
     public function convertRequestToWhereSql() {
 
-        $whereSql = " icj.is_submit_answer = 1 ";
+        $whereSql = " 1=1 ";
         $pageMap = [];
 
         $params = input("param.");
@@ -27,11 +27,14 @@ class CheckCompetition extends Base
 
             switch ($key) {
 
+                case "invite_code":
+                    $whereSql .= " and u.invite_code = '$value' ";
+                    break;
                 case "c_uuid":
                     $whereSql .= " and icj.c_uuid = '$value' ";
                     break;
                 case "is_comment":
-                    $whereSql .= " and icj.is_comment = $value ";
+                    $whereSql .= " and icj.is_submit_answer = 1 and icj.is_comment = $value ";
                     break;
 
             }
@@ -52,6 +55,14 @@ class CheckCompetition extends Base
         $condition = $this->convertRequestToWhereSql();
         $list = $this->internalCompetitionJoinService->getListByCondition($condition);
         $this->assign('list', $list);
+
+        foreach ($list as $item) {
+            $item["submit_answer_time"] = $item["is_submit_answer"]?
+                date("Y-m-d H:i:s", $item["submit_answer_time"]):"未提交";
+            $item["comment_time"] = $item["is_comment"]?date("Y-m-d H:i:s", $item["comment_time"]):"--";
+            $item["score"] = $item["is_comment"]?$item["score"]:"--";
+            $item["is_comment_desc"] = $item["is_submit_answer"]?($item["is_comment"]?"已批改":"未批改"):"--";
+        }
 
         $internalCompetitionJoinIsComment = InternalCompetitionJoinIsCommentEnum::getAllList();
         $this->assign("internalCompetitionJoinIsComment", $internalCompetitionJoinIsComment);
