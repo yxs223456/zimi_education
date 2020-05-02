@@ -17,6 +17,9 @@
                 <div class="col-sm-12">
                     <div class="col-sm-10">
                         <form method="post" action="{:url('synthesizeWritingList')}" id="searchForm" class="form-inline">
+                            <label for="">学员号</label>
+                            <input type="text" name="invite_code" value="{$invite_code|default=''}" class="form-control">
+
 
                             <label for="">是否批改</label>
                             {:getEnumSelectWidget($userWritingIsComment, 'is_comment', '-全部-', isset($is_comment) ? $is_comment : -999, 1)}
@@ -36,6 +39,7 @@
                         <table class="table table-bordered table-hover">
                             <thead>
                             <tr class="long-tr">
+                                <th>学员号</th>
                                 <th>题目</th>
                                 <th>提交时间</th>
                                 <th>批改时间</th>
@@ -47,6 +51,7 @@
                             <tbody id="list-content">
                             {foreach $list as $vo}
                             <tr class="long-td">
+                                <td>{$vo.invite_code}</td>
                                 <td>{$vo.topic}</td>
                                 <td>{$vo.create_time|date="Y-m-d H:i:s"}</td>
                                 <td>
@@ -115,7 +120,8 @@
                 //首次不执行
                 if(!first){
                     $("#searchForm").attr('action', '{:url("synthesizeWritingList")}?page='+obj.curr +
-                        "&is_comment={$is_comment|default=-999}"
+                        "&is_comment={$is_comment|default=-999}"+
+                        "&invite_code={$invite_code|default=''}"
                     );
                     $("#searchForm").submit();
                 }

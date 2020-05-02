@@ -36,9 +36,11 @@ class CheckWriting extends Base
                 continue;
 
             switch ($key) {
-
+                case "invite_code":
+                    $whereSql .= " and invite_code = '$value'";
+                    break;
                 case "is_comment":
-                    $whereSql .= " and is_comment = $value";
+                    $whereSql .= " and uw.is_comment = $value";
                     break;
 
             }
@@ -57,7 +59,7 @@ class CheckWriting extends Base
     public function studyWritingList()
     {
         $condition = $this->convertRequestToWhereSql();
-        $condition["whereSql"] .= " and source_type = " . UserWritingSourceTypeEnum::STUDY;
+        $condition["whereSql"] .= " and uw.source_type = " . UserWritingSourceTypeEnum::STUDY;
         $list = $this->userWritingService->getListByCondition($condition);
         $this->assign('list', $list);
 
@@ -137,7 +139,7 @@ class CheckWriting extends Base
     public function synthesizeWritingList()
     {
         $condition = $this->convertRequestToWhereSql();
-        $condition["whereSql"] .= " and source_type = " . UserWritingSourceTypeEnum::SYNTHESIZE;
+        $condition["whereSql"] .= " and uw.source_type = " . UserWritingSourceTypeEnum::SYNTHESIZE;
         $list = $this->userWritingService->getListByCondition($condition);
         $this->assign('list', $list);
 
