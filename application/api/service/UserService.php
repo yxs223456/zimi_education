@@ -51,7 +51,7 @@ class UserService extends Base
     }
 
     //微信绑定手机号
-    public function bindPhone($weChatInfoKey, $phone, $code, $password, $inviteCode)
+    public function bindPhone($weChatInfoKey, $phone, $code, $password, $inviteCode, $channel)
     {
         //用户微信信息
         $redis = Redis::factory();
@@ -105,7 +105,7 @@ class UserService extends Base
             try {
 
                 //通过手机号创建用户
-                $userInfo = $this->createUserByPhoneAndWeChat($phone, $password, $parentUuid, $inviteCode, $userWeChatInfo);
+                $userInfo = $this->createUserByPhoneAndWeChat($phone, $password, $parentUuid, $inviteCode, $userWeChatInfo, $channel);
 
                 $userModel->addUserInviteCountByUuid($parentUuid);
 
@@ -123,7 +123,7 @@ class UserService extends Base
     }
 
     //通过手机号注册用户
-    public function singUp($phone, $code, $password, $inviteCode)
+    public function singUp($phone, $code, $password, $inviteCode, $channel)
     {
         //判断手机号是否已注册
         $userModel = new UserBaseModel();
@@ -174,7 +174,7 @@ class UserService extends Base
         try {
 
             //通过手机号创建用户
-            $userInfo = $this->createUserByPhone($phone, $password, $parentUuid, $inviteCode);
+            $userInfo = $this->createUserByPhone($phone, $password, $parentUuid, $inviteCode, $channel);
 
             $userModel->addUserInviteCountByUuid($parentUuid);
 
@@ -237,7 +237,7 @@ class UserService extends Base
         return [];
     }
 
-    private function createUserByPhone($phone, $password, $parentUuid, $parentInviteCode)
+    private function createUserByPhone($phone, $password, $parentUuid, $parentInviteCode, $channel)
     {
         $encryptPassword = Pbkdf2::create_hash($password);
         $inviteCode = createInviteCode(6);
@@ -254,6 +254,7 @@ class UserService extends Base
             "invite_code" => $inviteCode,
             "parent_uuid" => $parentUuid,
             "parent_invite_code" => $parentInviteCode,
+            "channel" => $channel,
             "create_time" => $time,
             "update_time" => $time,
         ];
@@ -267,7 +268,7 @@ class UserService extends Base
         return $userInfo;
     }
 
-    private function createUserByPhoneAndWeChat($phone, $password, $parentUuid, $parentInviteCode, $userWeChatInfo)
+    private function createUserByPhoneAndWeChat($phone, $password, $parentUuid, $parentInviteCode, $userWeChatInfo, $channel)
     {
         $encryptPassword = Pbkdf2::create_hash($password);
         $inviteCode = createInviteCode(6);
@@ -291,6 +292,7 @@ class UserService extends Base
             "invite_code" => $inviteCode,
             "parent_uuid" => $parentUuid,
             "parent_invite_code" => $parentInviteCode,
+            "channel" => $channel,
             "create_time" => $time,
             "update_time" => $time,
         ];
@@ -487,8 +489,11 @@ class UserService extends Base
         ];
     }
 
-    public function userInfo($user)
+    public function userInfo($user, $channel)
     {
+        if (empty($user["channel"])) {
+            Db::name("user_base")->where("uuid", $user["uuid"])->update(["channel"=>$channel]);
+        }
         return $this->userInfoForRequire($user);
     }
 

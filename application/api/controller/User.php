@@ -39,6 +39,9 @@ class User extends Base
     //手机号注册
     public function signUp()
     {
+        $header = $this->request->header();
+        $channel = $header["channel"]??"";
+
         $phone = input("phone");
         $code = input("code", null);
         $password = input("password", null);
@@ -49,7 +52,7 @@ class User extends Base
         }
 
         $userService = new UserService();
-        $returnData = $userService->singUp($phone, $code, $password, $inviteCode);
+        $returnData = $userService->singUp($phone, $code, $password, $inviteCode, $channel);
 
         return $this->jsonResponse($returnData);
     }
@@ -164,6 +167,9 @@ class User extends Base
     //微信绑定手机号
     public function bindPhone()
     {
+        $header = $this->request->header();
+        $channel = $header["channel"]??"";
+
         $key = input("key");
         $phone = input("phone");
         $code = input("code", null);
@@ -175,7 +181,7 @@ class User extends Base
         }
 
         $userService = new UserService();
-        $returnData = $userService->bindPhone($key, $phone, $code, $password, $inviteCode);
+        $returnData = $userService->bindPhone($key, $phone, $code, $password, $inviteCode, $channel);
 
         return $this->jsonResponse($returnData);
     }
@@ -183,10 +189,12 @@ class User extends Base
     //用户详情
     public function userInfo()
     {
+        $header = $this->request->header();
+        $channel = $header["channel"]??"";
         $userInfo = $this->query["user"];
 
         $userService = new UserService();
-        $returnData = $userService->userInfo($userInfo);
+        $returnData = $userService->userInfo($userInfo, $channel);
 
         return $this->jsonResponse($returnData);
     }
