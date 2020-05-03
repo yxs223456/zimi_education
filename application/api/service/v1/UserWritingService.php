@@ -53,15 +53,13 @@ class UserWritingService extends Base
 
     public function getCommentLevel($totalScore, $score)
     {
-        //满分100分等级：优秀 90-100分，比较优秀80-90，合格70-80,一般60-70,不及格以下
-        //满分30分等级：27-30,24-27,21-24,18-21,18分以下不合格
+        //满分100分等级：优秀 90-100分，良好80-90，及格60-80,不及格以下
+        //满分30分等级：27-30,24-27,18-24,18分以下不合格
         $commentLevel = "";
         if ($totalScore == 100) {
             if ($score >= 90) {
-                $commentLevel = 5;
-            } else if ($score >= 80) {
                 $commentLevel = 4;
-            } else if ($score >= 70) {
+            } else if ($score >= 80) {
                 $commentLevel = 3;
             } else if ($score >= 60) {
                 $commentLevel = 2;
@@ -70,10 +68,8 @@ class UserWritingService extends Base
             }
         } else if ($totalScore == 30) {
             if ($score >= 27) {
-                $commentLevel = 5;
-            } else if ($score >= 24) {
                 $commentLevel = 4;
-            } else if ($score >= 21) {
+            } else if ($score >= 24) {
                 $commentLevel = 3;
             } else if ($score >= 18) {
                 $commentLevel = 2;
