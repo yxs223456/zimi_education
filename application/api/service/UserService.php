@@ -957,6 +957,7 @@ class UserService extends Base
     private function userInfoForRequire(array $userInfo)
     {
         return [
+            "userid" => $userInfo["uuid"],
             "token" => $userInfo["token"],
             "nickname" => $userInfo["nickname"],
             "head_image_url" => getImageUrl($userInfo["head_image_url"]),
