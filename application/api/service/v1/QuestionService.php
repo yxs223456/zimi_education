@@ -592,6 +592,10 @@ class QuestionService extends Base
             if (!isset($item["type"]) || !isset($item["list"]) || !is_array($item["list"])) {
                 throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_INVALID);
             }
+            //应客户端要求，type为0或list长度为0时忽略
+            if (($key==0 && $item["type"]==0) || count($item["list"]) == 0) {
+                return new \stdClass();
+            }
             if ($item["type"] != $questions[$key]["type"]) {
                 throw AppException::factory(AppException::SYNTHESIZE_SUBMIT_ANSWER_JUMP);
             }
