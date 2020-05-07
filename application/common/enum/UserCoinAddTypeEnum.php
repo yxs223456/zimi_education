@@ -67,4 +67,7 @@ class UserCoinAddTypeEnum
 
     const LEVEL_UP = 17;
     const LEVEL_UP_DESC = "获得星级称号";
+
+    const INTERNAL_USER = 18;
+    const INTERNAL_USER_DESC = "内测阶段赠送";
 }

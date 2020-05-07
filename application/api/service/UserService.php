@@ -101,6 +101,8 @@ class UserService extends Base
                 $inviteCode = "";
             }
 
+            $userCoinLogModel = new UserCoinLogModel();
+
             Db::startTrans();
             try {
 
@@ -108,6 +110,15 @@ class UserService extends Base
                 $userInfo = $this->createUserByPhoneAndWeChat($phone, $password, $parentUuid, $inviteCode, $userWeChatInfo, $channel);
 
                 $userModel->addUserInviteCountByUuid($parentUuid);
+
+                //纪录书币流水
+                $userCoinLogModel->recordAddLog(
+                    $userInfo["uuid"],
+                    UserCoinAddTypeEnum::INTERNAL_USER,
+                    50,
+                    0,
+                    50,
+                    UserCoinAddTypeEnum::INTERNAL_USER_DESC);
 
                 Db::commit();
             } catch (\Throwable $e) {
@@ -170,6 +181,8 @@ class UserService extends Base
             $inviteCode = "";
         }
 
+        $userCoinLogModel = new UserCoinLogModel();
+
         Db::startTrans();
         try {
 
@@ -177,6 +190,15 @@ class UserService extends Base
             $userInfo = $this->createUserByPhone($phone, $password, $parentUuid, $inviteCode, $channel);
 
             $userModel->addUserInviteCountByUuid($parentUuid);
+
+            //纪录书币流水
+            $userCoinLogModel->recordAddLog(
+                $userInfo["uuid"],
+                UserCoinAddTypeEnum::INTERNAL_USER,
+                50,
+                0,
+                50,
+                UserCoinAddTypeEnum::INTERNAL_USER_DESC);
 
             Db::commit();
 
