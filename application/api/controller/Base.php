@@ -76,7 +76,7 @@ class Base extends Controller
             }
         }
 
-        if (isset($user["cancel_status"]) || $user["cancel_status"] == UserCancelStatusEnum::CANCEL) {
+        if (isset($user["cancel_status"]) && $user["cancel_status"] == UserCancelStatusEnum::CANCEL) {
             throw AppException::factory(AppException::USER_CANCEL_ALREADY);
         }
         $GLOBALS['isLogin'] = $isLogin;
