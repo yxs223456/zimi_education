@@ -9,6 +9,7 @@
 namespace app\api\controller;
 
 use app\common\AppException;
+use app\common\enum\UserCancelStatusEnum;
 use app\common\helper\Redis;
 use app\common\model\UserBaseModel;
 use think\Controller;
@@ -73,6 +74,10 @@ class Base extends Controller
                 $isLogin = true;
                 $user = $cacheUser;
             }
+        }
+
+        if (isset($user["cancel_status"]) || $user["cancel_status"] == UserCancelStatusEnum::CANCEL) {
+            throw AppException::factory(AppException::USER_CANCEL_ALREADY);
         }
         $GLOBALS['isLogin'] = $isLogin;
         $this->query["user"] = $user;

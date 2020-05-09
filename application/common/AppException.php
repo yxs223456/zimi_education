@@ -36,6 +36,7 @@ class AppException extends \Exception
     const USER_BIND_WE_CHAT_ALREADY = [1016, "该手机号已绑定其他微信账号"];
     const USER_INVITE_CODE_SELF = [1017, "不要填自己的邀请码呦~"];
     const USER_NONE_MEDAL = [1018, "你没有这个勋章，无法更换"];
+    const USER_CANCEL_ALREADY = [1019, "当前账号已注销"];
 
     const WE_CHAT_GET_ACCESS_TOKEN_ERROR = [2000, "获取用户微信信息失败"];
     const WE_CHAT_NOT_BIND_USER = [2001, "当前微信号还没有绑定任何账号,请先使用手机号注册"];

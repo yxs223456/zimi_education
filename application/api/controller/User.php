@@ -303,4 +303,17 @@ class User extends Base
         $returnData = $service->updateSelfMedal($user, $medalIds);
         return $this->jsonResponse($returnData);
     }
+
+    public function cancelAccount()
+    {
+        $reason = input("reason");
+        if (empty($reason)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $service = new UserService();
+        $returnData = $service->cancelAccount($user, $reason);
+        return $this->jsonResponse($returnData);
+    }
 }

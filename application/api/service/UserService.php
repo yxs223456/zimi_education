@@ -11,6 +11,7 @@ use app\common\AppException;
 use app\common\Constant;
 use app\common\enum\PhoneVerificationCodeStatusEnum;
 use app\common\enum\PhoneVerificationCodeTypeEnum;
+use app\common\enum\UserCancelStatusEnum;
 use app\common\enum\UserCoinAddTypeEnum;
 use app\common\enum\UserIsBindWeChatEnum;
 use app\common\enum\UserLevelEnum;
@@ -912,6 +913,17 @@ class UserService extends Base
         cacheUserInfoByToken($newUser, $redis);
 
         return $medalUrls;
+    }
+
+    public function cancelAccount($userInfo, $reason)
+    {
+        $userModel = new UserBaseModel();
+        $user = $userModel->findByUuid($userInfo["uuid"]);
+        $user->cancel_status = UserCancelStatusEnum::CHECKING;
+        $user->cancel_reason = $reason;
+        $user->save();
+
+        return new \stdClass();
     }
 
     private function recordUserWeChatInfo(Model $user, $userWeChatInfo)
