@@ -59,6 +59,8 @@ Route::rule('user/coinFlowList', 'api/user/coinFlowList', 'post');
 Route::rule('user/medals', 'api/user/medals', 'post');
 //跟换个人勋章
 Route::rule('user/updateSelfMedal', 'api/user/updateSelfMedal', 'post');
+//申请注销账号
+Route::rule('user/cancelAccount', 'api/user/cancelAccount', 'post');
 
 
 //任务中心首页
