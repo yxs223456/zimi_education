@@ -61,6 +61,10 @@ Route::rule('user/medals', 'api/user/medals', 'post');
 Route::rule('user/updateSelfMedal', 'api/user/updateSelfMedal', 'post');
 //申请注销账号
 Route::rule('user/cancelAccount', 'api/user/cancelAccount', 'post');
+//未读消息数量
+Route::rule('user/unreadNewsCount', 'api/user/unreadNewsCount', 'post');
+//全部未读消息
+Route::rule('user/allUnreadNews', 'api/user/allUnreadNews', 'post');
 
 
 //任务中心首页

@@ -9,6 +9,7 @@ namespace app\api\service;
 
 use app\common\AppException;
 use app\common\Constant;
+use app\common\enum\NewsIsReadEnum;
 use app\common\enum\PhoneVerificationCodeStatusEnum;
 use app\common\enum\PhoneVerificationCodeTypeEnum;
 use app\common\enum\UserCancelStatusEnum;
@@ -19,6 +20,7 @@ use app\common\enum\UserPkLevelEnum;
 use app\common\helper\MobTech;
 use app\common\helper\Pbkdf2;
 use app\common\helper\Redis;
+use app\common\model\NewsModel;
 use app\common\model\PhoneVerificationCodeModel;
 use app\common\model\UserBaseModel;
 use app\common\model\UserCoinLogModel;
@@ -925,6 +927,35 @@ class UserService extends Base
 
         return new \stdClass();
     }
+
+    public function unreadNewsCount($user)
+    {
+        $newsModel = new NewsModel();
+        $unReadCount = $newsModel->getUnreadCountByUser($user["uuid"]);
+        return [
+            "count" => $unReadCount,
+        ];
+    }
+
+    public function allUnreadNews($user)
+    {
+        $newsModel = new NewsModel();
+        $allUnreadNews = $newsModel->allUnreadNewsByUser($user["uuid"]);
+
+        //全部标记为已读
+        if ($allUnreadNews) {
+            $allUuid = array($allUnreadNews, "uuid");
+            $newsModel->whereIn("uuid", $allUuid)
+                ->update([
+                    "is_read" => NewsIsReadEnum::YES,
+                    "read_time" => time(),
+                    "update_time" => time(),
+                ]);
+        }
+
+        return $allUnreadNews;
+    }
+
 
     private function recordUserWeChatInfo(Model $user, $userWeChatInfo)
     {

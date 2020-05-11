@@ -316,4 +316,20 @@ class User extends Base
         $returnData = $service->cancelAccount($user, $reason);
         return $this->jsonResponse($returnData);
     }
+
+    public function unreadNewsCount()
+    {
+        $user = $this->query["user"];
+        $service = new UserService();
+        $returnData = $service->unreadNewsCount($user);
+        return $this->jsonResponse($returnData);
+    }
+
+    public function allUnreadNews()
+    {
+        $user = $this->query["user"];
+        $service = new UserService();
+        $returnData = $service->allUnreadNews($user);
+        return $this->jsonResponse($returnData);
+    }
 }
