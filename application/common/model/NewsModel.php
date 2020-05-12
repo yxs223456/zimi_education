@@ -30,4 +30,19 @@ class NewsModel extends Base
             ->order("id", "desc")
             ->select()->toArray();
     }
+
+    public function addNews($userUuid, $content, $targetPage = "", array $pageParams = [])
+    {
+        $data = [
+            "uuid" => getRandomString(),
+            "user_uuid" => $userUuid,
+            "content" => $content,
+            "target_page" => $targetPage,
+            "page_params" => json_encode($pageParams, JSON_UNESCAPED_UNICODE),
+            "is_read" => NewsIsReadEnum::NO,
+            "create_time" => time(),
+            "update_time" => time(),
+        ];
+        $this->insert($data);
+    }
 }

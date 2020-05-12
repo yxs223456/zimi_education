@@ -20,6 +20,7 @@ use app\common\enum\UserSynthesizeIsFinishEnum;
 use app\common\enum\UserWritingSourceTypeEnum;
 use app\common\helper\Redis;
 use app\common\model\FillTheBlanksModel;
+use app\common\model\NewsModel;
 use app\common\model\SingleChoiceModel;
 use app\common\model\TrueFalseQuestionModel;
 use app\common\model\UserBaseModel;
@@ -149,7 +150,20 @@ class QuestionService extends Base
             Db::commit();
 
             $newUser = $userModel->findByUuid($userInfo["uuid"])->toArray();
-            cacheUserInfoByToken($newUser, Redis::factory());
+            $redis = Redis::factory();
+            cacheUserInfoByToken($newUser, $redis);
+
+            if ($noviceLevel > 0) {
+                //纪录消息
+                $newsModel =  new NewsModel();
+                $content = "恭喜你完成了新手测试，获得{$noviceLevel}DE 奖励，并 将获得准{$noviceLevel}星称号。";
+                $newsModel->addNews($userInfo["uuid"], $content);
+
+                //推送消息
+                createUnicastPushTask($newUser["os"], $newUser["umeng_device_token"], $content, "", [], $redis);
+            }
+
+
 
         } catch (\Throwable $e) {
             Db::rollback();

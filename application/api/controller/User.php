@@ -40,7 +40,6 @@ class User extends Base
     public function signUp()
     {
         $header = $this->request->header();
-        $channel = $header["channel"]??"";
 
         $phone = input("phone");
         $code = input("code", null);
@@ -52,7 +51,7 @@ class User extends Base
         }
 
         $userService = new UserService();
-        $returnData = $userService->singUp($phone, $code, $password, $inviteCode, $channel);
+        $returnData = $userService->signUp($phone, $code, $password, $inviteCode, $header);
 
         return $this->jsonResponse($returnData);
     }
@@ -76,13 +75,14 @@ class User extends Base
     {
         $phone = input("phone");
         $code = input("code");
+        $header = $this->request->header();
 
         if (!checkIsMobile($phone) || $code === null) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
         $userService = new UserService();
-        $returnData = $userService->signInByCode($phone, $code);
+        $returnData = $userService->signInByCode($phone, $code, $header);
 
         return $this->jsonResponse($returnData);
     }
@@ -92,13 +92,14 @@ class User extends Base
     {
         $phone = input("phone");
         $password = input("password");
+        $header = $this->request->header();
 
         if (!checkIsMobile($phone) || $password === null) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
         $userService = new UserService();
-        $returnData = $userService->signInByPassword($phone, $password);
+        $returnData = $userService->signInByPassword($phone, $password, $header);
 
         return $this->jsonResponse($returnData);
     }
@@ -154,12 +155,13 @@ class User extends Base
     public function weChatSignIn()
     {
         $code = input("code");
+        $header = $this->request->header();
         if (empty($code)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
         $userService = new UserService();
-        $returnData = $userService->weChatSignIn($code);
+        $returnData = $userService->weChatSignIn($code, $header);
 
         return $this->jsonResponse($returnData);
     }
@@ -168,7 +170,6 @@ class User extends Base
     public function bindPhone()
     {
         $header = $this->request->header();
-        $channel = $header["channel"]??"";
 
         $key = input("key");
         $phone = input("phone");
@@ -181,7 +182,7 @@ class User extends Base
         }
 
         $userService = new UserService();
-        $returnData = $userService->bindPhone($key, $phone, $code, $password, $inviteCode, $channel);
+        $returnData = $userService->bindPhone($key, $phone, $code, $password, $inviteCode, $header);
 
         return $this->jsonResponse($returnData);
     }
@@ -190,11 +191,10 @@ class User extends Base
     public function userInfo()
     {
         $header = $this->request->header();
-        $channel = $header["channel"]??"";
         $userInfo = $this->query["user"];
 
         $userService = new UserService();
-        $returnData = $userService->userInfo($userInfo, $channel);
+        $returnData = $userService->userInfo($userInfo, $header);
 
         return $this->jsonResponse($returnData);
     }

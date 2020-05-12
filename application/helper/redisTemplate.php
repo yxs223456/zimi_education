@@ -1003,3 +1003,29 @@ function getPkRankLikeTodayInfo($userUuid, $type, \Redis $redis) {
         return [];
     }
 }
+
+//创建缓存商品评论列表的任务
+function createUnicastPushTask($os, $umengDeviceToken, $content, $targetPage, array $pageParams, \Redis $redis, $title="消息通知") {
+    $key = "de_education:pushTask";
+    $data = [
+        "type" => "unicast",
+        "os" => $os,
+        "umengDeviceToken" => $umengDeviceToken,
+        "title" => $title,
+        "content" => $content,
+        "targetPage" => $targetPage,
+        "pageParams" => $pageParams,
+    ];
+    $redis->rPush($key, json_encode($data));
+}
+
+//获取缓存商品评论列表的任务
+function getPushTask(\Redis $redis) {
+    $key = "de_education:pushTask";
+    $data = $redis->blPop([$key], 30);
+
+    if ($data == null || empty($data[1])) {
+        return null;
+    }
+    return json_decode($data[1], true);
+}

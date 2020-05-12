@@ -17,4 +17,5 @@ return [
     'app\command\PkJoinTimeout',
     'app\command\PkFinish',
     'app\command\PkTimeoutFinish',
+    'app\command\PushMessageToUser',
 ];

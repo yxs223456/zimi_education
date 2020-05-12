@@ -13,6 +13,7 @@ use app\common\enum\PkTypeEnum;
 use app\common\enum\UserCoinAddTypeEnum;
 use app\common\enum\UserCoinLogTypeEnum;
 use app\common\helper\Redis;
+use app\common\model\NewsModel;
 use think\Db;
 use think\exception\PDOException;
 
@@ -139,11 +140,33 @@ class Pk extends Base
 
             Db::commit();
 
+            $redis = Redis::factory();
             //缓存用户信息
             if ($status == PkStatusEnum::AUDIT_FAIL && isset($newUser)) {
-                $redis = Redis::factory();
                 cacheUserInfoByToken($newUser, $redis);
             }
+
+            //消息纪录和推送
+            if (isset($newUser)) {
+                $newsModel =  new NewsModel();
+                if ($status == PkStatusEnum::AUDIT_FAIL) {
+                    //纪录消息
+                    $content = "很遗憾你发起的 PK 未通过审核，可以自我检讨 一下是否标题起的不符合规范呢。";
+                    $newsModel->addNews($newUser["uuid"], $content);
+
+                    //推送消息
+                    createUnicastPushTask($newUser["os"], $newUser["umeng_device_token"], $content, "", [], $redis);
+                } else {
+                    //纪录消息
+                    $content = "你发起的 PK 已成功通过审核，可邀请学员报名参加答题。";
+                    $newsModel->addNews($newUser["uuid"], $content);
+
+                    //推送消息
+                    createUnicastPushTask($newUser["os"], $newUser["umeng_device_token"], $content, "", [], $redis);
+                }
+            }
+
+
             $this->success("审核成功");
         } catch (\PDOException $e) {
             Db::rollback();

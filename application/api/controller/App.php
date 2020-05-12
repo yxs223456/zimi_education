@@ -10,6 +10,7 @@ namespace app\api\controller;
 
 use app\common\AppException;
 use app\common\enum\OperatingSystemEnum;
+use app\common\helper\UmengPush;
 use app\common\model\DeviceFirstOpenLogModel;
 use app\common\model\PackageConfigModel;
 use think\facade\Env;
@@ -24,6 +25,9 @@ class App extends Base
 
     public function submitPackage()
     {
+        $u = new UmengPush();
+        return $u->sendAndroidUnicast("AiErjHM-WKIRolN9vzI9DWUlt3-1CfZXEr37z9YzTtDB", "message notice", "success");
+        exit;
         $os = input("os", "");
         $version = input("version", "");
         $forced = (int) input("forced");

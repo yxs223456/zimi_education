@@ -31,7 +31,6 @@ use think\Model;
 
 class UserService extends Base
 {
-
     public function getCodeForSignUp($phone)
     {
         //判断手机号是否已注册
@@ -54,7 +53,7 @@ class UserService extends Base
     }
 
     //微信绑定手机号
-    public function bindPhone($weChatInfoKey, $phone, $code, $password, $inviteCode, $channel)
+    public function bindPhone($weChatInfoKey, $phone, $code, $password, $inviteCode, $header)
     {
         //用户微信信息
         $redis = Redis::factory();
@@ -110,7 +109,7 @@ class UserService extends Base
             try {
 
                 //通过手机号创建用户
-                $userInfo = $this->createUserByPhoneAndWeChat($phone, $password, $parentUuid, $inviteCode, $userWeChatInfo, $channel);
+                $userInfo = $this->createUserByPhoneAndWeChat($phone, $password, $parentUuid, $inviteCode, $userWeChatInfo, $header);
 
                 $userModel->addUserInviteCountByUuid($parentUuid);
 
@@ -124,6 +123,10 @@ class UserService extends Base
                     UserCoinAddTypeEnum::INTERNAL_USER_DESC);
 
                 Db::commit();
+
+                if (isset($inviteUser)) {
+                    $this->inviteNews($inviteUser, $userInfo, $redis);
+                }
             } catch (\Throwable $e) {
                 Db::rollback();
                 Log::write("create user by phone and we chat error:" . $e->getMessage(), "ERROR");
@@ -137,7 +140,7 @@ class UserService extends Base
     }
 
     //通过手机号注册用户
-    public function singUp($phone, $code, $password, $inviteCode, $channel)
+    public function signUp($phone, $code, $password, $inviteCode, $header)
     {
         //判断手机号是否已注册
         $userModel = new UserBaseModel();
@@ -190,7 +193,7 @@ class UserService extends Base
         try {
 
             //通过手机号创建用户
-            $userInfo = $this->createUserByPhone($phone, $password, $parentUuid, $inviteCode, $channel);
+            $userInfo = $this->createUserByPhone($phone, $password, $parentUuid, $inviteCode, $header);
 
             $userModel->addUserInviteCountByUuid($parentUuid);
 
@@ -204,6 +207,13 @@ class UserService extends Base
                 UserCoinAddTypeEnum::INTERNAL_USER_DESC);
 
             Db::commit();
+
+            if (isset($inviteUser)) {
+                $redis = Redis::factory();
+                $this->inviteNews($inviteUser, $userInfo, $redis);
+            }
+
+            $this->supplementUserInfo($userInfo, '');
 
         } catch (\Throwable $e) {
             Db::rollback();
@@ -262,77 +272,8 @@ class UserService extends Base
         return [];
     }
 
-    private function createUserByPhone($phone, $password, $parentUuid, $parentInviteCode, $channel)
-    {
-        $encryptPassword = Pbkdf2::create_hash($password);
-        $inviteCode = createInviteCode(6);
-        $token = getRandomString(32);
-        $uuid = getRandomString(32);
-        $time = time();
-
-        $userInfo = [
-            "uuid" => $uuid,
-            "phone" => $phone,
-            "password" => $encryptPassword,
-            "token" => $token,
-            "nickname" => "学员" . $inviteCode,
-            "invite_code" => $inviteCode,
-            "parent_uuid" => $parentUuid,
-            "parent_invite_code" => $parentInviteCode,
-            "channel" => $channel,
-            "create_time" => $time,
-            "update_time" => $time,
-        ];
-
-        $userBaseModel = new UserBaseModel();
-
-        $id = $userBaseModel->insertGetId($userInfo);
-
-        $userInfo = $userBaseModel->where("id", $id)->find()->toArray();
-
-        return $userInfo;
-    }
-
-    private function createUserByPhoneAndWeChat($phone, $password, $parentUuid, $parentInviteCode, $userWeChatInfo, $channel)
-    {
-        $encryptPassword = Pbkdf2::create_hash($password);
-        $inviteCode = createInviteCode(6);
-        $token = getRandomString(32);
-        $uuid = getRandomString(32);
-        $time = time();
-
-        $userInfo = [
-            "uuid" => $uuid,
-            "phone" => $phone,
-            "password" => $encryptPassword,
-            "unionid" => $userWeChatInfo["unionid"],
-            "mobile_openid" => $userWeChatInfo["openid"],
-            "nickname" => $userWeChatInfo["nickname"]?$userWeChatInfo["nickname"]:"学员".$inviteCode,
-            "head_image_url" => $userWeChatInfo["headimgurl"],
-            "sex" => $userWeChatInfo["sex"],
-            "country" => $userWeChatInfo["country"],
-            "province" => $userWeChatInfo["province"],
-            "city" => $userWeChatInfo["city"],
-            "token" => $token,
-            "invite_code" => $inviteCode,
-            "parent_uuid" => $parentUuid,
-            "parent_invite_code" => $parentInviteCode,
-            "channel" => $channel,
-            "create_time" => $time,
-            "update_time" => $time,
-        ];
-
-        $userBaseModel = new UserBaseModel();
-
-        $id = $userBaseModel->insertGetId($userInfo);
-
-        $userInfo = $userBaseModel->where("id", $id)->find()->toArray();
-
-        return $userInfo;
-    }
-
     //通过手机号和验证码登录
-    public function signInByCode($phone, $code)
+    public function signInByCode($phone, $code, $header)
     {
         //判断验证码是否正确
         if (MobTech::verify($phone, $code) == false) {
@@ -363,12 +304,13 @@ class UserService extends Base
 
         //更新用户token
         $userInfo = $this->updateUserToken($user);
+        $this->supplementUserInfo($userInfo, $header);
 
         return $this->userInfoForRequire($userInfo);
     }
 
     //通过手机号和验证码登录
-    public function signInByPassword($phone, $password)
+    public function signInByPassword($phone, $password, $header)
     {
         //通过手机号获取用户
         $userBaseModel = new UserBaseModel();
@@ -384,6 +326,7 @@ class UserService extends Base
 
         //更新用户token
         $userInfo = $this->updateUserToken($user);
+        $this->supplementUserInfo($userInfo, $header);
 
         return $this->userInfoForRequire($userInfo);
     }
@@ -475,7 +418,7 @@ class UserService extends Base
         ];
     }
 
-    public function weChatSignIn($code)
+    public function weChatSignIn($code, $header)
     {
         //获取access token
         $weChatConfig = config("account.we_chat.mobile");
@@ -508,17 +451,16 @@ class UserService extends Base
         $redis = Redis::factory();
         cacheUserInfoByToken($userInfo, $redis, $oldToken);
 
+        $this->supplementUserInfo($userInfo, $header);
+
         return [
             "user_exists" => 1,
             "user_info" => $this->userInfoForRequire($userInfo)
         ];
     }
 
-    public function userInfo($user, $channel)
+    public function userInfo($user)
     {
-        if (empty($user["channel"])) {
-            Db::name("user_base")->where("uuid", $user["uuid"])->update(["channel"=>$channel]);
-        }
         return $this->userInfoForRequire($user);
     }
 
@@ -580,6 +522,10 @@ class UserService extends Base
         $userInfo = $user->toArray();
         $redis = Redis::factory();
         cacheUserInfoByToken($userInfo, $redis);
+
+        if (isset($inviteUser)) {
+            $this->inviteNews($inviteUser, $userInfo, $redis);
+        }
 
         return $this->userInfoForRequire($userInfo);
     }
@@ -727,6 +673,33 @@ class UserService extends Base
             //缓存用户信息
             $redis = Redis::factory();
             cacheUserInfoByToken($userInfo, $redis);
+            if (in_array($userInfo["continuous_sign_times"], [3,7,15,30]) ||
+                $userInfo["cumulative_sign_times"] == 20) {
+                $newsModel = new NewsModel();
+                switch ($userInfo["continuous_sign_times"]) {
+                    case 3:
+                        $content = "你已连续签到 3 天，系统将奖励 5DE，请在签到页面手动领取。";
+                        $newsModel->addNews($userInfo["uuid"], $content);
+                        break;
+                    case 7:
+                        $content = "你已连续签到 7 天，系统将奖励 10DE，请在签到页面手动领取。";
+                        $newsModel->addNews($userInfo["uuid"], $content);
+                        break;
+                    case 15:
+                        $content = "你已连续签到 15 天，系统将奖励 20DE，请在签到页面手动领取。";
+                        $newsModel->addNews($userInfo["uuid"], $content);
+                        break;
+                    case 30:
+                        $content = "你已连续签到 30 天，系统将奖励 100DE，请在签到页面手动领取。";
+                        $newsModel->addNews($userInfo["uuid"], $content);
+                        break;
+                }
+                if ($userInfo["cumulative_sign_times"] == 20) {
+                    $content = "你已累积签到 20 天，系统将奖励 40DE。";
+                    $newsModel->addNews($userInfo["uuid"], $content);
+                }
+
+            }
 
             $returnData = [
                 "continuous_sign_times" => $userInfo["continuous_sign_times"],
@@ -956,6 +929,122 @@ class UserService extends Base
         return $allUnreadNews;
     }
 
+    private function inviteNews($oldUser, $newUser, $redis)
+    {
+        //纪录消息
+        $newsModel =  new NewsModel();
+        $content1 = "恭喜你邀请好友 {$newUser['nickname']} 注册成功，将获得 20DE 奖励。";
+        $content2 = "你已注册成功，系统将为建立邀请关系 的新学员奖励 10DE。";
+        $newsModel->addNews($oldUser["uuid"], $content1);
+        $newsModel->addNews($newUser["uuid"], $content2);
+
+        //推送消息
+        createUnicastPushTask($oldUser["os"], $oldUser["umeng_device_token"], $content1, "", [], $redis);
+        createUnicastPushTask($newUser["os"], $newUser["umeng_device_token"], $content2, "", [], $redis);
+    }
+
+    private function createUserByPhone($phone, $password, $parentUuid, $parentInviteCode, $header)
+    {
+        $encryptPassword = Pbkdf2::create_hash($password);
+        $inviteCode = createInviteCode(6);
+        $token = getRandomString(32);
+        $uuid = getRandomString(32);
+        $time = time();
+        $channel = $header["channel"]??"";
+        $umnegDeviceToken = $header["umeng_device_token"]??"";
+        $os = $header["os"]??"";
+
+        $userInfo = [
+            "uuid" => $uuid,
+            "phone" => $phone,
+            "password" => $encryptPassword,
+            "token" => $token,
+            "nickname" => "学员" . $inviteCode,
+            "invite_code" => $inviteCode,
+            "parent_uuid" => $parentUuid,
+            "parent_invite_code" => $parentInviteCode,
+            "channel" => $channel,
+            "umeng_device_token" => $umnegDeviceToken,
+            "os" => $os,
+            "create_time" => $time,
+            "update_time" => $time,
+        ];
+
+        $userBaseModel = new UserBaseModel();
+
+        $id = $userBaseModel->insertGetId($userInfo);
+
+        $userInfo = $userBaseModel->where("id", $id)->find()->toArray();
+
+        return $userInfo;
+    }
+
+    private function createUserByPhoneAndWeChat($phone, $password, $parentUuid, $parentInviteCode, $userWeChatInfo, $header)
+    {
+        $encryptPassword = Pbkdf2::create_hash($password);
+        $inviteCode = createInviteCode(6);
+        $token = getRandomString(32);
+        $uuid = getRandomString(32);
+        $time = time();
+        $channel = $header["channel"]??"";
+        $umnegDeviceToken = $header["umeng_device_token"]??"";
+        $os = $header["os"]??"";
+
+        $userInfo = [
+            "uuid" => $uuid,
+            "phone" => $phone,
+            "password" => $encryptPassword,
+            "unionid" => $userWeChatInfo["unionid"],
+            "mobile_openid" => $userWeChatInfo["openid"],
+            "nickname" => $userWeChatInfo["nickname"]?$userWeChatInfo["nickname"]:"学员".$inviteCode,
+            "head_image_url" => $userWeChatInfo["headimgurl"],
+            "sex" => $userWeChatInfo["sex"],
+            "country" => $userWeChatInfo["country"],
+            "province" => $userWeChatInfo["province"],
+            "city" => $userWeChatInfo["city"],
+            "token" => $token,
+            "invite_code" => $inviteCode,
+            "parent_uuid" => $parentUuid,
+            "parent_invite_code" => $parentInviteCode,
+            "channel" => $channel,
+            "umeng_device_token" => $umnegDeviceToken,
+            "os" => $os,
+            "create_time" => $time,
+            "update_time" => $time,
+        ];
+
+        $userBaseModel = new UserBaseModel();
+
+        $id = $userBaseModel->insertGetId($userInfo);
+
+        $userInfo = $userBaseModel->where("id", $id)->find()->toArray();
+
+        return $userInfo;
+    }
+
+    private function supplementUserInfo($user, $header)
+    {
+        $supplement = false;
+        $channel = $header["channel"]??"";
+        $umnegDeviceToken = $header["umeng_device_token"]??"";
+        $os = $header["os"]??"";
+        if (empty($user["channel"])) {
+            $supplement = true;
+            Db::name("user_base")->where("uuid", $user["uuid"])->update(["channel"=>$channel]);
+        }
+        if ($user["umeng_device_token"] != $umnegDeviceToken && $umnegDeviceToken != "") {
+            $supplement = true;
+            Db::name("user_base")->where("uuid", $user["uuid"])->update([
+                "umeng_device_token" => $umnegDeviceToken,
+                "os" => $os,
+            ]);
+        }
+        if ($supplement) {
+            $redis = Redis::factory();
+            $userInfo = (new UserBaseModel())->findByUuid($user["uuid"])->toArray();
+            cacheUserInfoByToken($userInfo, $redis);
+        }
+    }
 
     private function recordUserWeChatInfo(Model $user, $userWeChatInfo)
     {
