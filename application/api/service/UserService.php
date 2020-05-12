@@ -213,8 +213,6 @@ class UserService extends Base
                 $this->inviteNews($inviteUser, $userInfo, $redis);
             }
 
-            $this->supplementUserInfo($userInfo, '');
-
         } catch (\Throwable $e) {
             Db::rollback();
             Log::write("create user by phone error:" . $e->getMessage(), "ERROR");
