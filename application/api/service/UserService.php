@@ -156,7 +156,7 @@ class UserService extends Base
 
         //判断验证码是否正确（不验证手机号是否注册）
         if (MobTech::verify($phone, $code) == false) {
-        //    throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
+            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
         }
 
 //        $phoneVerificationCodeModel = new PhoneVerificationCodeModel();

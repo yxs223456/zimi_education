@@ -392,6 +392,7 @@ class CheckWriting extends Base
             }
             if ($unUpdateNews) {
                 //未升级消息
+                $redis = Redis::factory();
                 $newsModel =  new NewsModel();
                 $content = "很遗憾你没有通过{$userSynthesize['difficulty_level']}星综合测试，可以通过专项训 练提高自己的水平哦~";
                 $newsModel->addNews($user["uuid"], $content);
