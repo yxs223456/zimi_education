@@ -32,10 +32,9 @@ class PushMessageToUser extends Command
             do {
                 $pushTask = getPushTask($redis);
                 if ($pushTask) {
-                    $pushInfo = json_decode($pushTask, true);
-                    switch ($pushInfo["type"]) {
+                    switch ($pushTask["type"]) {
                         case "unicast":
-                            $this->unicastPush($pushInfo);
+                            $this->unicastPush($pushTask);
                             break;
                     }
                 }
