@@ -80,6 +80,7 @@ class InternalCompetitionFinish extends Command
                 try {
                     $pkFlowData = [];
                     $talentFlowData = [];
+                    $title = "作文大赛的结果出来啦，快来看看吧！";
                     foreach ($winners as $key=>$winner) {
                         $rank = $key+1;
                         if ($rank == 1) {
@@ -87,19 +88,19 @@ class InternalCompetitionFinish extends Command
                             $pkCoin = 50;
                             $content = "恭喜你获得{$waitFinishInternalCompetition['name']}冠军， 你将额外获得 50PK 值、5 才情值奖励。";
                             $newsModel->addNews($users[$winner["user_uuid"]]["uuid"], $content);
-                            createUnicastPushTask($users[$winner["user_uuid"]]["os"], $users[$winner["user_uuid"]]["uuid"], $content, "", [], $redis);
+                            createUnicastPushTask($users[$winner["user_uuid"]]["os"], $users[$winner["user_uuid"]]["uuid"], $content, "", [], $redis, $title);
                         } elseif ($rank == 2) {
                             $talentCoin = 3;
                             $pkCoin = 30;
                             $content = "恭喜你获得{$waitFinishInternalCompetition['name']}亚军，你将额外获得 30PK 值、3才情值奖励。";
                             $newsModel->addNews($users[$winner["user_uuid"]]["uuid"], $content);
-                            createUnicastPushTask($users[$winner["user_uuid"]]["os"], $users[$winner["user_uuid"]]["uuid"], $content, "", [], $redis);
+                            createUnicastPushTask($users[$winner["user_uuid"]]["os"], $users[$winner["user_uuid"]]["uuid"], $content, "", [], $redis, $title);
                         } else {
                             $talentCoin = 2;
                             $pkCoin = 20;
                             $content = "恭喜你获得{$waitFinishInternalCompetition['name']}季军，你将额外获得 20PK 值、2 才情值奖励。";
                             $newsModel->addNews($users[$winner["user_uuid"]]["uuid"], $content);
-                            createUnicastPushTask($users[$winner["user_uuid"]]["os"], $users[$winner["user_uuid"]]["uuid"], $content, "", [], $redis);
+                            createUnicastPushTask($users[$winner["user_uuid"]]["os"], $users[$winner["user_uuid"]]["uuid"], $content, "", [], $redis, $title);
                         }
                         //纪录用户排名
                         Db::name($internalCompetitionJoinModel->getTable())

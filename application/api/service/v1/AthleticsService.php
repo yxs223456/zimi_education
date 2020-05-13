@@ -276,12 +276,13 @@ class AthleticsService extends Base
             $newsModel->addNews($user["uuid"], $content);
 
             if ($pk["current_num"] == 2) {
+                $title = "你的报名结果出来啦，快来看看吧！";
                 $pkJoinUsers = $pkJoinModel->getListUserInfoByPkUuid($pkUuid);
                 $content = "你报名的由 {$initUser['nickname']} 发起的 {$pk['name']} 杯 PK 赛已开启 答题按钮，请尽快做答。";
                 foreach ($pkJoinUsers as $pkJoinUser) {
                     $newsModel->addNews($pkJoinUser["user_uuid"], $content);
 
-                    createUnicastPushTask($pkJoinUser["os"], $pkJoinUser["uuid"], $content, "", [], $redis);
+                    createUnicastPushTask($pkJoinUser["os"], $pkJoinUser["uuid"], $content, "", [], $redis, $title);
                 }
             }
 
@@ -935,7 +936,8 @@ class AthleticsService extends Base
             $newsModel =  new NewsModel();
             $content = "很开心你能参加{$competition['name']}，系统将对所有参赛学员 10DE、10PK 值、1 才情值奖励。";
             $newsModel->addNews($user["uuid"], $content);
-            createUnicastPushTask($newUser["os"], $newUser["uuid"], $content, "", [], $redis);
+            $title = "参加作文大赛的学员有惊喜等你哦~";
+            createUnicastPushTask($newUser["os"], $newUser["uuid"], $content, "", [], $redis, $title);
 
             $returnData = $randomQuestion;
             $returnData["submit_answer_ttl"] = 3600;

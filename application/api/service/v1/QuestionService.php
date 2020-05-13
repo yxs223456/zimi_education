@@ -160,7 +160,8 @@ class QuestionService extends Base
                 $newsModel->addNews($userInfo["uuid"], $content);
 
                 //推送消息
-                createUnicastPushTask($newUser["os"], $newUser["uuid"], $content, "", [], $redis);
+                $title = "新手测试送惊喜啦~";
+                createUnicastPushTask($newUser["os"], $newUser["uuid"], $content, "", [], $redis, $title);
             }
 
 

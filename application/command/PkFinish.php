@@ -195,7 +195,8 @@ class PkFinish extends Command
 
                     //纪录、发送消息
                     $newsModel->addNews($pkJoin["user_uuid"], $content);
-                    createUnicastPushTask($pkJoin["os"], $pkJoin["uuid"], $content, "", [], $redis);
+                    $title = "想知道PK结果如何，立马点击查看！";
+                    createUnicastPushTask($pkJoin["os"], $pkJoin["uuid"], $content, "", [], $redis, $title);
 
                     //纪录用户PK排行，纪录赢取的DE币
                     Db::name($pkJoinModel->getTable())
@@ -242,7 +243,8 @@ class PkFinish extends Command
                                 }
                                 //纪录、发送消息
                                 $newsModel->addNews($pkJoin["user_uuid"], $levelContent);
-                                createUnicastPushTask($pkJoin["os"], $pkJoin["uuid"], $levelContent, "", [], $redis);
+                                $levelTitle = "你的PK达标了，有新称号相送哦~";
+                                createUnicastPushTask($pkJoin["os"], $pkJoin["uuid"], $levelContent, "", [], $redis, $levelTitle);
                             }
                         }
 

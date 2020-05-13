@@ -134,7 +134,8 @@ class PkJoinTimeout extends Command
                 }
                 $content = "你报名的由 $initNickname 发起的 {$pk["name"]} PK 赛报名人数不满 3 人，因此此次 PK 成为流局。";
                 $newsModel->addNews($newUser["uuid"], $content);
-                createUnicastPushTask($newUser["os"], $newUser["uuid"], $content, "", [], $redis);
+                $title = "你的报名结果出来啦，快来看看吧！";
+                createUnicastPushTask($newUser["os"], $newUser["uuid"], $content, "", [], $redis, $title);
             }
             $redis->close();
 

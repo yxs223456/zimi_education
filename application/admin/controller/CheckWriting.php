@@ -388,7 +388,8 @@ class CheckWriting extends Base
                     $userSynthesize["difficulty_level"] * 10 .
                 "DE 奖励，系统将自动为你升级为{$userSynthesize['difficulty_level']}星学员称号。";
                 $newsModel->addNews($user["uuid"], $content);
-                createUnicastPushTask($user["os"], $user["uuid"], $content, "", [], $redis);
+                $title = "你的综合测试结果出来啦，快来看看吧！";
+                createUnicastPushTask($user["os"], $user["uuid"], $content, "", [], $redis, $title);
             }
             if ($unUpdateNews) {
                 //未升级消息
@@ -396,7 +397,8 @@ class CheckWriting extends Base
                 $newsModel =  new NewsModel();
                 $content = "很遗憾你没有通过{$userSynthesize['difficulty_level']}星综合测试，可以通过专项训 练提高自己的水平哦~";
                 $newsModel->addNews($user["uuid"], $content);
-                createUnicastPushTask($user["os"], $user["uuid"], $content, "", [], $redis);
+                $title = "你的综合测试结果出来啦，快来看看吧！";
+                createUnicastPushTask($user["os"], $user["uuid"], $content, "", [], $redis, $title);
             }
             $this->success("评分成功");
         } catch (\Throwable $e) {
