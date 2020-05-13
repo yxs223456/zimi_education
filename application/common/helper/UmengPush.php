@@ -47,8 +47,11 @@ class UmengPush
             // use file_id to send customized notification.
             $customizedcast->setPredefinedKeyValue("alias",            $userUuid);
             $customizedcast->setPredefinedKeyValue("alias_type",       "DE_education");
-            $customizedcast->setPredefinedKeyValue("is_single_user",       true);
-            $customizedcast->setPredefinedKeyValue("userid",       $userUuid);
+            $custom = json_encode([
+                "is_single_user"=>true,
+                "userid"=>$userUuid,
+            ]);
+            $customizedcast->setPredefinedKeyValue("custom",       $custom);
 
             $customizedcast->setPredefinedKeyValue("ticker",           "Android customizedcast ticker");
             $customizedcast->setPredefinedKeyValue("title",            $title);
