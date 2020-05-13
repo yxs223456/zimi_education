@@ -782,31 +782,27 @@ class UserService extends Base
 
         $levelRange = UserLevelEnum::getAllValues();
         foreach ($levelRange as $level) {
-            $noviceIsWin = 0;
-            $isWin = 0;
             if ($user["level"] == $level) {
-                $isWin = 1;
+                $returnData["level_list"][] = [
+                    "width" => $allMedals["level"][$level]["width"],
+                    "height" => $allMedals["level"][$level]["height"],
+                    "id" => $allMedals["level"][$level]["id"],
+                    "name" => $allMedals["level"][$level]["name"],
+                    "is_win" => 1,
+                    "medal_url" => getImageUrl($allMedals["level"][$level]["url1"])
+                ];
             } else if ($user["level"] == 0 && $user["novice_level"] == $level) {
-                $noviceIsWin = 1;
+                $returnData["level_list"][] = [
+                    "width" => $allMedals["novice_level"][$level]["width"],
+                    "height" => $allMedals["novice_level"][$level]["height"],
+                    "id" => $allMedals["novice_level"][$level]["id"],
+                    "name" => $allMedals["novice_level"][$level]["name"],
+                    "is_win" => 1,
+                    "medal_url" => getImageUrl($allMedals["novice_level"][$level]["url1"]),
+                ];
             }
-            $returnData["level_list"][] = [
-                "width" => $allMedals["novice_level"][$level]["width"],
-                "height" => $allMedals["novice_level"][$level]["height"],
-                "id" => $allMedals["novice_level"][$level]["id"],
-                "name" => $allMedals["novice_level"][$level]["name"],
-                "is_win" => $noviceIsWin,
-                "medal_url" => $noviceIsWin?getImageUrl($allMedals["novice_level"][$level]["url1"]):
-                    getImageUrl($allMedals["novice_level"][$level]["url2"]),
-            ];
-            $returnData["level_list"][] = [
-                "width" => $allMedals["level"][$level]["width"],
-                "height" => $allMedals["level"][$level]["height"],
-                "id" => $allMedals["level"][$level]["id"],
-                "name" => $allMedals["level"][$level]["name"],
-                "is_win" => $isWin,
-                "medal_url" => $isWin?getImageUrl($allMedals["level"][$level]["url1"]):
-                    getImageUrl($allMedals["level"][$level]["url2"]),
-            ];
+
+
         }
 
         $pkLevelRange = UserPkLevelEnum::getAllValues();

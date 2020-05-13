@@ -75,12 +75,16 @@ class UmengPush
             // Set your alias here, and use comma to split them if there are multiple alias.
             // And if you have many alias, you can also upload a file containing these alias, then
             // use file_id to send customized notification.
-            $customizedcast->setPredefinedKeyValue("alias",            "userid");
+            $customizedcast->setPredefinedKeyValue("alias",           $userUuid);
             // Set your alias_type here
             $customizedcast->setPredefinedKeyValue("alias_type",       "DE_education");
 
-            $customizedcast->setPredefinedKeyValue("userid",       $userUuid);
-            $customizedcast->setPredefinedKeyValue("alert", "IOS 个性化测试");
+            $custom = json_encode([
+                "is_single_user"=>true,
+                "userid"=>$userUuid,
+            ]);
+            $customizedcast->setPredefinedKeyValue("custom",       $custom);
+            $customizedcast->setPredefinedKeyValue("alert", $content);
             $customizedcast->setPredefinedKeyValue("badge", 0);
             $customizedcast->setPredefinedKeyValue("sound", "chime");
             // Set 'production_mode' to 'true' if your app is under production mode
