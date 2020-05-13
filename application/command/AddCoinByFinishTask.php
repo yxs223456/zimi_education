@@ -121,7 +121,7 @@ class AddCoinByFinishTask extends Command
             $newsModel = new NewsModel();
             $content = "恭喜你完善所有个人信息，将获得一次 性奖励 10DE。";
             $newsModel->addNews($newUser["uuid"], $content);
-            createUnicastPushTask($newUser["os"], $newUser["umeng_device_token"], $content, "", [], $redis);
+            createUnicastPushTask($newUser["os"], $newUser["uuid"], $content, "", [], $redis);
 
         } catch (\Throwable $e) {
             Db::rollback();
@@ -232,7 +232,7 @@ class AddCoinByFinishTask extends Command
             $newsModel = new NewsModel();
             $content = "你已成功绑定微信，将获得一次性奖励 10DE。";
             $newsModel->addNews($newUser["uuid"], $content);
-            createUnicastPushTask($newUser["os"], $newUser["umeng_device_token"], $content, "", [], $redis);
+            createUnicastPushTask($newUser["os"], $newUser["uuid"], $content, "", [], $redis);
         } catch (\Throwable $e) {
             Db::rollback();
             Log::write("add coin error: " . $e->getMessage(), "error");

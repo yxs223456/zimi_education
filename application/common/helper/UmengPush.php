@@ -35,51 +35,57 @@ class UmengPush
         $this->timestamp = strval(time());
     }
 
-    public function sendAndroidUnicast($deviceToken, $title, $content) {
+    public function sendAndroidUnicast($userUuid, $title, $content)
+    {
         try {
-            $unicast = new \AndroidUnicast();
-            $unicast->setAppMasterSecret($this->appMasterSecret);
-            $unicast->setPredefinedKeyValue("appkey",           $this->appkey);
-            $unicast->setPredefinedKeyValue("timestamp",        $this->timestamp);
-            // Set your device tokens here
-            $unicast->setPredefinedKeyValue("mipush",    true);
-            $unicast->setPredefinedKeyValue("mi_activity",    "com.zimi.study.module.push.UmengClickActivity");
-            $unicast->setPredefinedKeyValue("device_tokens",    $deviceToken);
-            $unicast->setPredefinedKeyValue("ticker",           "Android unicast ticker");
-            $unicast->setPredefinedKeyValue("title",            $title);
-            $unicast->setPredefinedKeyValue("text",             $content);
-            $unicast->setPredefinedKeyValue("after_open",       "go_app");
-            // Set 'production_mode' to 'false' if it's a test device.
-            // For how to register a test device, please see the developer doc.
-            $unicast->setPredefinedKeyValue("production_mode", "true");
-            // Set extra fields
-            $unicast->setExtraField("test", "helloworld");
-            $data = $unicast->send();
-            print ($data . "\r\n");
-            return $data;
+            $customizedcast = new \AndroidCustomizedcast();
+            $customizedcast->setAppMasterSecret($this->appMasterSecret);
+            $customizedcast->setPredefinedKeyValue("appkey",           $this->appkey);
+            $customizedcast->setPredefinedKeyValue("timestamp",        $this->timestamp);
+            // Set your alias here, and use comma to split them if there are multiple alias.
+            // And if you have many alias, you can also upload a file containing these alias, then
+            // use file_id to send customized notification.
+            $customizedcast->setPredefinedKeyValue("alias",            "userid");
+            // Set your alias_type here
+            $customizedcast->setPredefinedKeyValue("alias_type",       "DE_education");
+            $customizedcast->setPredefinedKeyValue("is_single_user",       true);
+            $customizedcast->setPredefinedKeyValue("userid",       $userUuid);
+
+            $customizedcast->setPredefinedKeyValue("ticker",           "Android customizedcast ticker");
+            $customizedcast->setPredefinedKeyValue("title",            "Android customizedcast title");
+            $customizedcast->setPredefinedKeyValue("text",             "Android customizedcast text");
+            $customizedcast->setPredefinedKeyValue("after_open",       "go_app");
+            print("Sending customizedcast notification, please wait...\r\n");
+            $customizedcast->send();
+            print("Sent SUCCESS\r\n");
         } catch (\Throwable $e) {
             print("Caught exception: " . $e->getMessage());
         }
     }
 
-    public function sendIOSUnicast($deviceToken, $content) {
+    public function sendIOSUnicast($userUuid, $content) {
         try {
-            $unicast = new \IOSUnicast();
-            $unicast->setAppMasterSecret($this->appMasterSecret);
-            $unicast->setPredefinedKeyValue("appkey",           $this->appkey);
-            $unicast->setPredefinedKeyValue("timestamp",        $this->timestamp);
-            // Set your device tokens here
-            $unicast->setPredefinedKeyValue("device_tokens",    $deviceToken);
-            $unicast->setPredefinedKeyValue("alert", $content);
-            $unicast->setPredefinedKeyValue("badge", 0);
-            $unicast->setPredefinedKeyValue("sound", "chime");
+            $customizedcast = new \IOSCustomizedcast();
+            $customizedcast->setAppMasterSecret($this->appMasterSecret);
+            $customizedcast->setPredefinedKeyValue("appkey",           $this->appkey);
+            $customizedcast->setPredefinedKeyValue("timestamp",        $this->timestamp);
+
+            // Set your alias here, and use comma to split them if there are multiple alias.
+            // And if you have many alias, you can also upload a file containing these alias, then
+            // use file_id to send customized notification.
+            $customizedcast->setPredefinedKeyValue("alias",            "userid");
+            // Set your alias_type here
+            $customizedcast->setPredefinedKeyValue("alias_type",       "DE_education");
+
+            $customizedcast->setPredefinedKeyValue("userid",       $userUuid);
+            $customizedcast->setPredefinedKeyValue("alert", "IOS 个性化测试");
+            $customizedcast->setPredefinedKeyValue("badge", 0);
+            $customizedcast->setPredefinedKeyValue("sound", "chime");
             // Set 'production_mode' to 'true' if your app is under production mode
-            $unicast->setPredefinedKeyValue("production_mode", "true");
-            // Set customized fields
-            $unicast->setCustomizedField("test", "helloworld");
-            $data = $unicast->send();
-            print ($data . "\r\n");
-            return $data;
+            $customizedcast->setPredefinedKeyValue("production_mode", "false");
+            print("Sending customizedcast notification, please wait...\r\n");
+            $customizedcast->send();
+            print("Sent SUCCESS\r\n");
         } catch (\Throwable $e) {
             print("Caught exception: " . $e->getMessage());
         }

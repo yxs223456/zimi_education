@@ -281,7 +281,7 @@ class AthleticsService extends Base
                 foreach ($pkJoinUsers as $pkJoinUser) {
                     $newsModel->addNews($pkJoinUser["user_uuid"], $content);
 
-                    createUnicastPushTask($pkJoinUser["os"], $pkJoinUser["umeng_device_token"], $content, "", [], $redis);
+                    createUnicastPushTask($pkJoinUser["os"], $pkJoinUser["uuid"], $content, "", [], $redis);
                 }
             }
 
@@ -935,7 +935,7 @@ class AthleticsService extends Base
             $newsModel =  new NewsModel();
             $content = "很开心你能参加{$competition['name']}，系统将对所有参赛学员 10DE、10PK 值、1 才情值奖励。";
             $newsModel->addNews($user["uuid"], $content);
-            createUnicastPushTask($newUser["os"], $newUser["umeng_device_token"], $content, "", [], $redis);
+            createUnicastPushTask($newUser["os"], $newUser["uuid"], $content, "", [], $redis);
 
             $returnData = $randomQuestion;
             $returnData["submit_answer_ttl"] = 3600;

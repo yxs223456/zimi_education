@@ -937,8 +937,8 @@ class UserService extends Base
         $newsModel->addNews($newUser["uuid"], $content2);
 
         //推送消息
-        createUnicastPushTask($oldUser["os"], $oldUser["umeng_device_token"], $content1, "", [], $redis);
-        createUnicastPushTask($newUser["os"], $newUser["umeng_device_token"], $content2, "", [], $redis);
+        createUnicastPushTask($oldUser["os"], $oldUser["uuid"], $content1, "", [], $redis);
+        createUnicastPushTask($newUser["os"], $newUser["uuid"], $content2, "", [], $redis);
     }
 
     private function createUserByPhone($phone, $password, $parentUuid, $parentInviteCode, $header)

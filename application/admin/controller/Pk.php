@@ -155,14 +155,14 @@ class Pk extends Base
                     $newsModel->addNews($newUser["uuid"], $content);
 
                     //推送消息
-                    createUnicastPushTask($newUser["os"], $newUser["umeng_device_token"], $content, "", [], $redis);
+                    createUnicastPushTask($newUser["os"], $newUser["uuid"], $content, "", [], $redis);
                 } else {
                     //纪录消息
                     $content = "你发起的 PK 已成功通过审核，可邀请学员报名参加答题。";
                     $newsModel->addNews($newUser["uuid"], $content);
 
                     //推送消息
-                    createUnicastPushTask($newUser["os"], $newUser["umeng_device_token"], $content, "", [], $redis);
+                    createUnicastPushTask($newUser["os"], $newUser["uuid"], $content, "", [], $redis);
                 }
             }
 

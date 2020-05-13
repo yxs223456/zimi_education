@@ -52,9 +52,9 @@ class PushMessageToUser extends Command
     {
         $umengPush = new UmengPush();
         if (strtolower($params["os"]) == "android") {
-            $umengPush->sendAndroidUnicast($params["umengDeviceToken"], $params["title"], $params["content"]);
+            $umengPush->sendAndroidUnicast($params["userUuid"], $params["title"], $params["content"]);
         } elseif (strtolower($params["os"]) == "ios") {
-            $umengPush->sendIOSUnicast($params["umengDeviceToken"], $params["content"]);
+            $umengPush->sendIOSUnicast($params["userUuid"], $params["content"]);
         }
     }
 }

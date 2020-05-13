@@ -1005,12 +1005,12 @@ function getPkRankLikeTodayInfo($userUuid, $type, \Redis $redis) {
 }
 
 //创建缓存商品评论列表的任务
-function createUnicastPushTask($os, $umengDeviceToken, $content, $targetPage, array $pageParams, \Redis $redis, $title="消息通知") {
+function createUnicastPushTask($os, $userUuid, $content, $targetPage, array $pageParams, \Redis $redis, $title="消息通知") {
     $key = "de_education:pushTask";
     $data = [
         "type" => "unicast",
         "os" => $os,
-        "umengDeviceToken" => $umengDeviceToken,
+        "userUuid" => $userUuid,
         "title" => $title,
         "content" => $content,
         "targetPage" => $targetPage,

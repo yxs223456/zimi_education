@@ -25,9 +25,6 @@ class App extends Base
 
     public function submitPackage()
     {
-        $u = new UmengPush();
-        return $u->sendAndroidUnicast("AiErjHM-WKIRolN9vzI9DWUlt3-1CfZXEr37z9YzTtDB", "message notice", "success");
-        exit;
         $os = input("os", "");
         $version = input("version", "");
         $forced = (int) input("forced");

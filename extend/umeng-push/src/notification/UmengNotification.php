@@ -34,7 +34,7 @@ abstract class UmengNotification {
 	);
 
 	protected $DATA_KEYS    = array("appkey", "timestamp", "type", "device_tokens", "alias", "alias_type", "file_id", "filter", "production_mode",
-								    "feedback", "description", "thirdparty_id", "mi_activity", "mipush");
+								    "feedback", "description", "thirdparty_id", "mi_activity", "mipush", "is_single_user", "userid");
 	protected $POLICY_KEYS  = array("start_time", "expire_time", "max_send_num");
 
 	function __construct() {
