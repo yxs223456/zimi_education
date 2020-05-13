@@ -51,10 +51,12 @@ class PushMessageToUser extends Command
     protected function unicastPush(array $params)
     {
         $umengPush = new UmengPush();
+        $result = "";
         if (strtolower($params["os"]) == "android") {
-            $umengPush->sendAndroidUnicast($params["userUuid"], $params["title"], $params["content"]);
+            $result = $umengPush->sendAndroidUnicast($params["userUuid"], $params["title"], $params["content"]);
         } elseif (strtolower($params["os"]) == "ios") {
-            $umengPush->sendIOSUnicast($params["userUuid"], $params["content"]);
+            $result = $umengPush->sendIOSUnicast($params["userUuid"], $params["content"]);
         }
+        Log::write("umeng push result:" . $result);
     }
 }

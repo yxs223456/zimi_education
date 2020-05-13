@@ -55,11 +55,9 @@ class UmengPush
             $customizedcast->setPredefinedKeyValue("title",            "Android customizedcast title");
             $customizedcast->setPredefinedKeyValue("text",             "Android customizedcast text");
             $customizedcast->setPredefinedKeyValue("after_open",       "go_app");
-            print("Sending customizedcast notification, please wait...\r\n");
-            $customizedcast->send();
-            print("Sent SUCCESS\r\n");
+            return $customizedcast->send();
         } catch (\Throwable $e) {
-            print("Caught exception: " . $e->getMessage());
+            return ("Caught exception: " . $e->getMessage());
         }
     }
 
@@ -83,11 +81,9 @@ class UmengPush
             $customizedcast->setPredefinedKeyValue("sound", "chime");
             // Set 'production_mode' to 'true' if your app is under production mode
             $customizedcast->setPredefinedKeyValue("production_mode", "false");
-            print("Sending customizedcast notification, please wait...\r\n");
-            $customizedcast->send();
-            print("Sent SUCCESS\r\n");
+            return $customizedcast->send();
         } catch (\Throwable $e) {
-            print("Caught exception: " . $e->getMessage());
+            return ("Caught exception: " . $e->getMessage());
         }
     }
 }
