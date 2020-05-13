@@ -1024,16 +1024,14 @@ class UserService extends Base
     {
         $supplement = false;
         $channel = $header["channel"]??"";
-        $umnegDeviceToken = $header["umeng_device_token"]??"";
         $os = $header["os"]??"";
         if (empty($user["channel"])) {
             $supplement = true;
             Db::name("user_base")->where("uuid", $user["uuid"])->update(["channel"=>$channel]);
         }
-        if ($user["umeng_device_token"] != $umnegDeviceToken && $umnegDeviceToken != "") {
+        if ($user["os"] != $os && $os != "") {
             $supplement = true;
             Db::name("user_base")->where("uuid", $user["uuid"])->update([
-                "umeng_device_token" => $umnegDeviceToken,
                 "os" => $os,
             ]);
         }
