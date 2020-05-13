@@ -457,8 +457,9 @@ class UserService extends Base
         ];
     }
 
-    public function userInfo($user)
+    public function userInfo($user, $header)
     {
+        $this->supplementUserInfo($user, $header);
         return $this->userInfoForRequire($user);
     }
 
@@ -1025,7 +1026,7 @@ class UserService extends Base
         $supplement = false;
         $channel = $header["channel"]??"";
         $os = $header["os"]??"";
-        if (empty($user["channel"])) {
+        if (empty($user["channel"]) && $channel) {
             $supplement = true;
             Db::name("user_base")->where("uuid", $user["uuid"])->update(["channel"=>$channel]);
         }
