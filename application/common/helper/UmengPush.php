@@ -52,6 +52,8 @@ class UmengPush
                 "userid"=>$userUuid,
             ]);
             $customizedcast->setPredefinedKeyValue("custom",       $custom);
+            $customizedcast->setPredefinedKeyValue("mipush",       true);
+            $customizedcast->setPredefinedKeyValue("mi_activity", "com.zimi.study.module.push.UmengClickActivity");
 
             $customizedcast->setPredefinedKeyValue("ticker",           "Android customizedcast ticker");
             $customizedcast->setPredefinedKeyValue("title",            $title);
