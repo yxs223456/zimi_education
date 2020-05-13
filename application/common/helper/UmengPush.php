@@ -52,8 +52,8 @@ class UmengPush
             $customizedcast->setPredefinedKeyValue("userid",       $userUuid);
 
             $customizedcast->setPredefinedKeyValue("ticker",           "Android customizedcast ticker");
-            $customizedcast->setPredefinedKeyValue("title",            "Android customizedcast title");
-            $customizedcast->setPredefinedKeyValue("text",             "Android customizedcast text");
+            $customizedcast->setPredefinedKeyValue("title",            $title);
+            $customizedcast->setPredefinedKeyValue("text",             $content);
             $customizedcast->setPredefinedKeyValue("after_open",       "go_app");
             return $customizedcast->send();
         } catch (\Throwable $e) {
