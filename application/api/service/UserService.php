@@ -913,6 +913,9 @@ class UserService extends Base
     {
         $newsModel = new NewsModel();
         $allUnreadNews = $newsModel->allUnreadNewsByUser($user["uuid"]);
+        foreach ($allUnreadNews as $key=>$allUnreadNew) {
+            $allUnreadNews[$key]["create_time"] = strtotime($allUnreadNew["create_time"]);
+        }
 
         //全部标记为已读
         if ($allUnreadNews) {
