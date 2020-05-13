@@ -45,8 +45,7 @@ class UmengPush
             // Set your alias here, and use comma to split them if there are multiple alias.
             // And if you have many alias, you can also upload a file containing these alias, then
             // use file_id to send customized notification.
-            $customizedcast->setPredefinedKeyValue("alias",            "userid");
-            // Set your alias_type here
+            $customizedcast->setPredefinedKeyValue("alias",            $userUuid);
             $customizedcast->setPredefinedKeyValue("alias_type",       "DE_education");
             $customizedcast->setPredefinedKeyValue("is_single_user",       true);
             $customizedcast->setPredefinedKeyValue("userid",       $userUuid);
