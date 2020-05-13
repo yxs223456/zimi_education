@@ -915,7 +915,7 @@ class UserService extends Base
 
         //全部标记为已读
         if ($allUnreadNews) {
-            $allUuid = array($allUnreadNews, "uuid");
+            $allUuid = array_column($allUnreadNews, "uuid");
             $newsModel->whereIn("uuid", $allUuid)
                 ->update([
                     "is_read" => NewsIsReadEnum::YES,
