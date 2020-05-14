@@ -275,7 +275,7 @@ class UserService extends Base
     {
         //判断验证码是否正确
         if (MobTech::verify($phone, $code) == false) {
-            throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
+     //       throw AppException::factory(AppException::USER_PHONE_VERIFY_CODE_ERROR);
         }
 //        $phoneVerificationCodeModel = new PhoneVerificationCodeModel();
 //        $useType = PhoneVerificationCodeTypeEnum::SIGN_IN;
@@ -297,12 +297,13 @@ class UserService extends Base
         $userBaseModel = new UserBaseModel();
         $user = $userBaseModel->getUserByPhone($phone);
         if (!$user) {
-            throw AppException::factory(AppException::USER_NOT_EXISTS);
+            //用户不存在创建用户
+            $userInfo = $this->createUserByPhone($phone, "", "", "", $header);
+        } else {
+            //更新用户token
+            $userInfo = $this->updateUserToken($user);
+            $this->supplementUserInfo($userInfo, $header);
         }
-
-        //更新用户token
-        $userInfo = $this->updateUserToken($user);
-        $this->supplementUserInfo($userInfo, $header);
 
         return $this->userInfoForRequire($userInfo);
     }
@@ -315,6 +316,10 @@ class UserService extends Base
         $user = $userBaseModel->getUserByPhone($phone);
         if (!$user) {
             throw AppException::factory(AppException::USER_NOT_EXISTS);
+        }
+
+        if ($user->password == "") {
+            throw AppException::factory(AppException::USER_PASSWORD_EMPTY);
         }
 
         //判断密码是否正确
@@ -944,7 +949,7 @@ class UserService extends Base
 
     private function createUserByPhone($phone, $password, $parentUuid, $parentInviteCode, $header)
     {
-        $encryptPassword = Pbkdf2::create_hash($password);
+        $encryptPassword = $password?Pbkdf2::create_hash($password):"";
         $inviteCode = createInviteCode(6);
         $token = getRandomString(32);
         $uuid = getRandomString(32);
@@ -1092,7 +1097,6 @@ class UserService extends Base
         $oldToken = $user->token;
         //更新用户token
         $user->token = getRandomString(32);
-        $user->update_time = time();
         $user->save();
 
         //更新用户缓存
