@@ -47,10 +47,12 @@ class UmengPush
             // use file_id to send customized notification.
             $customizedcast->setPredefinedKeyValue("alias",            $userUuid);
             $customizedcast->setPredefinedKeyValue("alias_type",       "DE_education");
-            $custom = json_encode([
-                "is_single_user"=>true,
-                "userid"=>$userUuid,
-            ]);
+            $customizedcast->setPredefinedKeyValue("production_mode", "true");
+            $custom = [
+                "is_single_user" => true,
+                "module" => "system_message",
+                "userid" => $userUuid,
+            ];
             $customizedcast->setPredefinedKeyValue("custom",       $custom);
             $customizedcast->setPredefinedKeyValue("mipush",       true);
             $customizedcast->setPredefinedKeyValue("mi_activity", "com.zimi.study.module.push.UmengClickActivity");
@@ -58,7 +60,7 @@ class UmengPush
             $customizedcast->setPredefinedKeyValue("ticker",           "Android customizedcast ticker");
             $customizedcast->setPredefinedKeyValue("title",            $title);
             $customizedcast->setPredefinedKeyValue("text",             $content);
-            $customizedcast->setPredefinedKeyValue("after_open",       "go_app");
+            $customizedcast->setPredefinedKeyValue("after_open",       "go_custom");
             return $customizedcast->send();
         } catch (\Throwable $e) {
             return ("Caught exception: " . $e->getMessage());
