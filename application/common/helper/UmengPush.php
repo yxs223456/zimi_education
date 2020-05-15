@@ -29,15 +29,15 @@ class UmengPush
     protected $validation_token = NULL;
 
     public function __construct() {
-        $umengConfig = config("account.umeng_push");
-        $this->appkey = $umengConfig["app_key"];
-        $this->appMasterSecret = $umengConfig["app_master_secret"];
         $this->timestamp = strval(time());
     }
 
     public function sendAndroidUnicast($userUuid, $title, $content)
     {
         try {
+            $umengConfig = config("account.android_umeng_push");
+            $this->appkey = $umengConfig["app_key"];
+            $this->appMasterSecret = $umengConfig["app_master_secret"];
             $customizedcast = new \AndroidCustomizedcast();
             $customizedcast->setAppMasterSecret($this->appMasterSecret);
             $customizedcast->setPredefinedKeyValue("appkey",           $this->appkey);
@@ -69,6 +69,9 @@ class UmengPush
 
     public function sendIOSUnicast($userUuid, $content) {
         try {
+            $umengConfig = config("account.ios_umeng_push");
+            $this->appkey = $umengConfig["app_key"];
+            $this->appMasterSecret = $umengConfig["app_master_secret"];
             $customizedcast = new \IOSCustomizedcast();
             $customizedcast->setAppMasterSecret($this->appMasterSecret);
             $customizedcast->setPredefinedKeyValue("appkey",           $this->appkey);
@@ -83,6 +86,7 @@ class UmengPush
 
             $custom = json_encode([
                 "is_single_user"=>true,
+                "module" => "system_message",
                 "userid"=>$userUuid,
             ]);
             $customizedcast->setPredefinedKeyValue("custom",       $custom);
