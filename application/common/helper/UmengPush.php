@@ -94,7 +94,7 @@ class UmengPush
             $customizedcast->setPredefinedKeyValue("badge", 0);
             $customizedcast->setPredefinedKeyValue("sound", "chime");
             // Set 'production_mode' to 'true' if your app is under production mode
-            $customizedcast->setPredefinedKeyValue("production_mode", "false");
+            $customizedcast->setPredefinedKeyValue("production_mode", "true");
             return $customizedcast->send();
         } catch (\Throwable $e) {
             return ("Caught exception: " . $e->getMessage());
