@@ -16,6 +16,7 @@ use app\common\enum\UserCoinLogTypeEnum;
 use app\common\enum\UserPkCoinAddTypeEnum;
 use app\common\enum\UserPkCoinLogTypeEnum;
 use app\common\helper\Redis;
+use app\common\model\NewsModel;
 use app\common\model\PkJoinModel;
 use app\common\model\PkModel;
 use app\common\model\UserBaseModel;
@@ -67,8 +68,10 @@ class PkFinish extends Command
         $userCoinLogModel = new UserCoinLogModel();
         $userPkCoinLogModel = new UserPkCoinLogModel();
         $userService = new UserService();
+        $newsModel = new NewsModel();
 
         do {
+            $redis = Redis::factory();
             $pk = Db::name($pkModel->getTable())
                 ->where("uuid", $pkUuid)
                 ->find();
@@ -80,10 +83,12 @@ class PkFinish extends Command
             //参与PK信息
             $joinCount = Db::name($pkJoinModel->getTable())
                 ->where("pk_uuid", $pk["uuid"])->count();
-            $pkJoins = Db::name($pkJoinModel->getTable())
-                ->where("pk_uuid", $pk["uuid"])
-                ->where("submit_answer_time" , ">", 0)
-                ->order(["score"=>"desc", "answer_time"=>"asc", "id"=>"asc"])
+            $pkJoins = Db::name($pkJoinModel->getTable())->alias("pj")
+                ->leftJoin("user_base u", "u.uuid=pj.user_uuid")
+                ->where("pj.pk_uuid", $pk["uuid"])
+                ->where("pj.submit_answer_time" , ">", 0)
+                ->field("pj.*,u.nickname,u.os,u.umeng_device_token")
+                ->order(["pj.score"=>"desc", "pj.answer_time"=>"asc", "pj.id"=>"asc"])
                 ->select();
 
             Db::startTrans();
@@ -99,6 +104,17 @@ class PkFinish extends Command
                 $totalRewardCoin = bcmul($pk["total_coin"], 0.8, 0);
                 foreach ($pkJoins as $key=>$pkJoin) {
                     if ($key == 0) {
+                        if ($joinCount <= 5) {
+                            $pkCoin = 3;
+                            $winCoin = bcmul($totalRewardCoin, 0.6, 0);
+                        } else if ($joinCount <= 9) {
+                            $pkCoin = 5;
+                            $winCoin = bcmul($totalRewardCoin, 0.5, 0);
+                        } else {
+                            $pkCoin = 10;
+                            $winCoin = bcmul($totalRewardCoin, 0.4, 0);
+                        }
+
                         //团长额外奖励发放
                         if ($pkJoin["is_initiator"] == PkIsInitiatorEnum::YES) {
                             $initiatorBonusCoin = bcmul($totalRewardCoin, 0.1, 0);
@@ -121,17 +137,11 @@ class PkFinish extends Command
                                 "create_time" => time(),
                                 "update_time" => time(),
                             ];
-                        }
-                        if ($joinCount <= 5) {
-                            $pkCoin = 3;
-                            $winCoin = bcmul($totalRewardCoin, 0.6, 0);
-                        } else if ($joinCount <= 9) {
-                            $pkCoin = 5;
-                            $winCoin = bcmul($totalRewardCoin, 0.5, 0);
+                            $content = "恭喜你获得 {$pk['name']} PK 赛的冠军，获 得{$winCoin}DE 奖励，{$pkCoin}PK 值奖励，系统将额外奖励{$initiatorBonusCoin}DE 给获得冠军的发起者。";
                         } else {
-                            $pkCoin = 10;
-                            $winCoin = bcmul($totalRewardCoin, 0.4, 0);
+                            $content = "恭喜你获得 {$pk['name']} PK 赛的冠军，获得{$winCoin}DE 奖励，{$pkCoin}PK 值奖励。";
                         }
+
                     } else if ($key == 1) {
                         if ($joinCount <= 5) {
                             $pkCoin = 0;
@@ -143,32 +153,50 @@ class PkFinish extends Command
                             $pkCoin = 5;
                             $winCoin = bcmul($totalRewardCoin, 0.3, 0);
                         }
+                        if ($joinCount <= 5) {
+                            $content = "恭喜你获得 {$pk['name']} PK 赛的第二名，获得{$winCoin}DE 奖励。";
+                        } else {
+                            $content = "恭喜你获得 {$pk['name']} PK 赛的第二名，获得{$winCoin}DE 奖励，{$pkCoin}PK 值奖励。";
+                        }
+
                     } else if ($key == 2) {
                         if ($joinCount <= 5) {
                             $pkCoin = 0;
                             $winCoin = 0;
+                            $content = "很遗憾你未获得 {$pk['name']} PK 赛名次， 继续加油哦。";
                         } else if ($joinCount <= 9) {
                             $pkCoin = 0;
                             $winCoin = bcmul($totalRewardCoin, 0.2, 0);
+                            $content = "恭喜你获得 {$pk['name']} PK 赛的第三名，获得{$winCoin}DE 奖励。";
                         } else {
                             $pkCoin = 3;
                             $winCoin = bcmul($totalRewardCoin, 0.2, 0);
+                            $content = "恭喜你获得 {$pk['name']} PK 赛的第三名，获得{$winCoin}DE 奖励，{$pkCoin}PK 值奖励。";
                         }
                     } else if ($key == 3) {
                         if ($joinCount <= 5) {
                             $pkCoin = 0;
                             $winCoin = 0;
+                            $content = "很遗憾你未获得 {$pk['name']} PK 赛名次， 继续加油哦。";
                         } else if ($joinCount <= 9) {
                             $pkCoin = 0;
                             $winCoin = 0;
+                            $content = "很遗憾你未获得 {$pk['name']} PK 赛名次， 继续加油哦。";
                         } else {
                             $pkCoin = 0;
                             $winCoin = bcmul($totalRewardCoin, 0.1, 0);
+                            $content = "恭喜你获得 {$pk['name']} PK 赛的第四名，获得{$winCoin}DE 奖励。";
                         }
                     } else {
                         $pkCoin = 0;
                         $winCoin = 0;
+                        $content = "很遗憾你未获得 {$pk['name']} PK 赛名次， 继续加油哦。";
                     }
+
+                    //纪录、发送消息
+                    $newsModel->addNews($pkJoin["user_uuid"], $content);
+                    $title = "想知道PK结果如何，立马点击查看！";
+                    createUnicastPushTask($pkJoin["os"], $pkJoin["uuid"], $content, "", [], $redis, $title);
 
                     //纪录用户PK排行，纪录赢取的DE币
                     Db::name($pkJoinModel->getTable())
@@ -196,6 +224,27 @@ class PkFinish extends Command
                                 }
                                 $userModel->where("uuid", $user["uuid"])->update($userUpdateData);
                                 $newUser["medals"] = json_encode($userAllMedals);
+                                switch ($userPkLevel) {
+                                    case 1:
+                                        $levelContent = "恭喜你 PK 达标 100 点，喜获 PK 新秀称号。";
+                                        break;
+                                    case 2:
+                                        $levelContent = "恭喜你 PK 达标 300 点，喜获 PK 达人称号。";
+                                        break;
+                                    case 3:
+                                        $levelContent = "恭喜你 PK 达标 800 点，喜获 PK 大师称号。";
+                                        break;
+                                    case 4:
+                                        $levelContent = "恭喜你 PK 达标 1500 点，喜获 PK 王称号。";
+                                        break;
+                                    default:
+                                        $levelContent = "恭喜你 PK 达标 1500 点，喜获 PK 王称号。";
+                                        break;
+                                }
+                                //纪录、发送消息
+                                $newsModel->addNews($pkJoin["user_uuid"], $levelContent);
+                                $levelTitle = "你的PK达标了，有新称号相送哦~";
+                                createUnicastPushTask($pkJoin["os"], $pkJoin["uuid"], $levelContent, "", [], $redis, $levelTitle);
                             }
                         }
 
@@ -257,17 +306,17 @@ class PkFinish extends Command
                 //修改获胜者用户信息
                 if ($winUserUuids) {
                     $winUsers = Db::name($userModel->getTable())->whereIn("uuid", $winUserUuids)->select();
-                    $redis = Redis::factory();
                     foreach ($winUsers as $winUser) {
                         cacheUserInfoByToken($winUser, $redis);
                     }
-                    $redis->close();
                 }
 
             } catch (\Throwable $e) {
                 Db::rollback();
                 Log::write("pk finish error:".$e->getMessage());
             }
+            $redis->close();
         } while(!!$pk);
+
     }
 }

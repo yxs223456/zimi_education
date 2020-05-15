@@ -17,6 +17,7 @@ use app\common\enum\UserSynthesizeScoreIsFinishEnum;
 use app\common\enum\UserWritingIsCommentEnum;
 use app\common\enum\UserWritingSourceTypeEnum;
 use app\common\helper\Redis;
+use app\common\model\NewsModel;
 use app\common\model\UserCoinLogModel;
 use think\Db;
 
@@ -328,6 +329,7 @@ class CheckWriting extends Base
 
             //当前星级题大于80分即可获得当前星级称
             $isUpdate = false;
+            $unUpdateNews = false;
             if ($userScore >= 80 && $userSynthesize["difficulty_level"] > $user["level"]) {
                 $user->level = $userSynthesize->difficulty_level;
                 //用户等级勋章
@@ -354,6 +356,8 @@ class CheckWriting extends Base
                     $user["coin"],
                     $user["coin"]+($userSynthesize["difficulty_level"] * 10),
                     UserCoinAddTypeEnum::LEVEL_UP_DESC);
+            } else if ($userSynthesize["difficulty_level"] > $user["level"] && $userScore < 80) {
+                $unUpdateNews = true;
             }
 
             $userSynthesizeRank = $this->userSynthesizeRankService
@@ -374,9 +378,27 @@ class CheckWriting extends Base
 
             if ($isUpdate == true) {
                 $redis = Redis::factory();
-                $userInfo = $user = $this->userBaseService->findByMap(["uuid"=>$userSynthesize["user_uuid"]])->toArray();
+                $userInfo = $this->userBaseService->findByMap(["uuid"=>$userSynthesize["user_uuid"]])->toArray();
                 cacheUserInfoByToken($userInfo, $redis);
                 pushSynthesizeUpdateList($userInfo["nickname"], $userSynthesize["difficulty_level"], $redis);
+
+                //升级消息
+                $newsModel =  new NewsModel();
+                $content = "恭喜你成功通过了{$userSynthesize['difficulty_level']}星综合测试，获得".
+                    $userSynthesize["difficulty_level"] * 10 .
+                "DE 奖励，系统将自动为你升级为{$userSynthesize['difficulty_level']}星学员称号。";
+                $newsModel->addNews($user["uuid"], $content);
+                $title = "你的综合测试结果出来啦，快来看看吧！";
+                createUnicastPushTask($user["os"], $user["uuid"], $content, "", [], $redis, $title);
+            }
+            if ($unUpdateNews) {
+                //未升级消息
+                $redis = Redis::factory();
+                $newsModel =  new NewsModel();
+                $content = "很遗憾你没有通过{$userSynthesize['difficulty_level']}星综合测试，可以通过专项训 练提高自己的水平哦~";
+                $newsModel->addNews($user["uuid"], $content);
+                $title = "你的综合测试结果出来啦，快来看看吧！";
+                createUnicastPushTask($user["os"], $user["uuid"], $content, "", [], $redis, $title);
             }
             $this->success("评分成功");
         } catch (\Throwable $e) {

@@ -12,6 +12,7 @@ use app\api\service\UserService;
 use app\common\Constant;
 use app\common\enum\UserCoinAddTypeEnum;
 use app\common\helper\Redis;
+use app\common\model\NewsModel;
 use app\common\model\UserBaseModel;
 use app\common\model\UserCoinLogModel;
 use think\console\Command;
@@ -115,6 +116,14 @@ class AddCoinByFinishTask extends Command
             
             //缓存用户信息
             cacheUserInfoByToken($newUser, $redis);
+
+            //纪录，发送消息
+            $newsModel = new NewsModel();
+            $content = "恭喜你完善所有个人信息，将获得一次 性奖励 10DE。";
+            $newsModel->addNews($newUser["uuid"], $content);
+            $title = "完善信息还有小奖励哦~";
+            createUnicastPushTask($newUser["os"], $newUser["uuid"], $content, "", [], $redis, $title);
+
         } catch (\Throwable $e) {
             Db::rollback();
             Log::write("add coin error: " . $e->getMessage(), "error");
@@ -219,6 +228,13 @@ class AddCoinByFinishTask extends Command
 
             //缓存用户信息
             cacheUserInfoByToken($newUser, $redis);
+
+            //纪录，发送消息
+            $newsModel = new NewsModel();
+            $content = "你已成功绑定微信，将获得一次性奖励 10DE。";
+            $newsModel->addNews($newUser["uuid"], $content);
+            $title = "绑定微信还有小惊喜哦~";
+            createUnicastPushTask($newUser["os"], $newUser["uuid"], $content, "", [], $redis, $title);
         } catch (\Throwable $e) {
             Db::rollback();
             Log::write("add coin error: " . $e->getMessage(), "error");
@@ -267,6 +283,11 @@ class AddCoinByFinishTask extends Command
             cacheUserInfoByToken($newUser, $redis);
             //用户今日分享领书币次数+1
             addUserGetCoinByShareTimes($userUuid, $redis);
+
+            //纪录，发送消息
+            $newsModel = new NewsModel();
+            $content = "你已成功分享，系统奖励 2DE。";
+            $newsModel->addNews($newUser["uuid"], $content);
         } catch (\Throwable $e) {
             Db::rollback();
             Log::write("add coin error: " . $e->getMessage(), "error");

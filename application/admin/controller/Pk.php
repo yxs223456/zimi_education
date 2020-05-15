@@ -13,6 +13,7 @@ use app\common\enum\PkTypeEnum;
 use app\common\enum\UserCoinAddTypeEnum;
 use app\common\enum\UserCoinLogTypeEnum;
 use app\common\helper\Redis;
+use app\common\model\NewsModel;
 use think\Db;
 use think\exception\PDOException;
 
@@ -112,13 +113,14 @@ class Pk extends Base
             }
 
             $pk->save();
+            $newUser = $this->userBaseService->findByMap(["uuid"=>$pk["initiator_uuid"]])->toArray();
 
             //审核不通过流程
             if ($status == PkStatusEnum::AUDIT_FAIL) {
                 //退还用户DE币
                 Db::name("user_base")->where("uuid", $pk["initiator_uuid"])
                     ->setInc("coin", $pk["total_coin"]);
-                $newUser = $this->userBaseService->findByMap(["uuid"=>$pk["initiator_uuid"]])->toArray();
+
 
                 //纪录DE币流水
                 $coinFlow = [
@@ -139,11 +141,32 @@ class Pk extends Base
 
             Db::commit();
 
+            $redis = Redis::factory();
             //缓存用户信息
-            if ($status == PkStatusEnum::AUDIT_FAIL && isset($newUser)) {
-                $redis = Redis::factory();
+            if ($status == PkStatusEnum::AUDIT_FAIL) {
                 cacheUserInfoByToken($newUser, $redis);
             }
+
+            //消息纪录和推送
+            $newsModel =  new NewsModel();
+            if ($status == PkStatusEnum::AUDIT_FAIL) {
+                //纪录消息
+                $content = "很遗憾你发起的 PK 未通过审核，可以自我检讨一下是否标题起的不符合规范呢。";
+                $newsModel->addNews($newUser["uuid"], $content);
+
+                //推送消息
+                $title = "你的审核结果出来啦，快来看看吧！";
+                createUnicastPushTask($newUser["os"], $newUser["uuid"], $content, "", [], $redis, $title);
+            } else {
+                //纪录消息
+                $content = "你发起的 PK 已成功通过审核，可邀请学员报名参加答题。";
+                $newsModel->addNews($newUser["uuid"], $content);
+
+                //推送消息
+                $title = "你的审核结果出来啦，快来看看吧！";
+                createUnicastPushTask($newUser["os"], $newUser["uuid"], $content, "", [], $redis, $title);
+            }
+
             $this->success("审核成功");
         } catch (\PDOException $e) {
             Db::rollback();

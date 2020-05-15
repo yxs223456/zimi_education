@@ -10,6 +10,7 @@ namespace app\api\controller;
 
 use app\common\AppException;
 use app\common\enum\OperatingSystemEnum;
+use app\common\helper\UmengPush;
 use app\common\model\DeviceFirstOpenLogModel;
 use app\common\model\PackageConfigModel;
 use think\facade\Env;

@@ -28,6 +28,7 @@ use app\common\helper\Redis;
 use app\common\model\InternalCompetitionJoinModel;
 use app\common\model\InternalCompetitionModel;
 use app\common\model\InternalCompetitionRankModel;
+use app\common\model\NewsModel;
 use app\common\model\PkJoinModel;
 use app\common\model\PkModel;
 use app\common\model\SingleChoiceModel;
@@ -159,6 +160,11 @@ class AthleticsService extends Base
             $user["coin"] -= $initPayCoin;
             cacheUserInfoByToken($user, $redis);
 
+            //记录消息
+            $newsModel =  new NewsModel();
+            $content = "你已成功发起 PK，请等待后台审核。";
+            $newsModel->addNews($user["uuid"], $content);
+
         } catch (\Throwable $e) {
             Db::rollback();
             throw $e;
@@ -261,6 +267,25 @@ class AthleticsService extends Base
             //修改用户缓存
             $user["coin"] -= $pk["join_coin"];
             cacheUserInfoByToken($user, $redis);
+
+            $initUser = Db::name("user_base")->where("uuid", $pk["initiator_uuid"])->find();
+
+            //纪录消息
+            $newsModel =  new NewsModel();
+            $content = "你已成功报名由 {$initUser['nickname']} 发起的 {$pk['name']} 杯 PK 赛。";
+            $newsModel->addNews($user["uuid"], $content);
+
+            if ($pk["current_num"] == 2) {
+                $title = "你的报名结果出来啦，快来看看吧！";
+                $pkJoinUsers = $pkJoinModel->getListUserInfoByPkUuid($pkUuid);
+                $content = "你报名的由 {$initUser['nickname']} 发起的 {$pk['name']} 杯 PK 赛已开启 答题按钮，请尽快做答。";
+                foreach ($pkJoinUsers as $pkJoinUser) {
+                    $newsModel->addNews($pkJoinUser["user_uuid"], $content);
+
+                    createUnicastPushTask($pkJoinUser["os"], $pkJoinUser["uuid"], $content, "", [], $redis, $title);
+                }
+            }
+
 
         } catch (\Throwable $e) {
             Db::rollback();
@@ -906,6 +931,14 @@ class AthleticsService extends Base
             //缓存用户信息
             $redis = Redis::factory();
             cacheUserInfoByToken($newUser, $redis);
+
+            //纪录、发送消息
+            $newsModel =  new NewsModel();
+            $content = "很开心你能参加{$competition['name']}，系统将对所有参赛学员 10DE、10PK 值、1 才情值奖励。";
+            $newsModel->addNews($user["uuid"], $content);
+            $title = "参加作文大赛的学员有惊喜等你哦~";
+            createUnicastPushTask($newUser["os"], $newUser["uuid"], $content, "", [], $redis, $title);
+
             $returnData = $randomQuestion;
             $returnData["submit_answer_ttl"] = 3600;
 

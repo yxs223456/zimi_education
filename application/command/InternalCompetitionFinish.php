@@ -20,6 +20,7 @@ use app\common\helper\Redis;
 use app\common\model\InternalCompetitionJoinModel;
 use app\common\model\InternalCompetitionModel;
 use app\common\model\InternalCompetitionRankModel;
+use app\common\model\NewsModel;
 use app\common\model\UserBaseModel;
 use app\common\model\UserPkCoinLogModel;
 use app\common\model\UserTalentCoinLogModel;
@@ -57,6 +58,8 @@ class InternalCompetitionFinish extends Command
                 ->count();
 
             if ($notCommentCount == 0) {
+                $redis = Redis::factory();
+                $newsModel =  new NewsModel();
                 //获得比赛前三名的同学可再得 2、3、5 才情值，在才情 榜上公示，各获得额外 20、30、50PK 值奖励。
                 $winners = $internalCompetitionJoinModel
                     ->where("c_uuid", $waitFinishInternalCompetition["uuid"])
@@ -70,24 +73,34 @@ class InternalCompetitionFinish extends Command
                 $talentCoinLogModel = new UserTalentCoinLogModel();
                 $userModel = new UserBaseModel();
                 $userUuids = array_column($winners, "user_uuid");
-                $users = $userModel->whereIn("uuid", $userUuids)->column("pk_coin,talent_coin", "uuid");
+                $users = $userModel->whereIn("uuid", $userUuids)->column("*", "uuid");
                 $userService = new UserService();
 
                 Db::startTrans();
                 try {
                     $pkFlowData = [];
                     $talentFlowData = [];
+                    $title = "作文大赛的结果出来啦，快来看看吧！";
                     foreach ($winners as $key=>$winner) {
                         $rank = $key+1;
                         if ($rank == 1) {
                             $talentCoin = 5;
                             $pkCoin = 50;
+                            $content = "恭喜你获得{$waitFinishInternalCompetition['name']}冠军， 你将额外获得 50PK 值、5 才情值奖励。";
+                            $newsModel->addNews($users[$winner["user_uuid"]]["uuid"], $content);
+                            createUnicastPushTask($users[$winner["user_uuid"]]["os"], $users[$winner["user_uuid"]]["uuid"], $content, "", [], $redis, $title);
                         } elseif ($rank == 2) {
                             $talentCoin = 3;
                             $pkCoin = 30;
+                            $content = "恭喜你获得{$waitFinishInternalCompetition['name']}亚军，你将额外获得 30PK 值、3才情值奖励。";
+                            $newsModel->addNews($users[$winner["user_uuid"]]["uuid"], $content);
+                            createUnicastPushTask($users[$winner["user_uuid"]]["os"], $users[$winner["user_uuid"]]["uuid"], $content, "", [], $redis, $title);
                         } else {
                             $talentCoin = 2;
                             $pkCoin = 20;
+                            $content = "恭喜你获得{$waitFinishInternalCompetition['name']}季军，你将额外获得 20PK 值、2 才情值奖励。";
+                            $newsModel->addNews($users[$winner["user_uuid"]]["uuid"], $content);
+                            createUnicastPushTask($users[$winner["user_uuid"]]["os"], $users[$winner["user_uuid"]]["uuid"], $content, "", [], $redis, $title);
                         }
                         //纪录用户排名
                         Db::name($internalCompetitionJoinModel->getTable())
@@ -169,7 +182,7 @@ class InternalCompetitionFinish extends Command
 
                     //缓存获胜者信息
                     $newUsers = $userModel->whereIn("uuid", $userUuids)->select()->toArray();
-                    $redis = Redis::factory();
+
                     foreach ($newUsers as $newUser) {
                         cacheUserInfoByToken($newUser, $redis);
                     }
@@ -178,6 +191,7 @@ class InternalCompetitionFinish extends Command
                     Db::rollback();
                     Log::write("internal competition finish error:". $e->getMessage(), "ERROR");
                 }
+                $redis->close();
             }
         }
 

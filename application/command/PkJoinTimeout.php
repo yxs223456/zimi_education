@@ -14,6 +14,7 @@ use app\common\enum\PkStatusEnum;
 use app\common\enum\UserCoinAddTypeEnum;
 use app\common\enum\UserCoinLogTypeEnum;
 use app\common\helper\Redis;
+use app\common\model\NewsModel;
 use app\common\model\PkJoinModel;
 use app\common\model\PkModel;
 use app\common\model\UserBaseModel;
@@ -122,6 +123,19 @@ class PkJoinTimeout extends Command
             $redis = Redis::factory();
             foreach ($newUsers as $newUser) {
                 cacheUserInfoByToken($newUser, $redis);
+            }
+
+            //发送消息
+            $newsModel =  new NewsModel();
+            $initNickname = "";
+            foreach ($newUsers as $key=>$newUser) {
+                if ($key==0) {
+                    $initNickname = $newUser["nickname"];
+                }
+                $content = "你报名的由 $initNickname 发起的 {$pk["name"]} PK 赛报名人数不满 3 人，因此此次 PK 成为流局。";
+                $newsModel->addNews($newUser["uuid"], $content);
+                $title = "你的报名结果出来啦，快来看看吧！";
+                createUnicastPushTask($newUser["os"], $newUser["uuid"], $content, "", [], $redis, $title);
             }
             $redis->close();
 
