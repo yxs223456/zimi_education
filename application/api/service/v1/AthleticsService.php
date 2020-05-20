@@ -272,13 +272,13 @@ class AthleticsService extends Base
 
             //纪录消息
             $newsModel =  new NewsModel();
-            $content = "你已成功报名由 {$initUser['nickname']} 发起的 {$pk['name']} 杯 PK 赛。";
+            $content = "你已成功报名由 {$initUser['nickname']} 发起的 {$pk['name']} PK 赛。";
             $newsModel->addNews($user["uuid"], $content);
 
             if ($pk["current_num"] == 2) {
                 $title = "你的报名结果出来啦，快来看看吧！";
                 $pkJoinUsers = $pkJoinModel->getListUserInfoByPkUuid($pkUuid);
-                $content = "你报名的由 {$initUser['nickname']} 发起的 {$pk['name']} 杯 PK 赛已开启 答题按钮，请尽快做答。";
+                $content = "你报名的由 {$initUser['nickname']} 发起的 {$pk['name']} PK 赛已开启 答题按钮，请尽快做答。";
                 foreach ($pkJoinUsers as $pkJoinUser) {
                     $newsModel->addNews($pkJoinUser["user_uuid"], $content);
 
