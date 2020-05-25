@@ -1040,7 +1040,10 @@ class UserService extends Base
             //增加用户de币
             $userModel->where("uuid", $user["uuid"])
                 ->inc("coin", Constant::READ_NOVICE_GUIDE_REWARD_COIN)
-                ->update(["update_time"=>time()]);
+                ->update([
+                    "novice_guide_read_reward" => UserNoviceGuideReadRewardEnum::YES,
+                    "update_time"=>time()
+                ]);
             $newUser = $userModel->findByUuid($user["uuid"])->toArray();
 
             //纪录书币流水
@@ -1052,6 +1055,10 @@ class UserService extends Base
                 $newUser["coin"],
                 UserCoinAddTypeEnum::READ_NOVICE_GUIDE_DESC);
             Db::commit();
+
+            //缓存用户
+            $redis = Redis::factory();
+            cacheUserInfoByToken($newUser, $redis);
 
         } catch (\Throwable $e) {
             Db::rollback();
