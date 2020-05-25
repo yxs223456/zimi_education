@@ -66,7 +66,7 @@ Route::rule('user/unreadNewsCount', 'api/user/unreadNewsCount', 'post');
 //全部未读消息
 Route::rule('user/allUnreadNews', 'api/user/allUnreadNews', 'post');
 //未读消息数量v2
-Route::rule('v2/user/allUnreadNews', 'api/user/unreadNewsCount2', 'post');
+Route::rule('v2/user/unreadNewsCount', 'api/user/unreadNewsCount2', 'post');
 //活动消息列表
 Route::rule('user/activityNewsList', 'api/user/activityNewsList', 'post');
 //领取阅读新手引导奖励
