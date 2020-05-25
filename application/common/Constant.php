@@ -73,6 +73,9 @@ class Constant
         ],
     ];
 
+    //阅读新手引导奖励de币数量
+    const READ_NOVICE_GUIDE_REWARD_COIN = 10;
+
     //每月可以获取累计签到奖励的天数
     const CUMULATIVE_SIGN_DAYS = 20;
 

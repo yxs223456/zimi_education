@@ -10,16 +10,20 @@ namespace app\api\service;
 use app\common\AppException;
 use app\common\Constant;
 use app\common\enum\NewsIsReadEnum;
+use app\common\enum\NewsTypeEnum;
 use app\common\enum\PhoneVerificationCodeStatusEnum;
 use app\common\enum\PhoneVerificationCodeTypeEnum;
 use app\common\enum\UserCancelStatusEnum;
 use app\common\enum\UserCoinAddTypeEnum;
 use app\common\enum\UserIsBindWeChatEnum;
 use app\common\enum\UserLevelEnum;
+use app\common\enum\UserNoviceGuideIsReadEnum;
+use app\common\enum\UserNoviceGuideReadRewardEnum;
 use app\common\enum\UserPkLevelEnum;
 use app\common\helper\MobTech;
 use app\common\helper\Pbkdf2;
 use app\common\helper\Redis;
+use app\common\model\ActivityNewsModel;
 use app\common\model\NewsModel;
 use app\common\model\PhoneVerificationCodeModel;
 use app\common\model\UserBaseModel;
@@ -932,6 +936,133 @@ class UserService extends Base
         return $allUnreadNews;
     }
 
+    public function unreadNewsCount2($user)
+    {
+        $newsModel = new NewsModel();
+        $activityNewsModel = new ActivityNewsModel();
+        $allActivityNewsCount = $activityNewsModel->getAllCount();
+
+        $unReadCountInfo = $newsModel->unreadNewsCountInfo($user["uuid"]);
+
+        $returnData = [
+            "system_news_unread_count" => 0,
+            "activity_news_unread_count" => $allActivityNewsCount,
+        ];
+        foreach ($unReadCountInfo as $item) {
+            if ($item["type"] == NewsTypeEnum::SYSTEM) {
+                $returnData["system_news_unread_count"] += 1;
+            } else if ($item["type"] == NewsTypeEnum::ACTIVITY && $item["is_read"] == NewsIsReadEnum::YES) {
+                $returnData["activity_news_unread_count"] -= 1;
+            }
+        }
+
+        return $returnData;
+    }
+
+    public function activityNewsList($user, $pageNum, $pageSize)
+    {
+        //活动消息
+        $activityNewsModel = new ActivityNewsModel();
+        $activityNewsList = $activityNewsModel->getList($pageNum, $pageSize);
+
+        $returnData = [];
+        if ($activityNewsList) {
+            $newsModel = new NewsModel();
+            $activityNewsUuid = array_column($activityNewsList, "uuid");
+
+            //活动消息阅读信息
+            $activityNews = $newsModel->getNewsByUserUuidAndActivityUuids($user["uuid"], $activityNewsUuid);
+            $activityNews = array_column($activityNews, null, "activity_uuid");
+            $unReadActivityNews = [];
+
+            //未读活动消息改为已读
+            foreach ($activityNewsList as $key=>$item) {
+                if (!isset($activityNews[$item["uuid"]])) {
+                    $uuid = getRandomString();
+                    $unReadActivityNews[] = [
+                        "uuid" => $uuid,
+                        "user_uuid" => $user["uuid"],
+                        "type" => NewsTypeEnum::ACTIVITY,
+                        "activity_uuid" => $item["uuid"],
+                        "content" => $item["content"],
+                        "target_page" => $item["target_page"],
+                        "page_params" => $item["page_params"],
+                        "is_read" => NewsIsReadEnum::YES,
+                        "read_time" => time(),
+                        "create_time" => time(),
+                        "update_time" => time(),
+                    ];
+                    $returnData[] = [
+                        "uuid" => $uuid,
+                        "content" => $item["content"],
+                        "target_page" => $item["target_page"],
+                        "page_params" => json_decode($item["page_params"], true),
+                        "is_read" => NewsIsReadEnum::NO,
+                        "create_time" => strtotime($item["create_time"]),
+                    ];
+                } else {
+                    $returnData[] = [
+                        "uuid" => $activityNews[$item["uuid"]]["uuid"],
+                        "content" => $item["content"],
+                        "target_page" => $item["target_page"],
+                        "page_params" => json_decode($item["page_params"], true),
+                        "is_read" => NewsIsReadEnum::YES,
+                        "create_time" => strtotime($item["create_time"]),
+                    ];
+                }
+            }
+            if ($unReadActivityNews) {
+                $newsModel->insertAll($unReadActivityNews);
+            }
+        }
+
+        return $returnData;
+    }
+
+    public function getNoviceGuideReward($user)
+    {
+        if (isset($user["novice_guide_read_reward"]) &&
+            $user["novice_guide_read_reward"] == UserNoviceGuideReadRewardEnum::YES) {
+            throw AppException::factory(AppException::USER_GET_NOVICE_GUIDE_REWARD_ALREADY);
+        }
+
+        $userCoinLogModel = new UserCoinLogModel();
+        $userModel = new UserBaseModel();
+        Db::startTrans();
+        try {
+            $userInfo = $userModel->findByUuid($user["uuid"]);
+            if (empty($userInfo)) {
+                throw AppException::factory(AppException::USER_NOT_EXISTS);
+            } elseif ($userInfo["novice_guide_read_reward"] == UserNoviceGuideReadRewardEnum::YES) {
+                throw AppException::factory(AppException::USER_GET_NOVICE_GUIDE_REWARD_ALREADY);
+            }
+
+            //增加用户de币
+            $userModel->where("uuid", $user["uuid"])
+                ->inc("coin", Constant::READ_NOVICE_GUIDE_REWARD_COIN)
+                ->update(["update_time"=>time()]);
+            $newUser = $userModel->findByUuid($user["uuid"])->toArray();
+
+            //纪录书币流水
+            $userCoinLogModel->recordAddLog(
+                $user["uuid"],
+                UserCoinAddTypeEnum::READ_NOVICE_GUIDE,
+                Constant::READ_NOVICE_GUIDE_REWARD_COIN,
+                $userInfo["coin"],
+                $newUser["coin"],
+                UserCoinAddTypeEnum::READ_NOVICE_GUIDE_DESC);
+            Db::commit();
+
+        } catch (\Throwable $e) {
+            Db::rollback();
+            throw $e;
+        }
+
+        return [
+            "coin" => $newUser["coin"],
+        ];
+    }
+
     private function inviteNews($oldUser, $newUser, $redis)
     {
         //纪录消息
@@ -1128,6 +1259,7 @@ class UserService extends Base
             "bind_wechat" => empty($userInfo["mobile_openid"]) ? UserIsBindWeChatEnum::NO : UserIsBindWeChatEnum::YES,
             "novice_test_is_show" => (int) $userInfo["novice_test_is_show"],
             "novice_level" => (int) $userInfo["novice_level"],
+            "novice_guide_is_read" => $userInfo["novice_guide_is_read"]??UserNoviceGuideIsReadEnum::NO,
             "current_medal_name" => $this->userSelfMedalName(json_decode($userInfo["self_medals"], true)),
         ];
     }
