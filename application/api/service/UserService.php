@@ -1266,8 +1266,8 @@ class UserService extends Base
             "bind_wechat" => empty($userInfo["mobile_openid"]) ? UserIsBindWeChatEnum::NO : UserIsBindWeChatEnum::YES,
             "novice_test_is_show" => (int) $userInfo["novice_test_is_show"],
             "novice_level" => (int) $userInfo["novice_level"],
-            "novice_guide_is_read" => $userInfo["novice_guide_is_read"]??UserNoviceGuideIsReadEnum::NO,
-            "novice_guide_read_reward" => $userInfo["novice_guide_read_reward"]??UserNoviceGuideReadRewardEnum::NO,
+            "novice_guide_is_read" => (int) $userInfo["novice_guide_is_read"]??UserNoviceGuideIsReadEnum::NO,
+            "novice_guide_read_reward" => (int) $userInfo["novice_guide_read_reward"]??UserNoviceGuideReadRewardEnum::NO,
             "current_medal_name" => $this->userSelfMedalName(json_decode($userInfo["self_medals"], true)),
         ];
     }
