@@ -1041,6 +1041,7 @@ class UserService extends Base
             $userModel->where("uuid", $user["uuid"])
                 ->inc("coin", Constant::READ_NOVICE_GUIDE_REWARD_COIN)
                 ->update([
+                    "novice_guide_is_read" => UserNoviceGuideIsReadEnum::YES,
                     "novice_guide_read_reward" => UserNoviceGuideReadRewardEnum::YES,
                     "update_time"=>time()
                 ]);
