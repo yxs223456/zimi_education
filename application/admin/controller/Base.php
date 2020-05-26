@@ -2,6 +2,7 @@
 
 namespace app\admin\controller;
 
+use app\admin\service\ActivityNewsService;
 use app\admin\service\FillTheBlanksService;
 use app\admin\service\InternalCompetitionJoinService;
 use app\admin\service\InternalCompetitionService;
@@ -22,6 +23,7 @@ use think\Controller;
 
 class Base extends Controller {
 
+    protected $activityNewsService;
     protected $adminService;
     protected $authGroupService;
     protected $authGroupAccessService;
@@ -42,6 +44,7 @@ class Base extends Controller {
     /**
      * 依赖注入
      * Base constructor.
+     * @param ActivityNewsService $activityNewsService
      * @param adminService $adminService
      * @param authGroupService $authGroupService
      * @param authGroupAccessService $authGroupAccessService
@@ -59,7 +62,8 @@ class Base extends Controller {
      * @param InternalCompetitionService $internalCompetitionService
      * @param PkService $pkService
      */
-    public function __construct( AdminService $adminService,
+    public function __construct( ActivityNewsService $activityNewsService,
+                                 AdminService $adminService,
                                  AuthGroupService $authGroupService,
                                  AuthGroupAccessService $authGroupAccessService,
                                  AuthRuleService $authRuleService,
@@ -78,6 +82,7 @@ class Base extends Controller {
 
         parent::__construct();
 
+        $this->activityNewsService = $activityNewsService;
         $this->adminService = $adminService;
         $this->authGroupService = $authGroupService;
         $this->authGroupAccessService = $authGroupAccessService;

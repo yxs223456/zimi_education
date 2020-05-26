@@ -36,6 +36,9 @@ class PushMessageToUser extends Command
                         case "unicast":
                             $this->unicastPush($pushTask);
                             break;
+                        case "broadcast":
+                            $this->broadcastPush($pushTask);
+                            break;
                     }
                 }
             } while($pushTask);
@@ -48,15 +51,26 @@ class PushMessageToUser extends Command
         }
     }
 
+    protected function broadcastPush(array $params)
+    {
+        $umengPush = new UmengPush();
+
+        $result = $umengPush->sendAndroidBroadcast($params["title"], $params["content"], $params["targetPageType"], $params["pageConfig"]);
+        Log::write("umeng android broadcast push result:" . $result);
+        $result = $umengPush->sendIOSBroadcast($params["content"], $params["targetPageType"], $params["pageParams"]);
+        Log::write("umeng ios broadcast  push result:" . $result);
+    }
+
     protected function unicastPush(array $params)
     {
         $umengPush = new UmengPush();
-        $result = "";
+
         if (strtolower($params["os"]) == "android") {
             $result = $umengPush->sendAndroidUnicast($params["userUuid"], $params["title"], $params["content"]);
+            Log::write("umeng android unicast push result:" . $result);
         } elseif (strtolower($params["os"]) == "ios") {
             $result = $umengPush->sendIOSUnicast($params["userUuid"], $params["content"]);
+            Log::write("umeng ios unicast push result:" . $result);
         }
-        Log::write("umeng push result:" . $result);
     }
 }

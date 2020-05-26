@@ -88,12 +88,17 @@ class CheckCompetition extends Base
         $answer = json_decode($info["answer"], true);
         $image = $answer["image"]??[];
         $text = $answer["text"]??[];
+        $contentLength = 0;
+        if ($text) {
+            $contentLength = mb_strlen($text["content"]);
+        }
 
         $this->assign("info", $info);
         $this->assign("topic", $topic);
         $this->assign("requirements", json_encode($requirements));
         $this->assign("image", $image);
         $this->assign("text", $text);
+        $this->assign("contentLength", $contentLength);
 
         return $this->fetch();
     }

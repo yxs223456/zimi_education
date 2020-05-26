@@ -1004,7 +1004,7 @@ function getPkRankLikeTodayInfo($userUuid, $type, \Redis $redis) {
     }
 }
 
-//创建缓存商品评论列表的任务
+//创建单推任务
 function createUnicastPushTask($os, $userUuid, $content, $targetPage, array $pageParams, \Redis $redis, $title="消息通知") {
     $key = "de_education:pushTask";
     $data = [
@@ -1015,6 +1015,19 @@ function createUnicastPushTask($os, $userUuid, $content, $targetPage, array $pag
         "content" => $content,
         "targetPage" => $targetPage,
         "pageParams" => $pageParams,
+    ];
+    $redis->rPush($key, json_encode($data));
+}
+
+//创建广播任务
+function createBroadcastPushTask($content, $title, $targetPageType, array $pageConfig, \Redis $redis) {
+    $key = "de_education:pushTask";
+    $data = [
+        "type" => "broadcast",
+        "title" => $title,
+        "content" => $content,
+        "targetPageType" => $targetPageType,
+        "pageConfig" => $pageConfig,
     ];
     $redis->rPush($key, json_encode($data));
 }

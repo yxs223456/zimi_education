@@ -84,11 +84,16 @@ class CheckWriting extends Base
         $answer = json_decode($userWriting["content"], true);
         $image = $answer["image"]??[];
         $text = $answer["text"]??[];
+        $contentLength = 0;
+        if ($text) {
+            $contentLength = mb_strlen($text["content"]);
+        }
 
         $this->assign("info", $userWriting);
         $this->assign("requirements", json_encode($requirements));
         $this->assign("image", $image);
         $this->assign("text", $text);
+        $this->assign("contentLength", $contentLength);
 
         return $this->fetch("checkStudyWriting");
     }
@@ -164,11 +169,16 @@ class CheckWriting extends Base
         $answer = json_decode($userWriting["content"], true);
         $image = $answer["image"]??[];
         $text = $answer["text"]??[];
+        $contentLength = 0;
+        if ($text) {
+            $contentLength = mb_strlen($text["content"]);
+        }
 
         $this->assign("info", $userWriting);
         $this->assign("requirements", json_encode($requirements));
         $this->assign("image", $image);
         $this->assign("text", $text);
+        $this->assign("contentLength", $contentLength);
 
         return $this->fetch("checkSynthesizeWriting");
     }
