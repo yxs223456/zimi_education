@@ -193,7 +193,7 @@ class UmengPush
                     break;
 
             }
-            $brocast->setPredefinedKeyValue("custom",       $custom);
+//            $brocast->setPredefinedKeyValue("custom",       $custom);
 
             return $brocast->send();
         } catch (\Throwable $e) {
