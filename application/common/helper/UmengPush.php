@@ -131,6 +131,7 @@ class UmengPush
                             "url" => $pageConfig["url"]
                         ],
                     ];
+                    $brocast->setPredefinedKeyValue("after_open",       "go_custom");
                     break;
                 default:
                     $custom = [
@@ -139,6 +140,7 @@ class UmengPush
                         "target_page_type" => $targetPageType,
                         "after_open" => "open_app",
                     ];
+                    $brocast->setPredefinedKeyValue("after_open",       "go_custom");
                     break;
 
             }
