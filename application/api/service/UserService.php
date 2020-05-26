@@ -9,6 +9,7 @@ namespace app\api\service;
 
 use app\common\AppException;
 use app\common\Constant;
+use app\common\enum\ActivityNewsTargetPageTypeEnum;
 use app\common\enum\NewsIsReadEnum;
 use app\common\enum\NewsTypeEnum;
 use app\common\enum\PhoneVerificationCodeStatusEnum;
@@ -977,6 +978,7 @@ class UserService extends Base
 
             //未读活动消息改为已读
             foreach ($activityNewsList as $key=>$item) {
+                $pageInfo = $this->activityNewsPageFormat($item);
                 if (!isset($activityNews[$item["uuid"]])) {
                     $uuid = getRandomString();
                     $unReadActivityNews[] = [
@@ -995,8 +997,8 @@ class UserService extends Base
                     $returnData[] = [
                         "uuid" => $uuid,
                         "content" => $item["content"],
-                        "target_page" => $item["target_page"],
-                        "page_params" => json_decode($item["page_params"], true),
+                        "target_page_type" => $item["target_page_type"],
+                        "h5_page_params" => $pageInfo["h5_page_params"],
                         "is_read" => NewsIsReadEnum::NO,
                         "create_time" => strtotime($item["create_time"]),
                     ];
@@ -1004,8 +1006,8 @@ class UserService extends Base
                     $returnData[] = [
                         "uuid" => $activityNews[$item["uuid"]]["uuid"],
                         "content" => $item["content"],
-                        "target_page" => $item["target_page"],
-                        "page_params" => json_decode($item["page_params"], true),
+                        "target_page_type" => $item["target_page_type"],
+                        "h5_page_params" => $pageInfo["h5_page_params"],
                         "is_read" => NewsIsReadEnum::YES,
                         "create_time" => strtotime($item["create_time"]),
                     ];
@@ -1014,6 +1016,23 @@ class UserService extends Base
             if ($unReadActivityNews) {
                 $newsModel->insertAll($unReadActivityNews);
             }
+        }
+
+        return $returnData;
+    }
+
+    private function activityNewsPageFormat($activityNews)
+    {
+        $returnData = [
+            "h5_page_params" => [
+                "title" => "",
+                "url" => "",
+            ],
+        ];
+        if ($activityNews["target_page_type"] == ActivityNewsTargetPageTypeEnum::H5) {
+            $pageParams = json_decode($activityNews["page_params"], true);
+            $returnData["h5_page_params"]["title"] = $pageParams["title"];
+            $returnData["h5_page_params"]["url"] = $activityNews["target_page"];
         }
 
         return $returnData;
