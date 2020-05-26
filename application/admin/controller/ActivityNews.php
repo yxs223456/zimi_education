@@ -78,6 +78,9 @@ class ActivityNews extends Base
             "page_params" => json_encode(["title"=>$h5Title], JSON_UNESCAPED_UNICODE),
             "is_push" => ActivityNewsIsPushEnum::YES,
             "is_push_already" => ActivityNewsIsPushAlreadyEnum::YES,
+            "create_time" => time(),
+            "update_time" => time(),
+
         ];
         Db::name("activity_news")->insert($newsInfo);
 
