@@ -125,7 +125,6 @@ class UmengPush
                         "is_single_user" => false,
                         "module" => "activity_message",
                         "target_page_type" => $targetPageType,
-                        "after_open" => "open_h5",
                         "h5_page_params" => [
                             "title" => $pageConfig["title"],
                             "url" => $pageConfig["url"]
@@ -138,7 +137,6 @@ class UmengPush
                         "is_single_user" => false,
                         "module" => "activity_message",
                         "target_page_type" => $targetPageType,
-                        "after_open" => "open_app",
                     ];
                     $brocast->setPredefinedKeyValue("after_open",       "go_custom");
                     break;
@@ -176,7 +174,6 @@ class UmengPush
                         "is_single_user" => false,
                         "module" => "activity_message",
                         "target_page_type" => $targetPageType,
-                        "after_open" => "open_h5",
                         "h5_page_params" => [
                             "title" => $pageParams["title"],
                             "url" => $pageParams["url"]
@@ -188,7 +185,6 @@ class UmengPush
                         "is_single_user" => false,
                         "module" => "activity_message",
                         "target_page_type" => $targetPageType,
-                        "after_open" => "open_app",
                     ];
                     break;
 
