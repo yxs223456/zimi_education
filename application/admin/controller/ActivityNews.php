@@ -85,7 +85,7 @@ class ActivityNews extends Base
         Db::name("activity_news")->insert($newsInfo);
 
         $redis = Redis::factory();
-        createBroadcastPushTask("你有一份新手手册请注意查收！",
+        createBroadcastPushTask($content,
             "送你一份读书伴手礼",
             ActivityNewsTargetPageTypeEnum::H5,
             ["title"=>$h5Title,"url"=>$targetPage],
