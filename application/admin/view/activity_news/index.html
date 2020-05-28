@@ -1,0 +1,105 @@
+{include file="public/header" /}
+<style type="text/css">
+    /*强制table不换行*/
+    table td{word-break: keep-all;white-space:nowrap;}
+    table th{word-break: keep-all;white-space:nowrap;}
+    .tableWordVreakNone{
+        white-space: normal !important;word-break: normal !important;
+    }
+</style>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>活动消息列表</h5>
+        </div>
+        <div class="ibox-content">
+            <!--搜索框开始-->
+            <div class="row">
+                <div class="col-sm-12">
+                    <div  class="col-sm-2" style="width: 100px">
+                        <div class="input-group" >
+                            <a href="{:url('add')}"><button class="btn btn-outline btn-primary" type="button">添加活动消息</button></a>
+                        </div>
+                    </div>
+                    <div class="col-sm-10">
+                        <form method="post" style="display: none" action="{:url('index')}" id="searchForm" class="form-inline">
+
+
+                            <button class="btn btn-success btn-sm" type="submit" style="margin-bottom:0;margin-left:4px"><i class="fa fa-filter"></i> 筛选</button>
+                            <a class="btn btn-primary btn-sm"  style="margin-bottom:0" href="{:url('index')}"><i class="fa fa-filter"></i> 重置</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!--搜索框结束-->
+            <div class="hr-line-dashed"></div>
+
+            <div class="example-wrap">
+                <div class="example">
+                    <div style="overflow-x:scroll;width:100%;">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr class="long-tr">
+                                <th>内容</th>
+                                <th>跳转页面类型</th>
+                                <th>跳转页面</th>
+                                <th>跳转参数</th>
+                                <th>是否推送</th>
+                                <th>创建时间</th>
+                            </tr>
+                            </thead>
+                            <tbody id="list-content">
+                            {foreach $list as $vo}
+                            <tr class="long-td">
+                                <td>{$vo.content}</td>
+                                <td>{$vo.target_page_type}</td>
+                                <td>{$vo.target_page}</td>
+                                <td>{$vo.page_params}</td>
+                                <td>{$vo.is_push}</td>
+                                <td>{$vo.create_time}</td>
+                            </tr>
+                            {/foreach}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="laypage"></div>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+</div>
+<!-- End Panel Other -->
+</div>
+
+{include file="public/footer" /}
+<script type="text/javascript" src="/static/admin/js/laypage.js"></script>
+<script type="text/javascript">
+
+    layui.use(['laypage', 'layer'], function(){
+        var laypage = layui.laypage
+            ,layer = layui.layer;
+
+        //完整功能
+        laypage.render({
+            elem: 'laypage'
+            ,count: '{$list->total()}' // 总数据条数
+            ,curr: '{$list->currentPage()}' // 当前第几页
+            ,limit: '{$list->listRows()}'   // 每页显示条数
+            ,layout: ['count', 'prev', 'page', 'next', 'refresh', 'skip']
+            ,jump: function(obj, first){
+                //首次不执行
+                if(!first){
+                    $("#searchForm").attr('action', '{:url("index")}?page='+obj.curr+
+                        "");
+                    $("#searchForm").submit();
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

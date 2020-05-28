@@ -70,4 +70,7 @@ class UserCoinAddTypeEnum
 
     const INTERNAL_USER = 18;
     const INTERNAL_USER_DESC = "内测阶段赠送";
+
+    const READ_NOVICE_GUIDE = 19;
+    const READ_NOVICE_GUIDE_DESC = "阅读新手手册";
 }

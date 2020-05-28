@@ -8,6 +8,7 @@
 namespace app\common\model;
 
 use app\common\enum\NewsIsReadEnum;
+use app\common\enum\NewsTypeEnum;
 
 class NewsModel extends Base
 {
@@ -17,6 +18,7 @@ class NewsModel extends Base
     {
         return $this
             ->where("user_uuid", $userUuid)
+            ->where("type", NewsTypeEnum::SYSTEM)
             ->where("is_read", NewsIsReadEnum::NO)
             ->count();
     }
@@ -25,6 +27,7 @@ class NewsModel extends Base
     {
         return $this
             ->where("user_uuid", $userUuid)
+            ->where("type", NewsTypeEnum::SYSTEM)
             ->where("is_read", NewsIsReadEnum::NO)
             ->field("uuid,content,create_time")
             ->order("id", "desc")
@@ -44,5 +47,19 @@ class NewsModel extends Base
             "update_time" => time(),
         ];
         $this->insert($data);
+    }
+
+    public function unreadNewsCountInfo($userUuid)
+    {
+        $sql = "select type,is_read from news where user_uuid='$userUuid' and ((type = 1 and is_read = 0) or (type = 2))";
+        return $this->query($sql);
+    }
+
+    public function getNewsByUserUuidAndActivityUuids($userUuid, array $activityUuids)
+    {
+        return $this->where("user_uuid", $userUuid)
+            ->whereIn("activity_uuid", $activityUuids)
+            ->select()
+            ->toArray();
     }
 }

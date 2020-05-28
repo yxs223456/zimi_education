@@ -7,6 +7,7 @@
  */
 namespace app\common\helper;
 
+use app\common\enum\ActivityNewsTargetPageTypeEnum;
 use think\facade\Env;
 
 include_once(Env::get('root_path') . 'extend/umeng-push/src/notification/android/AndroidBroadcast.php');
@@ -63,7 +64,7 @@ class UmengPush
             $customizedcast->setPredefinedKeyValue("after_open",       "go_custom");
             return $customizedcast->send();
         } catch (\Throwable $e) {
-            return ("Caught exception: " . $e->getMessage());
+            return "Caught exception: " . $e->getMessage();
         }
     }
 
@@ -97,7 +98,102 @@ class UmengPush
             $customizedcast->setPredefinedKeyValue("production_mode", "true");
             return $customizedcast->send();
         } catch (\Throwable $e) {
-            return ("Caught exception: " . $e->getMessage());
+            return "Caught exception: " . $e->getMessage();
+        }
+    }
+
+    public function sendAndroidBroadcast($title, $content, $targetPageType, array $pageConfig)
+    {
+        try {
+            $umengConfig = config("account.android_umeng_push");
+            $this->appkey = $umengConfig["app_key"];
+            $this->appMasterSecret = $umengConfig["app_master_secret"];
+            $brocast = new \AndroidBroadcast();
+            $brocast->setAppMasterSecret($this->appMasterSecret);
+            $brocast->setPredefinedKeyValue("appkey",           $this->appkey);
+            $brocast->setPredefinedKeyValue("timestamp",        $this->timestamp);
+            $brocast->setPredefinedKeyValue("ticker",           "Android broadcast ticker");
+            $brocast->setPredefinedKeyValue("title",            $title);
+            $brocast->setPredefinedKeyValue("text",             $content);
+            // Set 'production_mode' to 'false' if it's a test device.
+            // For how to register a test device, please see the developer doc.
+            $brocast->setPredefinedKeyValue("production_mode", "true");
+
+            switch ($targetPageType) {
+                case ActivityNewsTargetPageTypeEnum::H5:
+                    $custom = [
+                        "is_single_user" => false,
+                        "module" => "activity_message",
+                        "target_page_type" => $targetPageType,
+                        "h5_page_params" => [
+                            "title" => $pageConfig["title"],
+                            "url" => $pageConfig["url"]
+                        ],
+                    ];
+                    $brocast->setPredefinedKeyValue("after_open",       "go_custom");
+                    break;
+                default:
+                    $custom = [
+                        "is_single_user" => false,
+                        "module" => "activity_message",
+                        "target_page_type" => $targetPageType,
+                    ];
+                    $brocast->setPredefinedKeyValue("after_open",       "go_custom");
+                    break;
+
+            }
+            $brocast->setPredefinedKeyValue("custom",       $custom);
+            $brocast->setPredefinedKeyValue("mipush",       true);
+            $brocast->setPredefinedKeyValue("mi_activity", "com.zimi.study.module.push.UmengClickActivity");
+
+            return $brocast->send();
+        } catch (\Throwable $e) {
+            return "Caught exception: " . $e->getMessage();
+        }
+    }
+
+    function sendIOSBroadcast($content, $targetPageType, array $pageParams) {
+        try {
+            $umengConfig = config("account.ios_umeng_push");
+            $this->appkey = $umengConfig["app_key"];
+            $this->appMasterSecret = $umengConfig["app_master_secret"];
+            $brocast = new \IOSBroadcast();
+            $brocast->setAppMasterSecret($this->appMasterSecret);
+            $brocast->setPredefinedKeyValue("appkey",           $this->appkey);
+            $brocast->setPredefinedKeyValue("timestamp",        $this->timestamp);
+
+            $brocast->setPredefinedKeyValue("alert", $content);
+            $brocast->setPredefinedKeyValue("badge", 0);
+            $brocast->setPredefinedKeyValue("sound", "chime");
+            // Set 'production_mode' to 'true' if your app is under production mode
+            $brocast->setPredefinedKeyValue("production_mode", "false");
+
+            switch ($targetPageType) {
+                case ActivityNewsTargetPageTypeEnum::H5:
+                    $custom = [
+                        "is_single_user" => false,
+                        "module" => "activity_message",
+                        "target_page_type" => $targetPageType,
+                        "h5_page_params" => [
+                            "title" => $pageParams["title"],
+                            "url" => $pageParams["url"]
+                        ],
+                    ];
+                    break;
+                default:
+                    $custom = [
+                        "is_single_user" => false,
+                        "module" => "activity_message",
+                        "target_page_type" => $targetPageType,
+                    ];
+                    break;
+
+            }
+//            $brocast->setPredefinedKeyValue("custom",       $custom);
+
+            return $brocast->send();
+        } catch (\Throwable $e) {
+            return "Caught exception: " . $e->getMessage();
         }
     }
 }

@@ -332,4 +332,38 @@ class User extends Base
         $returnData = $service->allUnreadNews($user);
         return $this->jsonResponse($returnData);
     }
+
+    /**
+     * 系统消息，活动消息各自未读条数
+     * @return \think\response\Json
+     */
+    public function unreadNewsCount2()
+    {
+        $user = $this->query["user"];
+        $service = new UserService();
+        $returnData = $service->unreadNewsCount2($user);
+        return $this->jsonResponse($returnData);
+    }
+
+    public function activityNewsList()
+    {
+        $pageNum = input("page_num");
+        $pageSize = input("page_size");
+        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $service = new UserService();
+        $returnData = $service->activityNewsList($user, $pageNum, $pageSize);
+        return $this->jsonResponse($returnData);
+    }
+
+    public function getNoviceGuideReward()
+    {
+        $user = $this->query["user"];
+        $service = new UserService();
+        $returnData = $service->getNoviceGuideReward($user);
+        return $this->jsonResponse($returnData);
+    }
 }
