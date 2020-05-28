@@ -1040,54 +1040,48 @@ class UserService extends Base
 
     public function getNoviceGuideReward($user)
     {
-        if (isset($user["novice_guide_read_reward"]) &&
-            $user["novice_guide_read_reward"] == UserNoviceGuideReadRewardEnum::YES) {
-            throw AppException::factory(AppException::USER_GET_NOVICE_GUIDE_REWARD_ALREADY);
-        }
+        if (!isset($user["novice_guide_read_reward"]) ||
+            $user["novice_guide_read_reward"] != UserNoviceGuideReadRewardEnum::YES) {
+            $userCoinLogModel = new UserCoinLogModel();
+            $userModel = new UserBaseModel();
+            Db::startTrans();
+            try {
+                $userInfo = $userModel->findByUuid($user["uuid"]);
+                if (empty($userInfo)) {
+                    throw AppException::factory(AppException::USER_NOT_EXISTS);
+                } elseif ($userInfo["novice_guide_read_reward"] != UserNoviceGuideReadRewardEnum::YES) {
+                    //增加用户de币
+                    $userModel->where("uuid", $user["uuid"])
+                        ->inc("coin", Constant::READ_NOVICE_GUIDE_REWARD_COIN)
+                        ->update([
+                            "novice_guide_is_read" => UserNoviceGuideIsReadEnum::YES,
+                            "novice_guide_read_reward" => UserNoviceGuideReadRewardEnum::YES,
+                            "update_time"=>time()
+                        ]);
+                    $newUser = $userModel->findByUuid($user["uuid"])->toArray();
 
-        $userCoinLogModel = new UserCoinLogModel();
-        $userModel = new UserBaseModel();
-        Db::startTrans();
-        try {
-            $userInfo = $userModel->findByUuid($user["uuid"]);
-            if (empty($userInfo)) {
-                throw AppException::factory(AppException::USER_NOT_EXISTS);
-            } elseif ($userInfo["novice_guide_read_reward"] == UserNoviceGuideReadRewardEnum::YES) {
-                throw AppException::factory(AppException::USER_GET_NOVICE_GUIDE_REWARD_ALREADY);
+                    //纪录书币流水
+                    $userCoinLogModel->recordAddLog(
+                        $user["uuid"],
+                        UserCoinAddTypeEnum::READ_NOVICE_GUIDE,
+                        Constant::READ_NOVICE_GUIDE_REWARD_COIN,
+                        $userInfo["coin"],
+                        $newUser["coin"],
+                        UserCoinAddTypeEnum::READ_NOVICE_GUIDE_DESC);
+                    Db::commit();
+
+                    //缓存用户
+                    $redis = Redis::factory();
+                    cacheUserInfoByToken($newUser, $redis);
+                }
+
+            } catch (\Throwable $e) {
+                Db::rollback();
+                throw $e;
             }
-
-            //增加用户de币
-            $userModel->where("uuid", $user["uuid"])
-                ->inc("coin", Constant::READ_NOVICE_GUIDE_REWARD_COIN)
-                ->update([
-                    "novice_guide_is_read" => UserNoviceGuideIsReadEnum::YES,
-                    "novice_guide_read_reward" => UserNoviceGuideReadRewardEnum::YES,
-                    "update_time"=>time()
-                ]);
-            $newUser = $userModel->findByUuid($user["uuid"])->toArray();
-
-            //纪录书币流水
-            $userCoinLogModel->recordAddLog(
-                $user["uuid"],
-                UserCoinAddTypeEnum::READ_NOVICE_GUIDE,
-                Constant::READ_NOVICE_GUIDE_REWARD_COIN,
-                $userInfo["coin"],
-                $newUser["coin"],
-                UserCoinAddTypeEnum::READ_NOVICE_GUIDE_DESC);
-            Db::commit();
-
-            //缓存用户
-            $redis = Redis::factory();
-            cacheUserInfoByToken($newUser, $redis);
-
-        } catch (\Throwable $e) {
-            Db::rollback();
-            throw $e;
         }
 
-        return [
-            "coin" => $newUser["coin"],
-        ];
+        return new \stdClass();
     }
 
     private function inviteNews($oldUser, $newUser, $redis)

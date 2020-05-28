@@ -31,7 +31,7 @@ class Base extends Controller
         $host = $_SERVER['HTTP_ORIGIN'] ?? '';
         header("Access-Control-Allow-Origin:$host");
         header('Access-Control-Allow-Credentials: true');
-        header("Access-Control-Allow-Headers:token");
+        header("Access-Control-Allow-Headers: token");
         $this->query["v"] = $this->request->header('v');
         $this->query["os"] = $this->request->header('os');
 

@@ -70,7 +70,7 @@ Route::rule('v2/user/unreadNewsCount', 'api/user/unreadNewsCount2', 'post');
 //活动消息列表
 Route::rule('user/activityNewsList', 'api/user/activityNewsList', 'post');
 //领取阅读新手引导奖励
-Route::rule('user/getNoviceGuideReward', 'api/user/getNoviceGuideReward', 'post');
+Route::rule('user/getNoviceGuideReward', 'api/user/getNoviceGuideReward');
 
 
 //任务中心首页
