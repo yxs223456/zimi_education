@@ -8,6 +8,8 @@
 
 namespace app\common\model;
 
+use app\common\enum\UserWritingSourceTypeEnum;
+
 class UserWritingModel extends Base
 {
     protected $table = 'user_writing';
@@ -15,6 +17,24 @@ class UserWritingModel extends Base
     public function myWritingList($userUuid, $pageNum, $pageSize)
     {
         return $this->where("user_uuid", $userUuid)
+            ->order("id", "desc")
+            ->limit(($pageNum-1)*$pageSize, $pageSize)
+            ->select()->toArray();
+    }
+
+    public function studyWritingList($userUuid, $pageNum, $pageSize)
+    {
+        return $this->where("user_uuid", $userUuid)
+            ->where("source_type", UserWritingSourceTypeEnum::STUDY)
+            ->order("id", "desc")
+            ->limit(($pageNum-1)*$pageSize, $pageSize)
+            ->select()->toArray();
+    }
+
+    public function synthesizeWritingList($userUuid, $pageNum, $pageSize)
+    {
+        return $this->where("user_uuid", $userUuid)
+            ->where("source_type", UserWritingSourceTypeEnum::SYNTHESIZE)
             ->order("id", "desc")
             ->limit(($pageNum-1)*$pageSize, $pageSize)
             ->select()->toArray();

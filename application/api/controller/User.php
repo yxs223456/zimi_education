@@ -12,6 +12,7 @@ use app\api\service\UserService;
 use app\api\service\v1\AthleticsService;
 use app\api\service\v1\UserWritingService;
 use app\common\AppException;
+use app\common\enum\UserWritingSourceTypeEnum;
 
 class User extends Base
 {
@@ -265,6 +266,41 @@ class User extends Base
 
         return $this->jsonResponse($returnData);
     }
+
+    //专享测试作文
+    public function studyWritingList()
+    {
+        $pageNum = input("page_num");
+        $pageSize = input("page_size");
+        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $service = new UserWritingService();
+        $returnData = $service->writingListBySourceType($user, $pageNum, $pageSize,
+            UserWritingSourceTypeEnum::STUDY);
+
+        return $this->jsonResponse($returnData);
+    }
+
+    //综合测试作文
+    public function synthesizeWritingList()
+    {
+        $pageNum = input("page_num");
+        $pageSize = input("page_size");
+        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $service = new UserWritingService();
+        $returnData = $service->writingListBySourceType($user, $pageNum, $pageSize,
+            UserWritingSourceTypeEnum::SYNTHESIZE);
+
+        return $this->jsonResponse($returnData);
+    }
+
 
     //DE币流水
     public function coinFlowList()

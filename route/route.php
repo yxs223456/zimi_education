@@ -72,6 +72,11 @@ Route::rule('user/activityNewsList', 'api/user/activityNewsList', 'post');
 //领取阅读新手引导奖励
 Route::rule('user/getNoviceGuideReward', 'api/user/getNoviceGuideReward');
 
+//专享测试作文
+Route::rule('user/studyWritingList', 'api/user/studyWritingList', 'post');
+//综合测试作文
+Route::rule('user/synthesizeWritingList', 'api/user/synthesizeWritingList', 'post');
+
 
 //任务中心首页
 Route::rule('task/index', 'api/task/index', 'post');
