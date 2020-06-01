@@ -18,9 +18,12 @@ use app\common\enum\UserCancelStatusEnum;
 use app\common\enum\UserCoinAddTypeEnum;
 use app\common\enum\UserIsBindWeChatEnum;
 use app\common\enum\UserLevelEnum;
+use app\common\enum\UserLikeLevelEnum;
 use app\common\enum\UserNoviceGuideIsReadEnum;
 use app\common\enum\UserNoviceGuideReadRewardEnum;
 use app\common\enum\UserPkLevelEnum;
+use app\common\enum\UserShareLevelEnum;
+use app\common\enum\UserSignLevelEnum;
 use app\common\helper\MobTech;
 use app\common\helper\Pbkdf2;
 use app\common\helper\Redis;
@@ -632,6 +635,27 @@ class UserService extends Base
             ];
             (new UserSignLogModel())->insert($signLogData);
 
+            //用户连续签到天数（不考虑跨月）
+            if ($userInfo["last_sign_date"] == $yesterday) {
+                $continuousSignTimes2 = $userInfo["continuous_sign_times_2"] + 1;
+            } else {
+                $continuousSignTimes2 = 1;
+            }
+            //用户签到等级
+            $userNewSignLevel = $this->userSignLevel($continuousSignTimes2);
+            $userUpdateData = ["last_sign_date"=>$today,"update_time"=>$now,"continuous_sign_times_2"=>$continuousSignTimes2];
+            if ($userNewSignLevel > $userInfo["sign_level"]) {
+                //用户勋章以及当前勋章计算
+                $userMedals = json_decode($userInfo["medals"], true);
+                $selfMedals = json_decode($userInfo["self_medals"], true);
+                $userMedals["sign_level"] = $userNewSignLevel;
+                $userUpdateData["medals"] = json_encode($userMedals);
+                if (empty($selfMedals) || isset($selfMedals["sign_level"])) {
+                    $selfMedals["sign_level"] = $userNewSignLevel;
+                    $userUpdateData["self_medals"] = json_encode($selfMedals);
+                }
+            }
+
             //修改用户签到统计
             $lastSignMonth = substr($userInfo["last_sign_date"], 0, 7);
             $userExec = $userModel->where("uuid", $userUuid);
@@ -640,16 +664,18 @@ class UserService extends Base
                     //最后一次签到是本月，且最后一次签到是昨日
                     $userExec->inc("continuous_sign_times", 1)
                         ->inc("cumulative_sign_times", 1)
-                        ->update(["last_sign_date"=>$today,"update_time"=>$now]);
+                        ->update($userUpdateData);
                 } else {
                     //最后一次签到是本月，但最后一次签到不是昨日
+                    $userUpdateData["continuous_sign_times"] = 1;
                     $userExec->inc("cumulative_sign_times", 1)
-                        ->update(["last_sign_date"=>$today,"continuous_sign_times"=>1,"update_time"=>$now]);
+                        ->update($userUpdateData);
                 }
             } else {
                 //最后一次签到不是本月
-                $userExec->update(["last_sign_date"=>$today,"continuous_sign_times"=>1,
-                    "cumulative_sign_times"=>1,"update_time"=>$now]);
+                $userUpdateData["continuous_sign_times"] = 1;
+                $userUpdateData["cumulative_sign_times"] = 1;
+                $userExec->update($userUpdateData);
             }
 
             //用户累计签到达标，且未发放累计签到奖励，发放累计签到奖励
@@ -1344,5 +1370,55 @@ class UserService extends Base
         }
 
         return $pkLevel;
+    }
+
+    public function userSignLevel($continuousSignTimes2)
+    {
+        //  签到新人（连续签到7天获得）、签到能手（连续签到30天获得）、签到达人（连续签到90天获得）
+        if ($continuousSignTimes2 >= 90) {
+            $signLevel = UserSignLevelEnum::THREE;
+        } else if ($continuousSignTimes2 >= 30) {
+            $signLevel = UserSignLevelEnum::TWO;
+        } else if ($continuousSignTimes2 >= 7) {
+            $signLevel = UserSignLevelEnum::ONE;
+        } else {
+            $signLevel = 0;
+        }
+
+        return $signLevel;
+    }
+
+    public function userShareLevel($shareTimes)
+    {
+        //  分享助手（分享15次）、分享达人（分享50次）、分享大使（分享200次）
+        if ($shareTimes >= 200) {
+            $shareLevel = UserShareLevelEnum::THREE;
+        } else if ($shareTimes >= 50) {
+            $shareLevel = UserShareLevelEnum::TWO;
+        } else if ($shareTimes >= 15) {
+            $shareLevel = UserShareLevelEnum::ONE;
+        } else {
+            $shareLevel = 0;
+        }
+
+        return $shareLevel;
+    }
+
+    public function userLikeLevel($likeTimes)
+    {
+        //  铁手指（点赞10次）、铜手指（点赞100次）、银手指（点赞200次）、金手指（点赞500次）
+        if ($likeTimes >= 500) {
+            $likeLevel = UserLikeLevelEnum::FOUR;
+        } else if ($likeTimes >= 200) {
+            $likeLevel = UserLikeLevelEnum::THREE;
+        } else if ($likeTimes >= 100) {
+            $likeLevel = UserLikeLevelEnum::TWO;
+        } else if ($likeTimes >= 10) {
+            $likeLevel = UserLikeLevelEnum::ONE;
+        } else {
+            $likeLevel = 0;
+        }
+
+        return $likeLevel;
     }
 }

@@ -26,6 +26,7 @@ class UserWritingModel extends Base
     {
         return $this->where("user_uuid", $userUuid)
             ->where("source_type", UserWritingSourceTypeEnum::STUDY)
+            ->order("is_comment", "asc")
             ->order("id", "desc")
             ->limit(($pageNum-1)*$pageSize, $pageSize)
             ->select()->toArray();
@@ -35,6 +36,7 @@ class UserWritingModel extends Base
     {
         return $this->where("user_uuid", $userUuid)
             ->where("source_type", UserWritingSourceTypeEnum::SYNTHESIZE)
+            ->order("is_comment", "asc")
             ->order("id", "desc")
             ->limit(($pageNum-1)*$pageSize, $pageSize)
             ->select()->toArray();

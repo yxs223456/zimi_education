@@ -17,6 +17,7 @@ use app\common\model\InternalCompetitionLikeLogModel;
 use app\common\model\InternalCompetitionRankModel;
 use app\common\model\PkRankLikeLogModel;
 use app\common\model\SynthesizeRankLikeLogModel;
+use app\common\model\UserBaseModel;
 use app\common\model\UserPkRankModel;
 use app\common\model\UserSynthesizeRankModel;
 use think\Db;
@@ -102,6 +103,7 @@ class RankService extends Base
             $userSynthesizeRankModel->where("user_uuid", $likeUserUuid)
                 ->where("difficulty_level", $difficultyLevel)
                 ->setInc("like_count", 1);
+            $this->addLikeTimes($user["uuid"]);
             Db::commit();
         } catch (\Throwable $e) {
             Db::rollback();
@@ -192,6 +194,8 @@ class RankService extends Base
             //增加被助力次数
             $internalCompetitionRankModel->where("user_uuid", $likeUserUuid)
                 ->setInc("like_count", 1);
+
+            $this->addLikeTimes($user["uuid"]);
             Db::commit();
         } catch (\Throwable $e) {
             Db::rollback();
@@ -284,6 +288,8 @@ class RankService extends Base
             $userPkRankModel->where("user_uuid", $likeUserUuid)
                 ->where("type", $type)
                 ->setInc("like_count", 1);
+
+            $this->addLikeTimes($user["uuid"]);
             Db::commit();
         } catch (\Throwable $e) {
             Db::rollback();
@@ -298,4 +304,28 @@ class RankService extends Base
 
         return new \stdClass();
     }
+
+    private function addLikeTimes($userUuid)
+    {
+        $userService = new UserService();
+
+        $user = Db::name("user_base")->where("uuid", $userUuid)->find();
+        $likeTimes = $user["like_times"] + 1;
+        $userNewLikeLevel = $userService->userLikeLevel($likeTimes);
+        $userUpdateData = ["like_times"=>$likeTimes];
+        if ($userNewLikeLevel > $user["like_level"]) {
+            $userUpdateData["like_level"] = $userNewLikeLevel;
+            //用户勋章以及当前勋章计算
+            $userMedals = json_decode($user["medals"], true);
+            $selfMedals = json_decode($user["self_medals"], true);
+            $userMedals["like_level"] = $userNewLikeLevel;
+            $userUpdateData["medals"] = json_encode($userMedals);
+            if (empty($selfMedals) || isset($selfMedals["like_level"])) {
+                $selfMedals["like_level"] = $userNewLikeLevel;
+                $userUpdateData["self_medals"] = json_encode($selfMedals);
+            }
+        }
+        Db::name("user_base")->where("uuid", $userUuid)->update($userUpdateData);
+    }
+
 }
