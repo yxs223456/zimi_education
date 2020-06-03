@@ -353,6 +353,10 @@ class User extends Base
         return $this->jsonResponse($returnData);
     }
 
+    /**
+     * 未读系统消息数量v1
+     * @return \think\response\Json
+     */
     public function unreadNewsCount()
     {
         $user = $this->query["user"];
@@ -361,6 +365,10 @@ class User extends Base
         return $this->jsonResponse($returnData);
     }
 
+    /**
+     * 所有未读系统消息v1
+     * @return \think\response\Json
+     */
     public function allUnreadNews()
     {
         $user = $this->query["user"];
@@ -381,6 +389,11 @@ class User extends Base
         return $this->jsonResponse($returnData);
     }
 
+    /**
+     * 活动消息列表
+     * @return \think\response\Json
+     * @throws AppException
+     */
     public function activityNewsList()
     {
         $pageNum = input("page_num");

@@ -11,6 +11,7 @@ use app\common\AppException;
 use app\common\Constant;
 use app\common\enum\ActivityNewsTargetPageTypeEnum;
 use app\common\enum\NewsIsReadEnum;
+use app\common\enum\NewsTargetPageTypeEnum;
 use app\common\enum\NewsTypeEnum;
 use app\common\enum\PhoneVerificationCodeStatusEnum;
 use app\common\enum\PhoneVerificationCodeTypeEnum;
@@ -30,6 +31,7 @@ use app\common\helper\Redis;
 use app\common\model\ActivityNewsModel;
 use app\common\model\NewsModel;
 use app\common\model\PhoneVerificationCodeModel;
+use app\common\model\SystemNewsModel;
 use app\common\model\UserBaseModel;
 use app\common\model\UserCoinLogModel;
 use app\common\model\UserSignLogModel;
@@ -957,20 +959,32 @@ class UserService extends Base
     public function unreadNewsCount($user)
     {
         $newsModel = new NewsModel();
-        $unReadCount = $newsModel->getUnreadCountByUser($user["uuid"]);
+        $systemNewModel = new SystemNewsModel();
+        $unReadCount1 = $newsModel->getUnreadCountByUser($user["uuid"]);
+        $allSystemCount = $systemNewModel->getAllCount();
+        $readSystemCount = $newsModel->getReadSystemCount($user["uuid"]);
+        $unReadCount2 = $allSystemCount - $readSystemCount;
+
         return [
-            "count" => $unReadCount,
+            "count" => $unReadCount1 + $unReadCount2,
         ];
     }
 
     public function allUnreadNews($user)
     {
+        $returnData = [];
+
+        //个人系统消息
         $newsModel = new NewsModel();
         $allUnreadNews = $newsModel->allUnreadNewsByUser($user["uuid"]);
-        foreach ($allUnreadNews as $key=>$allUnreadNew) {
-            $allUnreadNews[$key]["create_time"] = strtotime($allUnreadNew["create_time"]);
+        foreach ($allUnreadNews as $allUnreadNew) {
+            $returnData[] = [
+                "uuid" => $allUnreadNew["uuid"],
+                "content" => $allUnreadNew["content"],
+                "target_page_type" => NewsTargetPageTypeEnum::NONE,
+                "create_time" => strtotime($allUnreadNew["create_time"]),
+            ];
         }
-
         //全部标记为已读
         if ($allUnreadNews) {
             $allUuid = array_column($allUnreadNews, "uuid");
@@ -982,11 +996,53 @@ class UserService extends Base
                 ]);
         }
 
-        return $allUnreadNews;
+        //群发系统消息
+        $systemNewsModel = new SystemNewsModel();
+        $allSystemNews = $systemNewsModel->getAll();
+        $readSystemNews = $newsModel->allSystemNewsByUser($user["uuid"]);
+        $readSystemNews = array_column($readSystemNews, "system_uuid");
+        $unreadSystemNews = [];
+        foreach ($allSystemNews as $item) {
+            if (in_array($item["uuid"], $readSystemNews)) {
+                continue;
+            }
+            $uuid = getRandomString();
+            $createTime = $item["is_push"]?$item["push_time"]:strtotime($item["create_time"]);
+            $unreadSystemNews[] = [
+                "uuid" => $uuid,
+                "user_uuid" => $user["uuid"],
+                "type" => NewsTypeEnum::SYSTEM_ALL,
+                "activity_uuid" => "",
+                "system_uuid" => $item["uuid"],
+                "content" => $item["content"],
+                "target_page" => $item["target_page"],
+                "page_params" => $item["page_params"],
+                "is_read" => NewsIsReadEnum::YES,
+                "read_time" => time(),
+                "create_time" => $createTime,
+                "update_time" => time(),
+            ];
+            $returnData[] = [
+                "uuid" => $uuid,
+                "content" => $item["content"],
+                "target_page_type" => NewsTargetPageTypeEnum::NONE,
+                "create_time" => $createTime,
+            ];
+        }
+        if ($unreadSystemNews) {
+            $newsModel->insertAll($unreadSystemNews);
+        }
+
+        $createTimeArray = array_column($returnData, "create_time");
+        array_multisort($createTimeArray, SORT_DESC, $returnData);
+
+        return $returnData;
     }
 
     public function unreadNewsCount2($user)
     {
+        $unReadSystemNewsUnreadCountInfo = $this->unreadNewsCount($user);
+        $unReadSystemNewsUnreadCount = $unReadSystemNewsUnreadCountInfo["count"];
         $newsModel = new NewsModel();
         $activityNewsModel = new ActivityNewsModel();
         $allActivityNewsCount = $activityNewsModel->getAllCount();
@@ -994,13 +1050,11 @@ class UserService extends Base
         $unReadCountInfo = $newsModel->unreadNewsCountInfo($user["uuid"]);
 
         $returnData = [
-            "system_news_unread_count" => 0,
+            "system_news_unread_count" => $unReadSystemNewsUnreadCount,
             "activity_news_unread_count" => $allActivityNewsCount,
         ];
         foreach ($unReadCountInfo as $item) {
-            if ($item["type"] == NewsTypeEnum::SYSTEM) {
-                $returnData["system_news_unread_count"] += 1;
-            } else if ($item["type"] == NewsTypeEnum::ACTIVITY && $item["is_read"] == NewsIsReadEnum::YES) {
+            if ($item["type"] == NewsTypeEnum::ACTIVITY && $item["is_read"] == NewsIsReadEnum::YES) {
                 $returnData["activity_news_unread_count"] -= 1;
             }
         }

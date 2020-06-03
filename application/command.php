@@ -18,4 +18,5 @@ return [
     'app\command\PkFinish',
     'app\command\PkTimeoutFinish',
     'app\command\PushMessageToUser',
+    'app\command\DoPushMessagePlan',
 ];

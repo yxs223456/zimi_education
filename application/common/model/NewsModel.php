@@ -23,6 +23,14 @@ class NewsModel extends Base
             ->count();
     }
 
+    public function getReadSystemCount($userUuid)
+    {
+        return $this
+            ->where("user_uuid", $userUuid)
+            ->where("type", NewsTypeEnum::SYSTEM_ALL)
+            ->count();
+    }
+
     public function allUnreadNewsByUser($userUuid)
     {
         return $this
@@ -30,6 +38,15 @@ class NewsModel extends Base
             ->where("type", NewsTypeEnum::SYSTEM)
             ->where("is_read", NewsIsReadEnum::NO)
             ->field("uuid,content,create_time")
+            ->order("id", "desc")
+            ->select()->toArray();
+    }
+
+    public function allSystemNewsByUser($userUuid)
+    {
+        return $this
+            ->where("user_uuid", $userUuid)
+            ->where("type", NewsTypeEnum::SYSTEM_ALL)
             ->order("id", "desc")
             ->select()->toArray();
     }
