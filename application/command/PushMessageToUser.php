@@ -55,9 +55,9 @@ class PushMessageToUser extends Command
     {
         $umengPush = new UmengPush();
 
-        $result = $umengPush->sendAndroidBroadcast($params["title"], $params["content"], $params["targetPageType"], $params["pageConfig"]);
+        $result = $umengPush->sendAndroidBroadcast($params["title"], $params["content"], $params["targetPageType"], $params["pageConfig"], $params["messageType"]);
         Log::write("umeng android broadcast push result:" . $result);
-        $result = $umengPush->sendIOSBroadcast($params["content"], $params["targetPageType"], $params["pageConfig"]);
+        $result = $umengPush->sendIOSBroadcast($params["content"], $params["targetPageType"], $params["pageConfig"], $params["messageType"]);
         Log::write("umeng ios broadcast  push result:" . $result);
     }
 

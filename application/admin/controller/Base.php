@@ -12,6 +12,7 @@ use app\admin\service\Admin as adminService;
 use app\admin\service\AuthGroup as authGroupService;
 use app\admin\service\AuthGroupAccess as authGroupAccessService;
 use app\admin\service\AuthRule as authRuleService;
+use app\admin\service\SystemNewsService;
 use app\admin\service\TrueFalseQuestionService;
 use app\admin\service\UserBaseService;
 use app\admin\service\UserStudyWritingService;
@@ -40,6 +41,7 @@ class Base extends Controller {
     protected $internalCompetitionJoinService;
     protected $internalCompetitionService;
     protected $pkService;
+    protected $systemNewsService;
 
     /**
      * 依赖注入
@@ -61,6 +63,7 @@ class Base extends Controller {
      * @param InternalCompetitionJoinService $internalCompetitionJoinService
      * @param InternalCompetitionService $internalCompetitionService
      * @param PkService $pkService
+     * @param SystemNewsService $systemNewsService
      */
     public function __construct( ActivityNewsService $activityNewsService,
                                  AdminService $adminService,
@@ -78,7 +81,8 @@ class Base extends Controller {
                                  UserSynthesizeService $userSynthesizeService,
                                  InternalCompetitionJoinService $internalCompetitionJoinService,
                                  InternalCompetitionService $internalCompetitionService,
-                                 PkService $pkService){
+                                 PkService $pkService,
+                                 SystemNewsService $systemNewsService){
 
         parent::__construct();
 
@@ -99,5 +103,6 @@ class Base extends Controller {
         $this->internalCompetitionJoinService = $internalCompetitionJoinService;
         $this->internalCompetitionService = $internalCompetitionService;
         $this->pkService = $pkService;
+        $this->systemNewsService = $systemNewsService;
     }
 }

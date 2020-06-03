@@ -53,6 +53,7 @@ class UmengPush
                 "is_single_user" => true,
                 "module" => "system_message",
                 "userid" => $userUuid,
+                "target_page_type" => 0,
             ];
             $customizedcast->setPredefinedKeyValue("custom",       $custom);
             $customizedcast->setPredefinedKeyValue("mipush",       true);
@@ -85,11 +86,12 @@ class UmengPush
             // Set your alias_type here
             $customizedcast->setPredefinedKeyValue("alias_type",       "DE_education");
 
-            $custom = json_encode([
+            $custom = [
                 "is_single_user"=>true,
                 "module" => "system_message",
                 "userid"=>$userUuid,
-            ]);
+                "target_page_type" => 0,
+            ];
             $customizedcast->setPredefinedKeyValue("custom",       $custom);
             $customizedcast->setPredefinedKeyValue("alert", $content);
             $customizedcast->setPredefinedKeyValue("badge", 0);
@@ -102,7 +104,7 @@ class UmengPush
         }
     }
 
-    public function sendAndroidBroadcast($title, $content, $targetPageType, array $pageConfig)
+    public function sendAndroidBroadcast($title, $content, $targetPageType, array $pageConfig, $messageType)
     {
         try {
             $umengConfig = config("account.android_umeng_push");
@@ -123,7 +125,7 @@ class UmengPush
                 case ActivityNewsTargetPageTypeEnum::H5:
                     $custom = [
                         "is_single_user" => false,
-                        "module" => "activity_message",
+                        "module" => $messageType,
                         "target_page_type" => $targetPageType,
                         "h5_page_params" => [
                             "title" => $pageConfig["title"],
@@ -152,7 +154,7 @@ class UmengPush
         }
     }
 
-    function sendIOSBroadcast($content, $targetPageType, array $pageParams) {
+    function sendIOSBroadcast($content, $targetPageType, array $pageParams, $messageType) {
         try {
             $umengConfig = config("account.ios_umeng_push");
             $this->appkey = $umengConfig["app_key"];
@@ -172,7 +174,7 @@ class UmengPush
                 case ActivityNewsTargetPageTypeEnum::H5:
                     $custom = [
                         "is_single_user" => false,
-                        "module" => "activity_message",
+                        "module" => $messageType,
                         "target_page_type" => $targetPageType,
                         "h5_page_params" => [
                             "title" => $pageParams["title"],
@@ -189,7 +191,7 @@ class UmengPush
                     break;
 
             }
-//            $brocast->setPredefinedKeyValue("custom",       $custom);
+            $brocast->setPredefinedKeyValue("custom",       $custom);
 
             return $brocast->send();
         } catch (\Throwable $e) {

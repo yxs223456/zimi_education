@@ -814,6 +814,30 @@ class UserService extends Base
                     "medal_url" => getImageUrl($allMedals["pk_level"][$userSelfMedals["pk_level"]]["top_url"]),
                 ];
             }
+            if (isset($userSelfMedals["sign_level"])) {
+                $returnData["current_medal"] = [
+                    "width" => $allMedals["sign_level"][$userSelfMedals["sign_level"]]["top_width"],
+                    "height" => $allMedals["sign_level"][$userSelfMedals["sign_level"]]["top_height"],
+                    "name" => $allMedals["sign_level"][$userSelfMedals["sign_level"]]["name"],
+                    "medal_url" => getImageUrl($allMedals["sign_level"][$userSelfMedals["sign_level"]]["top_url"]),
+                ];
+            }
+            if (isset($userSelfMedals["share_level"])) {
+                $returnData["current_medal"] = [
+                    "width" => $allMedals["share_level"][$userSelfMedals["share_level"]]["top_width"],
+                    "height" => $allMedals["share_level"][$userSelfMedals["share_level"]]["top_height"],
+                    "name" => $allMedals["share_level"][$userSelfMedals["share_level"]]["name"],
+                    "medal_url" => getImageUrl($allMedals["share_level"][$userSelfMedals["share_level"]]["top_url"]),
+                ];
+            }
+            if (isset($userSelfMedals["like_level"])) {
+                $returnData["current_medal"] = [
+                    "width" => $allMedals["like_level"][$userSelfMedals["like_level"]]["top_width"],
+                    "height" => $allMedals["like_level"][$userSelfMedals["like_level"]]["top_height"],
+                    "name" => $allMedals["like_level"][$userSelfMedals["like_level"]]["name"],
+                    "medal_url" => getImageUrl($allMedals["like_level"][$userSelfMedals["like_level"]]["top_url"]),
+                ];
+            }
         }
 
         $levelRange = UserLevelEnum::getAllValues();
@@ -837,8 +861,6 @@ class UserService extends Base
                     "medal_url" => getImageUrl($allMedals["novice_level"][$level]["url1"]),
                 ];
             }
-
-
         }
 
         $pkLevelRange = UserPkLevelEnum::getAllValues();
