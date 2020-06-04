@@ -10,8 +10,10 @@ namespace app\api\controller;
 
 use app\common\AppException;
 use app\common\enum\OperatingSystemEnum;
+use app\common\enum\PackageChannelEnum;
 use app\common\helper\UmengPush;
 use app\common\model\DeviceFirstOpenLogModel;
+use app\common\model\PackageChannelModel;
 use app\common\model\PackageConfigModel;
 use think\facade\Env;
 
@@ -19,9 +21,25 @@ class App extends Base
 {
     protected $beforeActionList = [
         'checkAuth' => [
-            'except' => 'submitPackage,checkUpdate,feedback,firstOpen,coinDescription',
+            'only' => 'share',
         ],
     ];
+
+    public function channelPackageInfo()
+    {
+        $model = new PackageChannelModel();
+        $data = $model->select();
+
+        $returnData = [];
+        foreach ($data as $item) {
+            $returnData[] = [
+                "channel" => $item["channel"],
+                "package_link" => config("web.self_domain") . "/".$item["package_link"]
+            ];
+        }
+
+        return $this->jsonResponse($returnData);
+    }
 
     public function submitPackage()
     {

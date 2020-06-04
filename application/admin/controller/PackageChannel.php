@@ -68,7 +68,7 @@ class PackageChannel extends Base
         $channel = input("channel");
         $packageLink = input("package_link");
 
-        $this->packageChannelService->saveByData(["channel"=>$channel], [
+        $this->packageChannelService->saveByWhereAndData(["channel"=>$channel], [
             "version" => $version,
             "channel" => $channel,
             "package_link" => $packageLink,

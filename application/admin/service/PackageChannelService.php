@@ -19,8 +19,14 @@ class PackageChannelService extends Base
         $this->currentModel = new PackageChannelModel();
     }
 
-    public function saveByData($where, $data)
+    public function saveByWhereAndData($where, $data)
     {
-        $this->currentModel->isUpdate(true, $where)->save($data);
+        $packageCount = $this->currentModel->where($where)->find();
+        if (!$packageCount) {
+            $this->currentModel->save($data);
+        } else {
+            $this->currentModel->where($where)->update(array_merge($data, ["update_time"=>time()]));
+        }
+
     }
 }
