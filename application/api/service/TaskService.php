@@ -11,7 +11,9 @@ namespace app\api\service;
 use app\common\Constant;
 use app\common\enum\UserCoinAddTypeEnum;
 use app\common\helper\Redis;
+use app\common\model\UserBaseModel;
 use app\common\model\UserCoinLogModel;
+use think\Db;
 
 class TaskService extends Base
 {
@@ -94,6 +96,8 @@ class TaskService extends Base
                 } else {
                     $reward = Constant::TASK_COIN_NUM["share"];
                 }
+                //分享次数累加
+                $this->addShareTimes($user["uuid"]);
                 break;
             default:
                 $reward = 0;
@@ -105,5 +109,37 @@ class TaskService extends Base
         return [
             "coin" => $user["coin"] + $reward,
         ];
+    }
+
+    //分享次数累加
+    private function addShareTimes($userUuid)
+    {
+        $userModel = new UserBaseModel();
+        $userService = new UserService();
+        Db::startTrans();
+        try {
+            $user = $userModel->findByUuid($userUuid);
+            $shareTimes = $user["share_times"] + 1;
+            $userNewShareLevel = $userService->userShareLevel($shareTimes);
+            $userUpdateData = ["share_times"=>$shareTimes];
+            if ($userNewShareLevel > $user["share_level"]) {
+                $userUpdateData["share_level"] = $userNewShareLevel;
+                //用户勋章以及当前勋章计算
+                $userMedals = json_decode($user["medals"], true);
+                $selfMedals = json_decode($user["self_medals"], true);
+                $userMedals["share_level"] = $userNewShareLevel;
+                $userUpdateData["medals"] = json_encode($userMedals);
+                if (empty($selfMedals) || isset($selfMedals["share_level"])) {
+                    $selfMedals["share_level"] = $userNewShareLevel;
+                    $userUpdateData["self_medals"] = json_encode($selfMedals);
+                }
+            }
+            $user->save($userUpdateData);
+
+            Db::commit();
+        } catch (\Throwable $e) {
+            Db::rollback();
+            throw $e;
+        }
     }
 }

@@ -1020,10 +1020,11 @@ function createUnicastPushTask($os, $userUuid, $content, $targetPage, array $pag
 }
 
 //创建广播任务
-function createBroadcastPushTask($content, $title, $targetPageType, array $pageConfig, \Redis $redis) {
+function createBroadcastPushTask($content, $title, $targetPageType, array $pageConfig, \Redis $redis, $messageType = "activity_message") {
     $key = "de_education:pushTask";
     $data = [
         "type" => "broadcast",
+        "messageType" => $messageType,
         "title" => $title,
         "content" => $content,
         "targetPageType" => $targetPageType,

@@ -1,0 +1,123 @@
+{include file="public/header" /}
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>添加/修改渠道包</h5>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal" name="add" id="add" method="post" action="{:url('addPost')}">
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">版本号：</label>
+                            <div class="input-group col-sm-4">
+                                <input id="version" type="text" class="form-control" name="version" >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">渠道：</label>
+                            <div class="input-group col-sm-4">
+                                <select name="channel" class="form-control"  id="channel">
+                                    {foreach $allChannel as $vo}
+                                    <option value="{$vo.value}">{$vo.desc}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">包链接：</label>
+                            <div class="input-group col-sm-4">
+                                <input type="text" id="package_link" class="form-control" name="package_link" readonly/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">包文件：</label>
+                            <div class="input-group col-sm-4">
+                                <input type="file" name="file" id="file_url"
+                                       onchange="uploadFile('package_link', 'file_url')" class="form-control file"/>
+                            </div>
+                        </div>
+
+
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-3">
+                                <button id="formSubmit" type="button" class="btn btn-primary"><i class="fa fa-save"></i> 保存</button>&nbsp;&nbsp;&nbsp;
+                                <a class="btn btn-danger" href="javascript:history.go(-1);"><i class="fa fa-close"></i> 返回</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{include file="public/footer" /}
+
+<script src="/static/admin/js/ajaxfileupload.js"></script>
+
+<script type="text/javascript">
+
+    //提交
+    $(function(){
+
+        $('#formSubmit').click(function() {
+
+            if(common.isNullOrEmpty($('#version').val())){
+                layer.msg('请输入版本号',{icon:2,time:1500,shade: 0.1}, function(index){
+                    layer.close(index);
+                });
+                return false;
+            }
+            if(common.isNullOrEmpty($('#channel').val())){
+                layer.msg('请选择渠道',{icon:2,time:1500,shade: 0.1}, function(index){
+                    layer.close(index);
+                });
+                return false;
+            }
+            if(common.isNullOrEmpty($('#package_link').val())){
+                layer.msg('请上传包文件',{icon:2,time:1500,shade: 0.1}, function(index){
+                    layer.close(index);
+                });
+                return false;
+            }
+
+            $("form#add").submit();
+
+        });
+
+    });
+
+    function uploadFile(formInput, fileInput) {
+        $.ajaxFileUpload({
+            url: "/admin/upload/uploadFile", //用于文件上传的服务器端请求地址
+            secureuri: false, //是否需要安全协议，一般设置为false
+            fileElementId: fileInput, //文件上传域的ID
+            dataType: 'json', //返回值类型 一般设置为json
+            data: "{}",
+            success: function (data, status)  //服务器成功响应处理函数
+            {
+                console.log(data);
+                if (data['code'] != 200) {
+                    layer.msg(data['msg']);
+                    return false;
+                }
+                $("#" + formInput).val(data['data']['url']);
+                console.log(data['data']['url'])
+            },
+            error: function (data, status, e)//服务器响应失败处理函数
+            {
+                console.log(e);
+            }
+        })
+    }
+
+</script>
+</body>
+</html>

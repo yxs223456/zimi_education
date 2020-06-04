@@ -11,6 +11,7 @@ use app\common\AppException;
 use app\common\Constant;
 use app\common\enum\ActivityNewsTargetPageTypeEnum;
 use app\common\enum\NewsIsReadEnum;
+use app\common\enum\NewsTargetPageTypeEnum;
 use app\common\enum\NewsTypeEnum;
 use app\common\enum\PhoneVerificationCodeStatusEnum;
 use app\common\enum\PhoneVerificationCodeTypeEnum;
@@ -18,15 +19,19 @@ use app\common\enum\UserCancelStatusEnum;
 use app\common\enum\UserCoinAddTypeEnum;
 use app\common\enum\UserIsBindWeChatEnum;
 use app\common\enum\UserLevelEnum;
+use app\common\enum\UserLikeLevelEnum;
 use app\common\enum\UserNoviceGuideIsReadEnum;
 use app\common\enum\UserNoviceGuideReadRewardEnum;
 use app\common\enum\UserPkLevelEnum;
+use app\common\enum\UserShareLevelEnum;
+use app\common\enum\UserSignLevelEnum;
 use app\common\helper\MobTech;
 use app\common\helper\Pbkdf2;
 use app\common\helper\Redis;
 use app\common\model\ActivityNewsModel;
 use app\common\model\NewsModel;
 use app\common\model\PhoneVerificationCodeModel;
+use app\common\model\SystemNewsModel;
 use app\common\model\UserBaseModel;
 use app\common\model\UserCoinLogModel;
 use app\common\model\UserSignLogModel;
@@ -632,6 +637,27 @@ class UserService extends Base
             ];
             (new UserSignLogModel())->insert($signLogData);
 
+            //用户连续签到天数（不考虑跨月）
+            if ($userInfo["last_sign_date"] == $yesterday) {
+                $continuousSignTimes2 = $userInfo["continuous_sign_times_2"] + 1;
+            } else {
+                $continuousSignTimes2 = 1;
+            }
+            //用户签到等级
+            $userNewSignLevel = $this->userSignLevel($continuousSignTimes2);
+            $userUpdateData = ["last_sign_date"=>$today,"update_time"=>$now,"continuous_sign_times_2"=>$continuousSignTimes2];
+            if ($userNewSignLevel > $userInfo["sign_level"]) {
+                //用户勋章以及当前勋章计算
+                $userMedals = json_decode($userInfo["medals"], true);
+                $selfMedals = json_decode($userInfo["self_medals"], true);
+                $userMedals["sign_level"] = $userNewSignLevel;
+                $userUpdateData["medals"] = json_encode($userMedals);
+                if (empty($selfMedals) || isset($selfMedals["sign_level"])) {
+                    $selfMedals["sign_level"] = $userNewSignLevel;
+                    $userUpdateData["self_medals"] = json_encode($selfMedals);
+                }
+            }
+
             //修改用户签到统计
             $lastSignMonth = substr($userInfo["last_sign_date"], 0, 7);
             $userExec = $userModel->where("uuid", $userUuid);
@@ -640,16 +666,18 @@ class UserService extends Base
                     //最后一次签到是本月，且最后一次签到是昨日
                     $userExec->inc("continuous_sign_times", 1)
                         ->inc("cumulative_sign_times", 1)
-                        ->update(["last_sign_date"=>$today,"update_time"=>$now]);
+                        ->update($userUpdateData);
                 } else {
                     //最后一次签到是本月，但最后一次签到不是昨日
+                    $userUpdateData["continuous_sign_times"] = 1;
                     $userExec->inc("cumulative_sign_times", 1)
-                        ->update(["last_sign_date"=>$today,"continuous_sign_times"=>1,"update_time"=>$now]);
+                        ->update($userUpdateData);
                 }
             } else {
                 //最后一次签到不是本月
-                $userExec->update(["last_sign_date"=>$today,"continuous_sign_times"=>1,
-                    "cumulative_sign_times"=>1,"update_time"=>$now]);
+                $userUpdateData["continuous_sign_times"] = 1;
+                $userUpdateData["cumulative_sign_times"] = 1;
+                $userExec->update($userUpdateData);
             }
 
             //用户累计签到达标，且未发放累计签到奖励，发放累计签到奖励
@@ -755,10 +783,11 @@ class UserService extends Base
 
     public function medals($user)
     {
+        $userModel = new UserBaseModel();
+        $user = $userModel->findByUuid($user["uuid"]);
         $allMedals = Constant::MEDAL_CONFIG;
         $userAllMedals = json_decode($user["medals"], true);
         $userSelfMedals = json_decode($user["self_medals"], true);
-
         $returnData = [];
 
         if (count($userSelfMedals) == 0) {
@@ -788,6 +817,30 @@ class UserService extends Base
                     "medal_url" => getImageUrl($allMedals["pk_level"][$userSelfMedals["pk_level"]]["top_url"]),
                 ];
             }
+            if (isset($userSelfMedals["sign_level"])) {
+                $returnData["current_medal"] = [
+                    "width" => $allMedals["sign_level"][$userSelfMedals["sign_level"]]["top_width"],
+                    "height" => $allMedals["sign_level"][$userSelfMedals["sign_level"]]["top_height"],
+                    "name" => $allMedals["sign_level"][$userSelfMedals["sign_level"]]["name"],
+                    "medal_url" => getImageUrl($allMedals["sign_level"][$userSelfMedals["sign_level"]]["top_url"]),
+                ];
+            }
+            if (isset($userSelfMedals["share_level"])) {
+                $returnData["current_medal"] = [
+                    "width" => $allMedals["share_level"][$userSelfMedals["share_level"]]["top_width"],
+                    "height" => $allMedals["share_level"][$userSelfMedals["share_level"]]["top_height"],
+                    "name" => $allMedals["share_level"][$userSelfMedals["share_level"]]["name"],
+                    "medal_url" => getImageUrl($allMedals["share_level"][$userSelfMedals["share_level"]]["top_url"]),
+                ];
+            }
+            if (isset($userSelfMedals["like_level"])) {
+                $returnData["current_medal"] = [
+                    "width" => $allMedals["like_level"][$userSelfMedals["like_level"]]["top_width"],
+                    "height" => $allMedals["like_level"][$userSelfMedals["like_level"]]["top_height"],
+                    "name" => $allMedals["like_level"][$userSelfMedals["like_level"]]["name"],
+                    "medal_url" => getImageUrl($allMedals["like_level"][$userSelfMedals["like_level"]]["top_url"]),
+                ];
+            }
         }
 
         $levelRange = UserLevelEnum::getAllValues();
@@ -811,14 +864,12 @@ class UserService extends Base
                     "medal_url" => getImageUrl($allMedals["novice_level"][$level]["url1"]),
                 ];
             }
-
-
         }
 
         $pkLevelRange = UserPkLevelEnum::getAllValues();
         foreach ($pkLevelRange as $pkLevel) {
             $isWin = 0;
-            if (isset($userAllMedals[$pkLevel]) && $userAllMedals[$pkLevel] == $pkLevel) {
+            if (isset($userAllMedals["pk_level"]) && $userAllMedals["pk_level"] >= $pkLevel) {
                 $isWin = 1;
             }
             $returnData["other_list"][] = [
@@ -832,13 +883,66 @@ class UserService extends Base
             ];
         }
 
+        $signLevelRange = UserSignLevelEnum::getAllValues();
+        foreach ($signLevelRange as $signLevel) {
+            $isWin = 0;
+            if (isset($userAllMedals["sign_level"]) && $userAllMedals["sign_level"] >= $signLevel) {
+                $isWin = 1;
+            }
+            $returnData["other_list"][] = [
+                "width" => $allMedals["sign_level"][$signLevel]["width"],
+                "height" => $allMedals["sign_level"][$signLevel]["height"],
+                "id" => $allMedals["sign_level"][$signLevel]["id"],
+                "name" => $allMedals["sign_level"][$signLevel]["name"],
+                "is_win" => $isWin,
+                "medal_url" => $isWin?getImageUrl($allMedals["sign_level"][$signLevel]["url1"]):
+                    getImageUrl($allMedals["sign_level"][$signLevel]["url2"]),
+            ];
+        }
+
+        $shareLevelRange = UserShareLevelEnum::getAllValues();
+        foreach ($shareLevelRange as $shareLevel) {
+            $isWin = 0;
+            if (isset($userAllMedals["share_level"]) && $userAllMedals["share_level"] >= $shareLevel) {
+                $isWin = 1;
+            }
+            $returnData["other_list"][] = [
+                "width" => $allMedals["share_level"][$shareLevel]["width"],
+                "height" => $allMedals["share_level"][$shareLevel]["height"],
+                "id" => $allMedals["share_level"][$shareLevel]["id"],
+                "name" => $allMedals["share_level"][$shareLevel]["name"],
+                "is_win" => $isWin,
+                "medal_url" => $isWin?getImageUrl($allMedals["share_level"][$shareLevel]["url1"]):
+                    getImageUrl($allMedals["share_level"][$shareLevel]["url2"]),
+            ];
+        }
+
+        $likeLevelRange = UserLikeLevelEnum::getAllValues();
+        foreach ($likeLevelRange as $likeLevel) {
+            $isWin = 0;
+            if (isset($userAllMedals["like_level"]) && $userAllMedals["like_level"] >= $likeLevel) {
+                $isWin = 1;
+            }
+            $returnData["other_list"][] = [
+                "width" => $allMedals["like_level"][$likeLevel]["width"],
+                "height" => $allMedals["like_level"][$likeLevel]["height"],
+                "id" => $allMedals["like_level"][$likeLevel]["id"],
+                "name" => $allMedals["like_level"][$likeLevel]["name"],
+                "is_win" => $isWin,
+                "medal_url" => $isWin?getImageUrl($allMedals["like_level"][$likeLevel]["url1"]):
+                    getImageUrl($allMedals["like_level"][$likeLevel]["url2"]),
+            ];
+        }
+
         return $returnData;
     }
 
     public function updateSelfMedal($user, $medalIds)
     {
-        $userSelfMedal = [];
-        $userAllMedal = [];
+        $userModel = new UserBaseModel();
+        $user = $userModel->findByUuid($user["uuid"])->toArray();
+        $userSelfMedal = json_decode($user["self_medals"], true);
+        $userAllMedal = json_decode($user["medals"], true);
         $allMedals = Constant::MEDAL_CONFIG;
         $medalUrls = [];
 
@@ -870,7 +974,7 @@ class UserService extends Base
 
         foreach ($allMedals["pk_level"] as $pkLevel => $pkLevelInfo) {
             if (in_array($pkLevelInfo["id"], $medalIds)) {
-                if (isset($userAllMedal["pk_level"]) && $userAllMedal["pk_level"] == $pkLevel) {
+                if (isset($userAllMedal["pk_level"]) && $userAllMedal["pk_level"] >= $pkLevel) {
                     $userSelfMedal["pk_level"] = $pkLevel;
                     $medalUrls[] = getImageUrl($pkLevelInfo["top_url"]);
                 } else {
@@ -879,7 +983,39 @@ class UserService extends Base
             }
         }
 
-        $userModel = new UserBaseModel();
+        foreach ($allMedals["sign_level"] as $signLevel => $signLevelInfo) {
+            if (in_array($signLevelInfo["id"], $medalIds)) {
+                if (isset($userAllMedal["sign_level"]) && $userAllMedal["sign_level"] >= $signLevel) {
+                    $userSelfMedal["sign_level"] = $signLevel;
+                    $medalUrls[] = getImageUrl($signLevelInfo["top_url"]);
+                } else {
+                    throw AppException::factory(AppException::USER_NONE_MEDAL);
+                }
+            }
+        }
+
+        foreach ($allMedals["share_level"] as $shareLevel => $shareLevelInfo) {
+            if (in_array($shareLevelInfo["id"], $medalIds)) {
+                if (isset($userAllMedal["share_level"]) && $userAllMedal["share_level"] >= $shareLevel) {
+                    $userSelfMedal["share_level"] = $shareLevel;
+                    $medalUrls[] = getImageUrl($shareLevelInfo["top_url"]);
+                } else {
+                    throw AppException::factory(AppException::USER_NONE_MEDAL);
+                }
+            }
+        }
+
+        foreach ($allMedals["like_level"] as $likeLevel => $likeLevelInfo) {
+            if (in_array($likeLevelInfo["id"], $medalIds)) {
+                if (isset($userAllMedal["like_level"]) && $userAllMedal["like_level"] >= $likeLevel) {
+                    $userSelfMedal["like_level"] = $likeLevel;
+                    $medalUrls[] = getImageUrl($likeLevelInfo["top_url"]);
+                } else {
+                    throw AppException::factory(AppException::USER_NONE_MEDAL);
+                }
+            }
+        }
+
         Db::name($userModel->getTable())
             ->where("uuid", $user["uuid"])
             ->update(
@@ -909,20 +1045,32 @@ class UserService extends Base
     public function unreadNewsCount($user)
     {
         $newsModel = new NewsModel();
-        $unReadCount = $newsModel->getUnreadCountByUser($user["uuid"]);
+        $systemNewModel = new SystemNewsModel();
+        $unReadCount1 = $newsModel->getUnreadCountByUser($user["uuid"]);
+        $allSystemCount = $systemNewModel->getAllCount();
+        $readSystemCount = $newsModel->getReadSystemCount($user["uuid"]);
+        $unReadCount2 = $allSystemCount - $readSystemCount;
+
         return [
-            "count" => $unReadCount,
+            "count" => $unReadCount1 + $unReadCount2,
         ];
     }
 
     public function allUnreadNews($user)
     {
+        $returnData = [];
+
+        //个人系统消息
         $newsModel = new NewsModel();
         $allUnreadNews = $newsModel->allUnreadNewsByUser($user["uuid"]);
-        foreach ($allUnreadNews as $key=>$allUnreadNew) {
-            $allUnreadNews[$key]["create_time"] = strtotime($allUnreadNew["create_time"]);
+        foreach ($allUnreadNews as $allUnreadNew) {
+            $returnData[] = [
+                "uuid" => $allUnreadNew["uuid"],
+                "content" => $allUnreadNew["content"],
+                "target_page_type" => NewsTargetPageTypeEnum::NONE,
+                "create_time" => strtotime($allUnreadNew["create_time"]),
+            ];
         }
-
         //全部标记为已读
         if ($allUnreadNews) {
             $allUuid = array_column($allUnreadNews, "uuid");
@@ -934,11 +1082,80 @@ class UserService extends Base
                 ]);
         }
 
-        return $allUnreadNews;
+        //群发系统消息
+        $systemNewsModel = new SystemNewsModel();
+        $allSystemNews = $systemNewsModel->getAll();
+        $readSystemNews = $newsModel->allSystemNewsByUser($user["uuid"]);
+        $readSystemNews = array_column($readSystemNews, "system_uuid");
+        $unreadSystemNews = [];
+        foreach ($allSystemNews as $item) {
+            if (in_array($item["uuid"], $readSystemNews)) {
+                continue;
+            }
+            $uuid = getRandomString();
+            $createTime = $item["is_push"]?$item["push_time"]:strtotime($item["create_time"]);
+            $unreadSystemNews[] = [
+                "uuid" => $uuid,
+                "user_uuid" => $user["uuid"],
+                "type" => NewsTypeEnum::SYSTEM_ALL,
+                "activity_uuid" => "",
+                "system_uuid" => $item["uuid"],
+                "content" => $item["content"],
+                "target_page" => $item["target_page"],
+                "page_params" => $item["page_params"],
+                "is_read" => NewsIsReadEnum::YES,
+                "read_time" => time(),
+                "create_time" => $createTime,
+                "update_time" => time(),
+            ];
+            $localAndroid = new \stdClass();
+            $localIos = new \stdClass();
+            $h5PageParams =  new \stdClass();
+            switch ($item["target_page_type"]) {
+                case NewsTargetPageTypeEnum::APP:
+                    $targetPage = json_decode($item["target_page"], true);
+                    $pageParams = json_decode($item["page_params"], true);
+                    $localAndroid = [
+                        "page" => $targetPage["android"],
+                        "params" => $pageParams["android"],
+                    ];
+                    $localIos = [
+                        "page" => $targetPage["ios"],
+                        "params" => $pageParams["ios"],
+                    ];
+                    break;
+                case NewsTargetPageTypeEnum::H5:
+                    $targetParams = json_decode($item["target_params"], true);
+                    $h5PageParams = [
+                        "title" => $targetParams["title"],
+                        "url" => $item["target_page"],
+                    ];
+
+            }
+            $returnData[] = [
+                "uuid" => $uuid,
+                "content" => $item["content"],
+                "target_page_type" => $item["target_page_type"],
+                "local_android" => $localAndroid,
+                "local_ios" => $localIos,
+                "h5_page_params" => $h5PageParams,
+                "create_time" => $createTime,
+            ];
+        }
+        if ($unreadSystemNews) {
+            $newsModel->insertAll($unreadSystemNews);
+        }
+
+        $createTimeArray = array_column($returnData, "create_time");
+        array_multisort($createTimeArray, SORT_DESC, $returnData);
+
+        return $returnData;
     }
 
     public function unreadNewsCount2($user)
     {
+        $unReadSystemNewsUnreadCountInfo = $this->unreadNewsCount($user);
+        $unReadSystemNewsUnreadCount = $unReadSystemNewsUnreadCountInfo["count"];
         $newsModel = new NewsModel();
         $activityNewsModel = new ActivityNewsModel();
         $allActivityNewsCount = $activityNewsModel->getAllCount();
@@ -946,13 +1163,11 @@ class UserService extends Base
         $unReadCountInfo = $newsModel->unreadNewsCountInfo($user["uuid"]);
 
         $returnData = [
-            "system_news_unread_count" => 0,
+            "system_news_unread_count" => $unReadSystemNewsUnreadCount,
             "activity_news_unread_count" => $allActivityNewsCount,
         ];
         foreach ($unReadCountInfo as $item) {
-            if ($item["type"] == NewsTypeEnum::SYSTEM) {
-                $returnData["system_news_unread_count"] += 1;
-            } else if ($item["type"] == NewsTypeEnum::ACTIVITY && $item["is_read"] == NewsIsReadEnum::YES) {
+            if ($item["type"] == NewsTypeEnum::ACTIVITY && $item["is_read"] == NewsIsReadEnum::YES) {
                 $returnData["activity_news_unread_count"] -= 1;
             }
         }
@@ -1344,5 +1559,55 @@ class UserService extends Base
         }
 
         return $pkLevel;
+    }
+
+    public function userSignLevel($continuousSignTimes2)
+    {
+        //  签到新人（连续签到7天获得）、签到能手（连续签到30天获得）、签到达人（连续签到90天获得）
+        if ($continuousSignTimes2 >= 90) {
+            $signLevel = UserSignLevelEnum::THREE;
+        } else if ($continuousSignTimes2 >= 30) {
+            $signLevel = UserSignLevelEnum::TWO;
+        } else if ($continuousSignTimes2 >= 7) {
+            $signLevel = UserSignLevelEnum::ONE;
+        } else {
+            $signLevel = 0;
+        }
+
+        return $signLevel;
+    }
+
+    public function userShareLevel($shareTimes)
+    {
+        //  分享助手（分享15次）、分享达人（分享50次）、分享大使（分享200次）
+        if ($shareTimes >= 200) {
+            $shareLevel = UserShareLevelEnum::THREE;
+        } else if ($shareTimes >= 50) {
+            $shareLevel = UserShareLevelEnum::TWO;
+        } else if ($shareTimes >= 15) {
+            $shareLevel = UserShareLevelEnum::ONE;
+        } else {
+            $shareLevel = 0;
+        }
+
+        return $shareLevel;
+    }
+
+    public function userLikeLevel($likeTimes)
+    {
+        //  铁手指（点赞10次）、铜手指（点赞100次）、银手指（点赞200次）、金手指（点赞500次）
+        if ($likeTimes >= 500) {
+            $likeLevel = UserLikeLevelEnum::FOUR;
+        } else if ($likeTimes >= 200) {
+            $likeLevel = UserLikeLevelEnum::THREE;
+        } else if ($likeTimes >= 100) {
+            $likeLevel = UserLikeLevelEnum::TWO;
+        } else if ($likeTimes >= 10) {
+            $likeLevel = UserLikeLevelEnum::ONE;
+        } else {
+            $likeLevel = 0;
+        }
+
+        return $likeLevel;
     }
 }

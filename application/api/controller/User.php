@@ -12,6 +12,7 @@ use app\api\service\UserService;
 use app\api\service\v1\AthleticsService;
 use app\api\service\v1\UserWritingService;
 use app\common\AppException;
+use app\common\enum\UserWritingSourceTypeEnum;
 
 class User extends Base
 {
@@ -266,6 +267,41 @@ class User extends Base
         return $this->jsonResponse($returnData);
     }
 
+    //专享测试作文
+    public function studyWritingList()
+    {
+        $pageNum = input("page_num");
+        $pageSize = input("page_size");
+        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $service = new UserWritingService();
+        $returnData = $service->writingListBySourceType($user, $pageNum, $pageSize,
+            UserWritingSourceTypeEnum::STUDY);
+
+        return $this->jsonResponse($returnData);
+    }
+
+    //综合测试作文
+    public function synthesizeWritingList()
+    {
+        $pageNum = input("page_num");
+        $pageSize = input("page_size");
+        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $service = new UserWritingService();
+        $returnData = $service->writingListBySourceType($user, $pageNum, $pageSize,
+            UserWritingSourceTypeEnum::SYNTHESIZE);
+
+        return $this->jsonResponse($returnData);
+    }
+
+
     //DE币流水
     public function coinFlowList()
     {
@@ -317,6 +353,10 @@ class User extends Base
         return $this->jsonResponse($returnData);
     }
 
+    /**
+     * 未读系统消息数量v1
+     * @return \think\response\Json
+     */
     public function unreadNewsCount()
     {
         $user = $this->query["user"];
@@ -325,6 +365,10 @@ class User extends Base
         return $this->jsonResponse($returnData);
     }
 
+    /**
+     * 所有未读系统消息v1
+     * @return \think\response\Json
+     */
     public function allUnreadNews()
     {
         $user = $this->query["user"];
@@ -345,6 +389,11 @@ class User extends Base
         return $this->jsonResponse($returnData);
     }
 
+    /**
+     * 活动消息列表
+     * @return \think\response\Json
+     * @throws AppException
+     */
     public function activityNewsList()
     {
         $pageNum = input("page_num");

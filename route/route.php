@@ -72,6 +72,11 @@ Route::rule('user/activityNewsList', 'api/user/activityNewsList', 'post');
 //领取阅读新手引导奖励
 Route::rule('user/getNoviceGuideReward', 'api/user/getNoviceGuideReward');
 
+//专享测试作文
+Route::rule('user/studyWritingList', 'api/user/studyWritingList', 'post');
+//综合测试作文
+Route::rule('user/synthesizeWritingList', 'api/user/synthesizeWritingList', 'post');
+
 
 //任务中心首页
 Route::rule('task/index', 'api/task/index', 'post');
@@ -89,6 +94,8 @@ Route::rule('app/share', 'api/app/share', 'post');
 Route::rule('app/firstOpen', 'api/app/firstOpen', 'post');
 //de币说明
 Route::rule('app/coinDescription', 'api/app/coinDescription', 'post');
+//渠道包
+Route::rule('app/channelPackageInfo', 'api/app/channelPackageInfo', 'post');
 
 
 //获取新手测试题

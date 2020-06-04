@@ -6,12 +6,15 @@ use app\admin\service\ActivityNewsService;
 use app\admin\service\FillTheBlanksService;
 use app\admin\service\InternalCompetitionJoinService;
 use app\admin\service\InternalCompetitionService;
+use app\admin\service\PackageChannelService;
+use app\admin\service\PackageConfigService;
 use app\admin\service\PkService;
 use app\admin\service\SingleChoiceService;
 use app\admin\service\Admin as adminService;
 use app\admin\service\AuthGroup as authGroupService;
 use app\admin\service\AuthGroupAccess as authGroupAccessService;
 use app\admin\service\AuthRule as authRuleService;
+use app\admin\service\SystemNewsService;
 use app\admin\service\TrueFalseQuestionService;
 use app\admin\service\UserBaseService;
 use app\admin\service\UserStudyWritingService;
@@ -40,6 +43,9 @@ class Base extends Controller {
     protected $internalCompetitionJoinService;
     protected $internalCompetitionService;
     protected $pkService;
+    protected $systemNewsService;
+    protected $packageConfigService;
+    protected $packageChannelService;
 
     /**
      * 依赖注入
@@ -61,6 +67,9 @@ class Base extends Controller {
      * @param InternalCompetitionJoinService $internalCompetitionJoinService
      * @param InternalCompetitionService $internalCompetitionService
      * @param PkService $pkService
+     * @param SystemNewsService $systemNewsService
+     * @param PackageConfigService $packageConfigService
+     * @param PackageChannelService $packageChannelService
      */
     public function __construct( ActivityNewsService $activityNewsService,
                                  AdminService $adminService,
@@ -78,7 +87,10 @@ class Base extends Controller {
                                  UserSynthesizeService $userSynthesizeService,
                                  InternalCompetitionJoinService $internalCompetitionJoinService,
                                  InternalCompetitionService $internalCompetitionService,
-                                 PkService $pkService){
+                                 PkService $pkService,
+                                 SystemNewsService $systemNewsService,
+                                 PackageConfigService $packageConfigService,
+                                 PackageChannelService $packageChannelService){
 
         parent::__construct();
 
@@ -99,5 +111,8 @@ class Base extends Controller {
         $this->internalCompetitionJoinService = $internalCompetitionJoinService;
         $this->internalCompetitionService = $internalCompetitionService;
         $this->pkService = $pkService;
+        $this->systemNewsService = $systemNewsService;
+        $this->packageChannelService = $packageChannelService;
+        $this->packageConfigService = $packageConfigService;
     }
 }

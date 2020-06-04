@@ -18,8 +18,11 @@ class NewsTypeEnum
     use EnumTrait;
 
     const SYSTEM = 1;
-    const SYSTEM_DSC = "系统消息";
+    const SYSTEM_DSC = "个人系统消息";
 
     const ACTIVITY = 2;
     const ACTIVITY_DESC = "活动消息";
+
+    const SYSTEM_ALL = 3;
+    const SYSTEM_ALL_DSC = "群发系统消息";
 }
