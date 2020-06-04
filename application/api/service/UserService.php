@@ -1114,11 +1114,14 @@ class UserService extends Base
             switch ($item["target_page_type"]) {
                 case NewsTargetPageTypeEnum::APP:
                     $targetPage = json_decode($item["target_page"], true);
+                    $pageParams = json_decode($item["page_params"], true);
                     $localAndroid = [
                         "page" => $targetPage["android"],
+                        "params" => $pageParams["android"],
                     ];
                     $localIos = [
                         "page" => $targetPage["ios"],
+                        "params" => $pageParams["ios"],
                     ];
                     break;
                 case NewsTargetPageTypeEnum::H5:

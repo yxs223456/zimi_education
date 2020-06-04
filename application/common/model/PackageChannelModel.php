@@ -11,4 +11,12 @@ namespace app\common\model;
 class PackageChannelModel extends Base
 {
     protected $table = 'package_channel';
+
+    public function findByChannel($channel)
+    {
+        return $this->where("channel", $channel)
+            ->find();
+    }
+
+
 }
