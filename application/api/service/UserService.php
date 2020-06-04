@@ -939,8 +939,10 @@ class UserService extends Base
 
     public function updateSelfMedal($user, $medalIds)
     {
-        $userSelfMedal = [];
-        $userAllMedal = [];
+        $userModel = new UserBaseModel();
+        $user = $userModel->findByUuid($user["uuid"])->toArray();
+        $userSelfMedal = json_decode($user["self_medals"], true);
+        $userAllMedal = json_decode($user["medals"], true);
         $allMedals = Constant::MEDAL_CONFIG;
         $medalUrls = [];
 
@@ -981,7 +983,39 @@ class UserService extends Base
             }
         }
 
-        $userModel = new UserBaseModel();
+        foreach ($allMedals["sign_level"] as $signLevel => $signLevelInfo) {
+            if (in_array($signLevelInfo["id"], $medalIds)) {
+                if (isset($userAllMedal["sign_level"]) && $userAllMedal["sign_level"] == $signLevel) {
+                    $userSelfMedal["sign_level"] = $signLevel;
+                    $medalUrls[] = getImageUrl($signLevelInfo["top_url"]);
+                } else {
+                    throw AppException::factory(AppException::USER_NONE_MEDAL);
+                }
+            }
+        }
+
+        foreach ($allMedals["share_level"] as $shareLevel => $shareLevelInfo) {
+            if (in_array($shareLevelInfo["id"], $medalIds)) {
+                if (isset($userAllMedal["share_level"]) && $userAllMedal["share_level"] == $shareLevel) {
+                    $userSelfMedal["share_level"] = $shareLevel;
+                    $medalUrls[] = getImageUrl($shareLevelInfo["top_url"]);
+                } else {
+                    throw AppException::factory(AppException::USER_NONE_MEDAL);
+                }
+            }
+        }
+
+        foreach ($allMedals["like_level"] as $likeLevel => $likeLevelInfo) {
+            if (in_array($likeLevelInfo["id"], $medalIds)) {
+                if (isset($userAllMedal["like_level"]) && $userAllMedal["like_level"] == $likeLevel) {
+                    $userSelfMedal["like_level"] = $likeLevel;
+                    $medalUrls[] = getImageUrl($likeLevelInfo["top_url"]);
+                } else {
+                    throw AppException::factory(AppException::USER_NONE_MEDAL);
+                }
+            }
+        }
+
         Db::name($userModel->getTable())
             ->where("uuid", $user["uuid"])
             ->update(
@@ -1074,10 +1108,34 @@ class UserService extends Base
                 "create_time" => $createTime,
                 "update_time" => time(),
             ];
+            $localAndroid = new \stdClass();
+            $localIos = new \stdClass();
+            $h5PageParams =  new \stdClass();
+            switch ($item["target_page_type"]) {
+                case NewsTargetPageTypeEnum::APP:
+                    $targetPage = json_decode($item["target_page"], true);
+                    $localAndroid = [
+                        "page" => $targetPage["android"],
+                    ];
+                    $localIos = [
+                        "page" => $targetPage["ios"],
+                    ];
+                    break;
+                case NewsTargetPageTypeEnum::H5:
+                    $targetParams = json_decode($item["target_params"], true);
+                    $h5PageParams = [
+                        "title" => $targetParams["title"],
+                        "url" => $item["target_page"],
+                    ];
+
+            }
             $returnData[] = [
                 "uuid" => $uuid,
                 "content" => $item["content"],
-                "target_page_type" => NewsTargetPageTypeEnum::NONE,
+                "target_page_type" => $item["target_page_type"],
+                "local_android" => $localAndroid,
+                "local_ios" => $localIos,
+                "h5_page_params" => $h5PageParams,
                 "create_time" => $createTime,
             ];
         }

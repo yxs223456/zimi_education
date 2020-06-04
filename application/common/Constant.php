@@ -433,7 +433,7 @@ class Constant
                 "name" => "银手指",
                 "top_url" => "static/medal/toplikelevel3.png",
                 "url1" => "static/medal/likelevel3.png",
-                "url2" => "static/medal/graylilkelevel3.png",
+                "url2" => "static/medal/graylikelevel3.png",
                 "top_width" => 255,
                 "top_height" => 255,
                 "width" => 120,
