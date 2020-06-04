@@ -11,6 +11,7 @@ namespace app\command;
 use app\common\enum\ActivityNewsTargetPageTypeEnum;
 use app\common\enum\NewsIsPushAlreadyEnum;
 use app\common\enum\NewsIsPushEnum;
+use app\common\enum\NewsTargetPageTypeEnum;
 use app\common\helper\Redis;
 use app\common\model\SystemNewsModel;
 use think\console\Command;
@@ -45,11 +46,28 @@ class DoPushMessagePlan extends Command
                 ->find();
 
             if ($waitPushNews) {
+                $targetPageType = $waitPushNews["target_page_type"];
+                if ($targetPageType == NewsTargetPageTypeEnum::APP) {
+                    $pageConfig = [
+                        "target_page" => json_decode($waitPushNews["target_page"], true),
+                        "page_params" => json_decode($waitPushNews["page_params"], true)
+                    ];
+                } else if ($targetPageType == NewsTargetPageTypeEnum::H5) {
+                    $pageParams = json_decode($waitPushNews["page_params"], true);
+                    $pageConfig = [
+                        "url" => $waitPushNews["target_page"],
+                        "title" => $pageParams["title"]
+                    ];
+                } else {
+                    $targetPageType = NewsTargetPageTypeEnum::NONE;
+                    $pageConfig = [];
+                }
+
                 $redis = Redis::factory();
                 createBroadcastPushTask($waitPushNews["content"],
-                    $waitPushNews["push_time"],
-                    ActivityNewsTargetPageTypeEnum::NONE,
-                    [],
+                    $waitPushNews["push_title"],
+                    $targetPageType,
+                    $pageConfig,
                     $redis,
                     "system_message");
                 $redis->close();

@@ -783,10 +783,11 @@ class UserService extends Base
 
     public function medals($user)
     {
+        $userModel = new UserBaseModel();
+        $user = $userModel->findByUuid($user["uuid"]);
         $allMedals = Constant::MEDAL_CONFIG;
         $userAllMedals = json_decode($user["medals"], true);
         $userSelfMedals = json_decode($user["self_medals"], true);
-
         $returnData = [];
 
         if (count($userSelfMedals) == 0) {
@@ -868,7 +869,7 @@ class UserService extends Base
         $pkLevelRange = UserPkLevelEnum::getAllValues();
         foreach ($pkLevelRange as $pkLevel) {
             $isWin = 0;
-            if (isset($userAllMedals[$pkLevel]) && $userAllMedals[$pkLevel] == $pkLevel) {
+            if (isset($userAllMedals["pk_level"]) && $userAllMedals["pk_level"] >= $pkLevel) {
                 $isWin = 1;
             }
             $returnData["other_list"][] = [
@@ -879,6 +880,57 @@ class UserService extends Base
                 "is_win" => $isWin,
                 "medal_url" => $isWin?getImageUrl($allMedals["pk_level"][$pkLevel]["url1"]):
                     getImageUrl($allMedals["pk_level"][$pkLevel]["url2"]),
+            ];
+        }
+
+        $signLevelRange = UserSignLevelEnum::getAllValues();
+        foreach ($signLevelRange as $signLevel) {
+            $isWin = 0;
+            if (isset($userAllMedals["sign_level"]) && $userAllMedals["sign_level"] >= $signLevel) {
+                $isWin = 1;
+            }
+            $returnData["other_list"][] = [
+                "width" => $allMedals["sign_level"][$signLevel]["width"],
+                "height" => $allMedals["sign_level"][$signLevel]["height"],
+                "id" => $allMedals["sign_level"][$signLevel]["id"],
+                "name" => $allMedals["sign_level"][$signLevel]["name"],
+                "is_win" => $isWin,
+                "medal_url" => $isWin?getImageUrl($allMedals["sign_level"][$signLevel]["url1"]):
+                    getImageUrl($allMedals["sign_level"][$signLevel]["url2"]),
+            ];
+        }
+
+        $shareLevelRange = UserShareLevelEnum::getAllValues();
+        foreach ($shareLevelRange as $shareLevel) {
+            $isWin = 0;
+            if (isset($userAllMedals["share_level"]) && $userAllMedals["share_level"] >= $shareLevel) {
+                $isWin = 1;
+            }
+            $returnData["other_list"][] = [
+                "width" => $allMedals["share_level"][$shareLevel]["width"],
+                "height" => $allMedals["share_level"][$shareLevel]["height"],
+                "id" => $allMedals["share_level"][$shareLevel]["id"],
+                "name" => $allMedals["share_level"][$shareLevel]["name"],
+                "is_win" => $isWin,
+                "medal_url" => $isWin?getImageUrl($allMedals["share_level"][$shareLevel]["url1"]):
+                    getImageUrl($allMedals["share_level"][$shareLevel]["url2"]),
+            ];
+        }
+
+        $likeLevelRange = UserLikeLevelEnum::getAllValues();
+        foreach ($likeLevelRange as $likeLevel) {
+            $isWin = 0;
+            if (isset($userAllMedals["like_level"]) && $userAllMedals["like_level"] >= $likeLevel) {
+                $isWin = 1;
+            }
+            $returnData["other_list"][] = [
+                "width" => $allMedals["like_level"][$likeLevel]["width"],
+                "height" => $allMedals["like_level"][$likeLevel]["height"],
+                "id" => $allMedals["like_level"][$likeLevel]["id"],
+                "name" => $allMedals["like_level"][$likeLevel]["name"],
+                "is_win" => $isWin,
+                "medal_url" => $isWin?getImageUrl($allMedals["like_level"][$likeLevel]["url1"]):
+                    getImageUrl($allMedals["like_level"][$likeLevel]["url2"]),
             ];
         }
 

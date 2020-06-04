@@ -72,6 +72,38 @@ class SystemNews extends Base
         $content = trim(input("content"));
         $pushTitle = input("push_title");
         $pushTime = strtotime(input("push_time"));
+        $targetPageType = (int) input("target_page");
+        if ($targetPageType == NewsTargetPageTypeEnum::APP) {
+            $androidPage = input("android_page");
+            $androidParams = json_decode(input("android_params"), true);
+            $iosPage = input("ios_page");
+            $iosParams = json_decode(input("ios_params"), true);
+            if ($androidPage == "") {
+                $this->error('请填写Android页面链接');
+            } else if (!is_array($androidParams)) {
+                $this->error('Android页面参数格式错误');
+            } else if ($iosPage == "") {
+                $this->error('请填写IOS页面链接');
+            } else if (!is_array($iosParams)) {
+                $this->error('IOS页面参数格式错误');
+            }
+            $targetPage = json_encode(["android"=>$androidPage,"ios"=>$iosPage]);
+            $targetParams = json_encode(["android"=>$androidParams,"ios"=>$iosParams]);
+        } else if (NewsTargetPageTypeEnum::H5) {
+            $h5Title = input("h5_title");
+            $h5Url = input("h5_url");
+            if ($h5Title == "") {
+                $this->error('h5页面标题不能为空');
+            } else if ($h5Url == "") {
+                $this->error('h5链接不能为空');
+            }
+            $targetPage = $h5Url;
+            $targetParams = json_encode(["title"=>$h5Title]);
+        } else {
+            $targetPageType = NewsTargetPageTypeEnum::NONE;
+            $targetPage = "";
+            $targetParams = "";
+        }
 
         $newsInfo = [
             "uuid" => getRandomString(),
@@ -80,6 +112,9 @@ class SystemNews extends Base
             "push_time" => $pushTime,
             "is_push" => NewsIsPushEnum::YES,
             "is_push_already" => NewsIsPushAlreadyEnum::NO,
+            "target_page_type" => $targetPageType,
+            "target_page" => $targetPage,
+            "page_params" => $targetParams,
             "create_time" => time(),
             "update_time" => time(),
 

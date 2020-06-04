@@ -1,12 +1,21 @@
 {include file="public/header" /}
-
+<link href="/static/admin/css/select2.min.css" rel="stylesheet">
+<!-- 配置文件 -->
+<script type="text/javascript" src="/static/admin/ueditor/ueditor.config.js"></script>
+<!-- 编辑器源码文件 -->
+<script type="text/javascript" src="/static/admin/ueditor/ueditor.all.js"></script>
+<style>
+    .file-item{float: left; position: relative; width: 110px;height: 110px; margin: 0 20px 20px 0; padding: 4px;}
+    .file-item .info{overflow: hidden;}
+    .uploader-list{width: 100%; overflow: hidden;}
+</style>
 <style type="text/css">
     .laydate-icon {
         background: transparent !important;
     }
 </style>
 <body class="gray-bg">
-<div class="wrapper wrapper-content animated fadeInRight">
+<div class="wrapper wrapper-content animated fadeInRight" id="app">
     <div class="row">
         <div class="col-sm-12">
             <div class="ibox float-e-margins">
@@ -27,6 +36,61 @@
                                 <input id="content" type="text" class="form-control" name="content" >
                             </div>
                         </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">跳转页面类型：</label>
+                            <div class="input-group col-sm-4">
+                                <select name="target_page" class="form-control" v-model="target_page">
+                                    <option value="0">不跳转</option>
+                                    <option value="1">跳转到app</option>
+                                    <option value="2">跳转到H5</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div v-if="target_page == 1">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Android页面链接：</label>
+                                <div class="input-group col-sm-4">
+                                    <input type="text" name="android_page" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Android页面参数：</label>
+                                <div class="input-group col-sm-4">
+                                    <input type="text" name="android_params" value="{}" class="form-control" placeholder="填写json字符串">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">IOS页面链接：</label>
+                                <div class="input-group col-sm-4">
+                                    <input type="text" name="ios_page" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">IOS页面参数：</label>
+                                <div class="input-group col-sm-4">
+                                    <input type="text" name="ios_params" value="{}" class="form-control" placeholder="填写json字符串">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="target_page == 2">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">H5页面标题：</label>
+                                <div class="input-group col-sm-4">
+                                    <input type="text" name="h5_title" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">H5链接：</label>
+                                <div class="input-group col-sm-4">
+                                    <input type="text" name="h5_url" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <label class="col-sm-3 control-label">推送时间：</label>
                             <div class="input-group col-sm-4">
@@ -49,9 +113,29 @@
     </div>
 </div>
 {include file="public/footer" /}
-
+<script type="text/javascript" src="/static/admin/webupload/webuploader.min.js"></script>
 <script type="text/javascript" src="/static/admin/js/common.js"></script>
+<script src="/static/admin/js/select2.full.min.js"></script>
+<script src="/static/admin/js/ajaxfileupload.js"></script>
+<!-- 开发环境版本，包含了有帮助的命令行警告 -->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<!-- 引入样式 -->
+<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<!-- 引入组件库 -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
 <script type="text/javascript">
+    let app = new Vue({
+        el: "#app",
+        data: {
+            dialogVisible: false,
+            target_page: 0,
+            selectedLoading: false,
+        },
+        methods: {
+
+        }
+    });
 
     $(function(){
 
@@ -64,6 +148,12 @@
             }
             if(common.isNullOrEmpty($('#push_title').val())){
                 layer.msg('请输入推送标题',{icon:2,time:1500,shade: 0.1}, function(index){
+                    layer.close(index);
+                });
+                return false;
+            }
+            if(common.isNullOrEmpty($('#push_time').val())){
+                layer.msg('请选择推送时间',{icon:2,time:1500,shade: 0.1}, function(index){
                     layer.close(index);
                 });
                 return false;
