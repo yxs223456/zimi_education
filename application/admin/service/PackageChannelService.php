@@ -18,4 +18,9 @@ class PackageChannelService extends Base
         parent::__construct();
         $this->currentModel = new PackageChannelModel();
     }
+
+    public function saveByData($where, $data)
+    {
+        $this->currentModel->isUpdate(true, $where)->save($data);
+    }
 }
