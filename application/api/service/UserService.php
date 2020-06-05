@@ -1125,7 +1125,7 @@ class UserService extends Base
                     ];
                     break;
                 case NewsTargetPageTypeEnum::H5:
-                    $targetParams = json_decode($item["target_params"], true);
+                    $targetParams = json_decode($item["page_params"], true);
                     $h5PageParams = [
                         "title" => $targetParams["title"],
                         "url" => $item["target_page"],
