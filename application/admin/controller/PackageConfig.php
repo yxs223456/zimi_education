@@ -47,6 +47,10 @@ class PackageConfig extends Base
         $condition = $this->convertRequestToWhereSql();
         $list = $this->packageConfigService->getListByCondition($condition);
 
+        foreach ($list as $item) {
+            $item["package_link"] = config("web.self_domain") . "/". $item["package_link"];
+        }
+
         $this->assign('list', $list);
 
         return $this->fetch();

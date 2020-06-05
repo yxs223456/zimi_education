@@ -55,6 +55,8 @@
                                 <td>{$vo.version}</td>
                                 <td>{$vo.create_time}</td>
                                 <td>
+                                    <a href="{$vo.package_link}" target="_blank" class="btn btn-info btn-xs">
+                                        <i class="fa fa-download"></i> 下载</a>
                                     <a href="{:url('delete',['id'=>$vo['id']])}" class="btn btn-danger btn-xs">
                                         <i class="fa fa-trash-o"></i> 删除</a>
                                 </td>
