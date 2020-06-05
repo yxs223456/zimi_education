@@ -130,11 +130,11 @@ class UmengPush
                         "target_page_type" => $targetPageType,
                         "local_android" => [
                             "page" => $pageConfig["target_page"]["android"],
-                            "params" => $pageConfig["page_params"]["android"],
+                            "params" => $pageConfig["page_params"]["android"]?$pageConfig["page_params"]["android"]:(new \stdClass()),
                         ],
                         "local_ios" => [
                             "page" => $pageConfig["target_page"]["ios"],
-                            "params" => $pageConfig["page_params"]["ios"],
+                            "params" => $pageConfig["page_params"]["ios"]?$pageConfig["page_params"]["ios"]:(new \stdClass()),
                         ],
                     ];
                     break;

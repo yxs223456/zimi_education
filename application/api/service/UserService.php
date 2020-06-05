@@ -1117,11 +1117,11 @@ class UserService extends Base
                     $pageParams = json_decode($item["page_params"], true);
                     $localAndroid = [
                         "page" => $targetPage["android"],
-                        "params" => $pageParams["android"],
+                        "params" => $pageParams["android"]?$pageParams["android"]:(new \stdClass()),
                     ];
                     $localIos = [
                         "page" => $targetPage["ios"],
-                        "params" => $pageParams["ios"],
+                        "params" => $pageParams["ios"]?$pageParams["ios"]:(new \stdClass()),
                     ];
                     break;
                 case NewsTargetPageTypeEnum::H5:
