@@ -941,7 +941,7 @@ class UserService extends Base
     {
         $userModel = new UserBaseModel();
         $user = $userModel->findByUuid($user["uuid"])->toArray();
-        $userSelfMedal = json_decode($user["self_medals"], true);
+        $userSelfMedal = [];
         $userAllMedal = json_decode($user["medals"], true);
         $allMedals = Constant::MEDAL_CONFIG;
         $medalUrls = [];
