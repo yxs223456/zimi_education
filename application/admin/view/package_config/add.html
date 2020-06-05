@@ -137,9 +137,9 @@
 
     elem.onchange = function () {
         if(elem.checked) {
-            $("input[name='forced']").val(0);
-        } else {
             $("input[name='forced']").val(1);
+        } else {
+            $("input[name='forced']").val(0);
         }
     };
 
