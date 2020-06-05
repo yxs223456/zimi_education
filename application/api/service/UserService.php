@@ -652,7 +652,7 @@ class UserService extends Base
                 $selfMedals = json_decode($userInfo["self_medals"], true);
                 $userMedals["sign_level"] = $userNewSignLevel;
                 $userUpdateData["medals"] = json_encode($userMedals);
-                if (empty($selfMedals) || isset($selfMedals["sign_level"])) {
+                if (empty($selfMedals)) {
                     $selfMedals["sign_level"] = $userNewSignLevel;
                     $userUpdateData["self_medals"] = json_encode($selfMedals);
                 }

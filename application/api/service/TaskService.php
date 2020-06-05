@@ -129,7 +129,7 @@ class TaskService extends Base
                 $selfMedals = json_decode($user["self_medals"], true);
                 $userMedals["share_level"] = $userNewShareLevel;
                 $userUpdateData["medals"] = json_encode($userMedals);
-                if (empty($selfMedals) || isset($selfMedals["share_level"])) {
+                if (empty($selfMedals)) {
                     $selfMedals["share_level"] = $userNewShareLevel;
                     $userUpdateData["self_medals"] = json_encode($selfMedals);
                 }

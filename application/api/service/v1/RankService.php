@@ -320,7 +320,7 @@ class RankService extends Base
             $selfMedals = json_decode($user["self_medals"], true);
             $userMedals["like_level"] = $userNewLikeLevel;
             $userUpdateData["medals"] = json_encode($userMedals);
-            if (empty($selfMedals) || isset($selfMedals["like_level"])) {
+            if (empty($selfMedals)) {
                 $selfMedals["like_level"] = $userNewLikeLevel;
                 $userUpdateData["self_medals"] = json_encode($selfMedals);
             }

@@ -25,7 +25,7 @@
                         <div class="form-group">
                             <label class="col-sm-3 control-label">版本描述：</label>
                             <div class="input-group col-sm-4">
-                                <textarea rows="6" class="col-sm-12" name="change_log"></textarea>
+                                <textarea rows="6" class="col-sm-12" id="change_log" name="change_log"></textarea>
                             </div>
                         </div>
 
@@ -137,9 +137,9 @@
 
     elem.onchange = function () {
         if(elem.checked) {
-            $("input[name='forced']").val(0);
-        } else {
             $("input[name='forced']").val(1);
+        } else {
+            $("input[name='forced']").val(0);
         }
     };
 

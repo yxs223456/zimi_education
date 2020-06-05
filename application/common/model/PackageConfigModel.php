@@ -8,6 +8,8 @@
 
 namespace app\common\model;
 
+use app\common\enum\DbIsDeleteEnum;
+
 class PackageConfigModel extends Base
 {
     protected $table = 'package_config';
@@ -15,6 +17,7 @@ class PackageConfigModel extends Base
     public function findByOsAndVersion($os, $version)
     {
         return $this->where("os", $os)
+            ->where("is_delete", DbIsDeleteEnum::NO)
             ->where("version", $version)
             ->find();
     }
@@ -23,6 +26,7 @@ class PackageConfigModel extends Base
     public function findCurrentPackageByOs($os)
     {
         return $this->where("os", $os)
+            ->where("is_delete", DbIsDeleteEnum::NO)
             ->order("version desc")
             ->find();
     }
@@ -31,6 +35,7 @@ class PackageConfigModel extends Base
     public function getAllPackageOrderByVersion($os)
     {
         return $this->where("os", $os)
+            ->where("is_delete", DbIsDeleteEnum::NO)
             ->order("version desc")
             ->select();
     }
