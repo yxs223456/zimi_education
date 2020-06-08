@@ -95,7 +95,7 @@ Route::rule('app/firstOpen', 'api/app/firstOpen', 'post');
 //de币说明
 Route::rule('app/coinDescription', 'api/app/coinDescription', 'post');
 //渠道包
-Route::rule('app/channelPackageInfo', 'api/app/channelPackageInfo', 'post');
+Route::rule('app/channelPackageInfo', 'api/app/channelPackageInfo');
 
 
 //获取新手测试题
