@@ -74,6 +74,8 @@ class AppException extends \Exception
     const RANK_DAILY_LIKE_THREE_TIMES = [7001, "每日只能助力3次呦~"];
     const RANK_DAILY_LIKE_SOMEONE_ONE_TIMES = [7002, "每天只能助力同一人一次"];
 
+    const FORUM_UPVOTE_ALREADY = [8000, "已经点过赞啦~"];
+
     public static function factory($errConst)
     {
         $e = new self($errConst[1], $errConst[0]);

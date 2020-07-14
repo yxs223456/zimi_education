@@ -781,6 +781,64 @@ class UserService extends Base
         return $returnData;
     }
 
+    public function getUserCurrentMedal(array $userSelfMedals)
+    {
+        $returnData = [];
+        $allMedals = Constant::MEDAL_CONFIG;
+        if (count($userSelfMedals) != 0) {
+            if (isset($userSelfMedals["novice_level"])) {
+                $returnData = [
+                    "width" => $allMedals["novice_level"][$userSelfMedals["novice_level"]]["top_width"],
+                    "height" => $allMedals["novice_level"][$userSelfMedals["novice_level"]]["top_height"],
+                    "name" => $allMedals["novice_level"][$userSelfMedals["novice_level"]]["name"],
+                    "medal_url" => getImageUrl($allMedals["novice_level"][$userSelfMedals["novice_level"]]["top_url"]),
+                ];
+            }
+            if (isset($userSelfMedals["level"])) {
+                $returnData = [
+                    "width" => $allMedals["level"][$userSelfMedals["level"]]["top_width"],
+                    "height" => $allMedals["level"][$userSelfMedals["level"]]["top_height"],
+                    "name" => $allMedals["level"][$userSelfMedals["level"]]["name"],
+                    "medal_url" => getImageUrl($allMedals["level"][$userSelfMedals["level"]]["top_url"]),
+                ];
+            }
+            if (isset($userSelfMedals["pk_level"])) {
+                $returnData = [
+                    "width" => $allMedals["pk_level"][$userSelfMedals["pk_level"]]["top_width"],
+                    "height" => $allMedals["pk_level"][$userSelfMedals["pk_level"]]["top_height"],
+                    "name" => $allMedals["pk_level"][$userSelfMedals["pk_level"]]["name"],
+                    "medal_url" => getImageUrl($allMedals["pk_level"][$userSelfMedals["pk_level"]]["top_url"]),
+                ];
+            }
+            if (isset($userSelfMedals["sign_level"])) {
+                $returnData = [
+                    "width" => $allMedals["sign_level"][$userSelfMedals["sign_level"]]["top_width"],
+                    "height" => $allMedals["sign_level"][$userSelfMedals["sign_level"]]["top_height"],
+                    "name" => $allMedals["sign_level"][$userSelfMedals["sign_level"]]["name"],
+                    "medal_url" => getImageUrl($allMedals["sign_level"][$userSelfMedals["sign_level"]]["top_url"]),
+                ];
+            }
+            if (isset($userSelfMedals["share_level"])) {
+                $returnData = [
+                    "width" => $allMedals["share_level"][$userSelfMedals["share_level"]]["top_width"],
+                    "height" => $allMedals["share_level"][$userSelfMedals["share_level"]]["top_height"],
+                    "name" => $allMedals["share_level"][$userSelfMedals["share_level"]]["name"],
+                    "medal_url" => getImageUrl($allMedals["share_level"][$userSelfMedals["share_level"]]["top_url"]),
+                ];
+            }
+            if (isset($userSelfMedals["like_level"])) {
+                $returnData = [
+                    "width" => $allMedals["like_level"][$userSelfMedals["like_level"]]["top_width"],
+                    "height" => $allMedals["like_level"][$userSelfMedals["like_level"]]["top_height"],
+                    "name" => $allMedals["like_level"][$userSelfMedals["like_level"]]["name"],
+                    "medal_url" => getImageUrl($allMedals["like_level"][$userSelfMedals["like_level"]]["top_url"]),
+                ];
+            }
+        }
+
+        return $returnData;
+    }
+
     public function medals($user)
     {
         $userModel = new UserBaseModel();

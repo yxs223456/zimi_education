@@ -185,6 +185,34 @@ Route::rule('rank/pkRank', 'api/rank/pkRank', 'post');
 //pk排行榜点赞
 Route::rule('rank/pkLike', 'api/rank/pkLike', 'post');
 
+
+//论坛话题
+Route::rule('forum/topic', 'api/forum/topic');
+//发布帖子
+Route::rule('forum/publishPost', 'api/forum/publishPost');
+//评论帖子
+Route::rule('forum/replyPost', 'api/forum/replyPost');
+//点赞帖子
+Route::rule('forum/upvotePost', 'api/forum/upvotePost');
+//取消点赞帖子
+Route::rule('forum/cancelUpvotePost', 'api/forum/cancelUpvotePost');
+//帖子详情
+Route::rule('forum/postInfo', 'api/forum/postInfo');
+//帖子评论列表
+Route::rule('forum/postReplyList', 'api/forum/postReplyList');
+//点赞评论
+Route::rule('forum/upvoteReply', 'api/forum/upvoteReply');
+//取消点赞评论
+Route::rule('forum/cancelUpvoteReply', 'api/forum/cancelUpvoteReply');
+//某话题下的帖子列表
+Route::rule('forum/postListOnTopic', 'api/forum/postListOnTopic');
+//推荐帖子列表
+Route::rule('forum/recommendPostList', 'api/forum/recommendPostList');
+//帖子列表
+Route::rule('forum/postList', 'api/forum/postList');
+
+
+
 return [
 
 ];
