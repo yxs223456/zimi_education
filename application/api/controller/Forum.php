@@ -16,7 +16,7 @@ class Forum extends Base
 {
     protected $beforeActionList = [
         'checkAuth' => [
-            'except' => 'topic,postListOnTopic',
+            'except' => 'topic',
         ],
     ];
 
@@ -36,14 +36,34 @@ class Forum extends Base
     {
         $topicUuid = input("t_uuid");
         $content = input("content");
+        $photos = input("photos", []);
 
         if (empty($topicUuid) || empty($content)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+        if (!is_array($photos)) {
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
         $user = $this->query["user"];
         $service = new ForumService();
-        return $this->jsonResponse($service->publishPost($user, $topicUuid, $content));
+        return $this->jsonResponse($service->publishPost($user, $topicUuid, $content, $photos));
+    }
+
+    /**
+     * 帖子详情
+     */
+    public function postInfo()
+    {
+        $postUuid = input("p_uuid");
+
+        if (empty($postUuid)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $service = new ForumService();
+        return $this->jsonResponse($service->postInfo($user, $postUuid));
     }
 
     /**
@@ -93,22 +113,6 @@ class Forum extends Base
         $user = $this->query["user"];
         $service = new ForumService();
         return $this->jsonResponse($service->cancelUpvotePost($user, $postUuid));
-    }
-
-    /**
-     * 帖子详情
-     */
-    public function postInfo()
-    {
-        $postUuid = input("p_uuid");
-
-        if (empty($postUuid)) {
-            throw AppException::factory(AppException::COM_PARAMS_ERR);
-        }
-
-        $user = $this->query["user"];
-        $service = new ForumService();
-        return $this->jsonResponse($service->postInfo($user["uuid"], $postUuid));
     }
 
     /**
@@ -180,8 +184,9 @@ class Forum extends Base
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
+        $user = $this->query["user"];
         $service = new ForumService();
-        return $this->jsonResponse($service->postListOnTopic($topicUuid, $pageNum, $pageSize));
+        return $this->jsonResponse($service->postListOnTopic($user, $topicUuid, $pageNum, $pageSize));
     }
 
     /**
@@ -196,8 +201,9 @@ class Forum extends Base
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
+        $user = $this->query["user"];
         $service = new ForumService();
-        return $this->jsonResponse($service->recommendPostList($pageNum, $pageSize));
+        return $this->jsonResponse($service->recommendPostList($user, $pageNum, $pageSize));
     }
 
     /**
@@ -212,7 +218,8 @@ class Forum extends Base
             throw AppException::factory(AppException::COM_PARAMS_ERR);
         }
 
+        $user = $this->query["user"];
         $service = new ForumService();
-        return $this->jsonResponse($service->postList($pageNum, $pageSize));
+        return $this->jsonResponse($service->postList($user, $pageNum, $pageSize));
     }
 }

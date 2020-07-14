@@ -58,10 +58,11 @@ class ForumService extends Base
      * @param $user
      * @param $topicUuid
      * @param $content
+     * @param $photos
      * @return array
      * @throws \Throwable
      */
-    public function publishPost($user, $topicUuid, $content)
+    public function publishPost($user, $topicUuid, $content, array $photos)
     {
         $forumPostModel = new ForumPostModel();
         Db::startTrans();
@@ -74,6 +75,7 @@ class ForumService extends Base
                 "user_uuid" => $user["uuid"],
                 "t_uuid" => $topicUuid,
                 "content" => $content,
+                "photos" => json_encode($photos),
             ];
             $forumPostModel->save($postInfo);
 
@@ -232,7 +234,7 @@ class ForumService extends Base
 
     /**
      * 帖子详情
-     * @param $userUuid
+     * @param $user
      * @param $postUuid
      * @return array
      * @throws AppException
@@ -240,35 +242,50 @@ class ForumService extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function postInfo($userUuid, $postUuid)
+    public function postInfo($user, $postUuid)
     {
+        //帖子信息
         $forumPost = Db::name("forum_post")->alias("fp")
             ->leftJoin("forum_topic ft", "fp.t_uuid=ft.uuid")
+            ->leftJoin("user_base u", "u.uuid=fp.user_uuid")
             ->where("fp.uuid", $postUuid)
-            ->field("fp.*,ft.topic")
+            ->field("fp.*,ft.topic,u.nickname,u.head_image_url,u.self_medals")
             ->find();
         if (empty($forumPost)) {
             throw AppException::factory(AppException::COM_INVALID);
         }
 
-        $userModel = new UserBaseModel();
-        $user = $userModel->findByUuid($userUuid);
-        $userSelfMedals = json_decode($user["self_medals"], true);
+        //帖子图片
+        $photos = json_decode($forumPost["photos"], true);
+        foreach ($photos as $key=>$photo) {
+            $photos[$key] = getImageUrl($photo);
+        }
+
+        //作者勋章
+        $userSelfMedals = json_decode($forumPost["self_medals"], true);
         $userCurrentMedal = (new UserService())->getUserCurrentMedal($userSelfMedals);
+
+        //当前用户是否点赞
+        $isUpvote = (int) (bool) Db::name("forum_post_upvote_log")
+            ->where("p_uuid", $postUuid)
+            ->where("user_uuid", $user["uuid"])
+            ->count();
 
         $returnData = [
             "user" => [
-                "nickname" => $user["nickname"],
-                "head_image_url" => getImageUrl($user["head_image_url"]),
+                "nickname" => getNickname($forumPost["nickname"]),
+                "head_image_url" => getHeadImageUrl($forumPost["head_image_url"]),
                 "medal" => $userCurrentMedal["medal_url"]??"",
             ],
             "post" => [
                 "uuid" => $forumPost["uuid"],
                 "content" => $forumPost["content"],
+                "photos" => $photos,
                 "topic" => $forumPost["topic"],
                 "publish_time" => date("m-d H:i", $forumPost["create_time"]),
                 "reply_num" => $forumPost["direct_reply_num"],
                 "upvote_num" => $forumPost["upvote_num"],
+                "is_upvote" => $isUpvote,
             ],
         ];
 
@@ -288,6 +305,7 @@ class ForumService extends Base
      */
     public function postReplyList($userUuid, $postUuid, $pageNum, $pageSize)
     {
+        //评论列表
         $replyList = Db::name("forum_post_reply")
             ->where("p_uuid", $postUuid)
             ->limit(($pageNum-1)*$pageSize, $pageSize)
@@ -312,12 +330,11 @@ class ForumService extends Base
             $userSelfMedals = json_decode($user["self_medals"], true);
             $userCurrentMedal = (new UserService())->getUserCurrentMedal($userSelfMedals);
             $userInfo[$user["uuid"]] = [
-                "nickname" => $user["nickname"],
-                "head_image_url" => getImageUrl($user["head_image_url"]),
+                "nickname" => getNickname($user["nickname"]),
+                "head_image_url" => getHeadImageUrl($user["head_image_url"]),
                 "medal" => $userCurrentMedal["medal_url"]??"",
             ];
         }
-
 
         $returnData = [];
         foreach ($replyList as $item) {
@@ -387,6 +404,13 @@ class ForumService extends Base
         return new \stdClass();
     }
 
+    /**
+     * 取消点赞评论
+     * @param $user
+     * @param $replyUuid
+     * @return \stdClass
+     * @throws \Throwable
+     */
     public function cancelUpvoteReply($user, $replyUuid)
     {
         $forumPostReplyModel = new ForumPostReplyModel();
@@ -425,6 +449,7 @@ class ForumService extends Base
 
     /**
      * 某话题下的帖子列表
+     * @param $user
      * @param $topicUuid
      * @param $pageNum
      * @param $pageSize
@@ -433,8 +458,9 @@ class ForumService extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function postListOnTopic($topicUuid, $pageNum, $pageSize)
+    public function postListOnTopic($user, $topicUuid, $pageNum, $pageSize)
     {
+        $returnData = [];
         $postList = Db::name("forum_post")->alias("fp")
             ->leftJoin("user_base u", "u.uuid=fp.user_uuid")
             ->where("fp.t_uuid", $topicUuid)
@@ -443,25 +469,42 @@ class ForumService extends Base
             ->limit(($pageNum-1)*$pageSize, $pageSize)
             ->select();
 
-        $userService = new UserService();
-        $returnData = [];
-        foreach ($postList as $item) {
-            $userSelfMedals = json_decode($item["self_medals"], true);
-            $userCurrentMedal = $userService->getUserCurrentMedal($userSelfMedals);
-            $returnData[] = [
-                "user" => [
-                    "nickname" => $item["nickname"],
-                    "head_image_url" => getImageUrl($item["head_image_url"]),
-                    "medal" => $userCurrentMedal["medal_url"]??"",
-                ],
-                "post" => [
-                    "uuid" => $item["uuid"],
-                    "content" => $item["content"],
-                    "publish_time" => date("m-d H:i", $item["create_time"]),
-                    "reply_num" => $item["direct_reply_num"],
-                    "upvote_num" => $item["upvote_num"],
-                ],
-            ];
+        if ($postList) {
+            //当前用户点赞情况
+            $postUuids = array_column($postList, "uuid");
+            $upvoteData = Db::name("forum_post_upvote_log")->where("user_uuid", $user["uuid"])
+                ->whereIn("p_uuid", $postUuids)
+                ->column("p_uuid");
+
+            $userService = new UserService();
+            foreach ($postList as $item) {
+                //作者勋章
+                $userSelfMedals = json_decode($item["self_medals"], true);
+                $userCurrentMedal = $userService->getUserCurrentMedal($userSelfMedals);
+
+                //帖子图集
+                $photos = json_decode($item["photos"], true);
+                foreach ($photos as $key=>$photo) {
+                    $photos[$key] = getImageUrl($photo);
+                }
+
+                $returnData[] = [
+                    "user" => [
+                        "nickname" => getNickname($item["nickname"]),
+                        "head_image_url" => getHeadImageUrl($item["head_image_url"]),
+                        "medal" => $userCurrentMedal["medal_url"]??"",
+                    ],
+                    "post" => [
+                        "uuid" => $item["uuid"],
+                        "content" => $item["content"],
+                        "photos" => $photos,
+                        "publish_time" => date("m-d H:i", $item["create_time"]),
+                        "reply_num" => $item["direct_reply_num"],
+                        "upvote_num" => $item["upvote_num"],
+                        "is_upvote" => (int) in_array($item["uuid"], $upvoteData),
+                    ],
+                ];
+            }
         }
 
         return $returnData;
@@ -469,6 +512,7 @@ class ForumService extends Base
 
     /**
      * 推荐帖子列表
+     * @param $user
      * @param $pageNum
      * @param $pageSize
      * @return array
@@ -476,8 +520,9 @@ class ForumService extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function recommendPostList($pageNum, $pageSize)
+    public function recommendPostList($user, $pageNum, $pageSize)
     {
+        $returnData = [];
         $postList = Db::name("forum_post")->alias("fp")
             ->leftJoin("user_base u", "u.uuid=fp.user_uuid")
             ->where("fp.is_recommend", PostIsRecommendEnum::YES)
@@ -486,25 +531,42 @@ class ForumService extends Base
             ->limit(($pageNum-1)*$pageSize, $pageSize)
             ->select();
 
-        $userService = new UserService();
-        $returnData = [];
-        foreach ($postList as $item) {
-            $userSelfMedals = json_decode($item["self_medals"], true);
-            $userCurrentMedal = $userService->getUserCurrentMedal($userSelfMedals);
-            $returnData[] = [
-                "user" => [
-                    "nickname" => $item["nickname"],
-                    "head_image_url" => getImageUrl($item["head_image_url"]),
-                    "medal" => $userCurrentMedal["medal_url"]??"",
-                ],
-                "post" => [
-                    "uuid" => $item["uuid"],
-                    "content" => $item["content"],
-                    "publish_time" => date("m-d H:i", $item["create_time"]),
-                    "reply_num" => $item["direct_reply_num"],
-                    "upvote_num" => $item["upvote_num"],
-                ],
-            ];
+        if ($postList) {
+            //当前用户点赞情况
+            $postUuids = array_column($postList, "uuid");
+            $upvoteData = Db::name("forum_post_upvote_log")->where("user_uuid", $user["uuid"])
+                ->whereIn("p_uuid", $postUuids)
+                ->column("p_uuid");
+
+            $userService = new UserService();
+            foreach ($postList as $item) {
+                //作者勋章
+                $userSelfMedals = json_decode($item["self_medals"], true);
+                $userCurrentMedal = $userService->getUserCurrentMedal($userSelfMedals);
+
+                //帖子图集
+                $photos = json_decode($item["photos"], true);
+                foreach ($photos as $key=>$photo) {
+                    $photos[$key] = getImageUrl($photo);
+                }
+
+                $returnData[] = [
+                    "user" => [
+                        "nickname" => getNickname($item["nickname"]),
+                        "head_image_url" => getHeadImageUrl($item["head_image_url"]),
+                        "medal" => $userCurrentMedal["medal_url"]??"",
+                    ],
+                    "post" => [
+                        "uuid" => $item["uuid"],
+                        "content" => $item["content"],
+                        "photos" => $photos,
+                        "publish_time" => date("m-d H:i", $item["create_time"]),
+                        "reply_num" => $item["direct_reply_num"],
+                        "upvote_num" => $item["upvote_num"],
+                        "is_upvote" => (int) in_array($item["uuid"], $upvoteData),
+                    ],
+                ];
+            }
         }
 
         return $returnData;
@@ -512,6 +574,7 @@ class ForumService extends Base
 
     /**
      * 帖子列表
+     * @param $user
      * @param $pageNum
      * @param $pageSize
      * @return array
@@ -519,8 +582,9 @@ class ForumService extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function postList($pageNum, $pageSize)
+    public function postList($user, $pageNum, $pageSize)
     {
+        $returnData = [];
         $postList = Db::name("forum_post")->alias("fp")
             ->leftJoin("user_base u", "u.uuid=fp.user_uuid")
             ->field("fp.*,u.nickname,u.head_image_url,u.self_medals")
@@ -528,25 +592,42 @@ class ForumService extends Base
             ->limit(($pageNum-1)*$pageSize, $pageSize)
             ->select();
 
-        $userService = new UserService();
-        $returnData = [];
-        foreach ($postList as $item) {
-            $userSelfMedals = json_decode($item["self_medals"], true);
-            $userCurrentMedal = $userService->getUserCurrentMedal($userSelfMedals);
-            $returnData[] = [
-                "user" => [
-                    "nickname" => $item["nickname"],
-                    "head_image_url" => getImageUrl($item["head_image_url"]),
-                    "medal" => $userCurrentMedal["medal_url"]??"",
-                ],
-                "post" => [
-                    "uuid" => $item["uuid"],
-                    "content" => $item["content"],
-                    "publish_time" => date("m-d H:i", $item["create_time"]),
-                    "reply_num" => $item["direct_reply_num"],
-                    "upvote_num" => $item["upvote_num"],
-                ],
-            ];
+        if ($postList) {
+            //当前用户点赞情况
+            $postUuids = array_column($postList, "uuid");
+            $upvoteData = Db::name("forum_post_upvote_log")->where("user_uuid", $user["uuid"])
+                ->whereIn("p_uuid", $postUuids)
+                ->column("p_uuid");
+
+            $userService = new UserService();
+            foreach ($postList as $item) {
+                //作者勋章
+                $userSelfMedals = json_decode($item["self_medals"], true);
+                $userCurrentMedal = $userService->getUserCurrentMedal($userSelfMedals);
+
+                //帖子图集
+                $photos = json_decode($item["photos"], true);
+                foreach ($photos as $key=>$photo) {
+                    $photos[$key] = getImageUrl($photo);
+                }
+
+                $returnData[] = [
+                    "user" => [
+                        "nickname" => getNickname($item["nickname"]),
+                        "head_image_url" => getHeadImageUrl($item["head_image_url"]),
+                        "medal" => $userCurrentMedal["medal_url"]??"",
+                    ],
+                    "post" => [
+                        "uuid" => $item["uuid"],
+                        "content" => $item["content"],
+                        "photos" => $photos,
+                        "publish_time" => date("m-d H:i", $item["create_time"]),
+                        "reply_num" => $item["direct_reply_num"],
+                        "upvote_num" => $item["upvote_num"],
+                        "is_upvote" => (int) in_array($item["uuid"], $upvoteData),
+                    ],
+                ];
+            }
         }
 
         return $returnData;

@@ -190,14 +190,14 @@ Route::rule('rank/pkLike', 'api/rank/pkLike', 'post');
 Route::rule('forum/topic', 'api/forum/topic');
 //发布帖子
 Route::rule('forum/publishPost', 'api/forum/publishPost');
+//帖子详情
+Route::rule('forum/postInfo', 'api/forum/postInfo');
 //评论帖子
 Route::rule('forum/replyPost', 'api/forum/replyPost');
 //点赞帖子
 Route::rule('forum/upvotePost', 'api/forum/upvotePost');
 //取消点赞帖子
 Route::rule('forum/cancelUpvotePost', 'api/forum/cancelUpvotePost');
-//帖子详情
-Route::rule('forum/postInfo', 'api/forum/postInfo');
 //帖子评论列表
 Route::rule('forum/postReplyList', 'api/forum/postReplyList');
 //点赞评论
