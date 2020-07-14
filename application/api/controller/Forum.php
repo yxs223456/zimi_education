@@ -222,4 +222,38 @@ class Forum extends Base
         $service = new ForumService();
         return $this->jsonResponse($service->postList($user, $pageNum, $pageSize));
     }
+
+    /**
+     * 我发布的帖子列表
+     */
+    public function myPublishPostList()
+    {
+        $pageNum = input("page_num");
+        $pageSize = input("page_size");
+
+        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $service = new ForumService();
+        return $this->jsonResponse($service->myPublishPostList($user, $pageNum, $pageSize));
+    }
+
+    /**
+     * 我参与的帖子列表
+     */
+    public function myRelatedPostList()
+    {
+        $pageNum = input("page_num");
+        $pageSize = input("page_size");
+
+        if (!checkInt($pageNum, false) || !checkInt($pageSize, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $service = new ForumService();
+        return $this->jsonResponse($service->myRelatedPostList($user, $pageNum, $pageSize));
+    }
 }

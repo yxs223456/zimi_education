@@ -462,9 +462,10 @@ class ForumService extends Base
     {
         $returnData = [];
         $postList = Db::name("forum_post")->alias("fp")
+            ->leftJoin("forum_topic ft", "ft.uuid=fp.t_uuid")
             ->leftJoin("user_base u", "u.uuid=fp.user_uuid")
             ->where("fp.t_uuid", $topicUuid)
-            ->field("fp.*,u.nickname,u.head_image_url,u.self_medals")
+            ->field("fp.*,ft.topic,u.nickname,u.head_image_url,u.self_medals")
             ->order("fp.id desc")
             ->limit(($pageNum-1)*$pageSize, $pageSize)
             ->select();
@@ -502,6 +503,7 @@ class ForumService extends Base
                         "reply_num" => $item["direct_reply_num"],
                         "upvote_num" => $item["upvote_num"],
                         "is_upvote" => (int) in_array($item["uuid"], $upvoteData),
+                        "topic" => $item["topic"],
                     ],
                 ];
             }
@@ -524,9 +526,10 @@ class ForumService extends Base
     {
         $returnData = [];
         $postList = Db::name("forum_post")->alias("fp")
+            ->leftJoin("forum_topic ft", "ft.uuid=fp.t_uuid")
             ->leftJoin("user_base u", "u.uuid=fp.user_uuid")
             ->where("fp.is_recommend", PostIsRecommendEnum::YES)
-            ->field("fp.*,u.nickname,u.head_image_url,u.self_medals")
+            ->field("fp.*,ft.topic,u.nickname,u.head_image_url,u.self_medals")
             ->order("fp.id desc")
             ->limit(($pageNum-1)*$pageSize, $pageSize)
             ->select();
@@ -564,6 +567,7 @@ class ForumService extends Base
                         "reply_num" => $item["direct_reply_num"],
                         "upvote_num" => $item["upvote_num"],
                         "is_upvote" => (int) in_array($item["uuid"], $upvoteData),
+                        "topic" => $item["topic"],
                     ],
                 ];
             }
@@ -586,8 +590,9 @@ class ForumService extends Base
     {
         $returnData = [];
         $postList = Db::name("forum_post")->alias("fp")
+            ->leftJoin("forum_topic ft", "ft.uuid=fp.t_uuid")
             ->leftJoin("user_base u", "u.uuid=fp.user_uuid")
-            ->field("fp.*,u.nickname,u.head_image_url,u.self_medals")
+            ->field("fp.*,ft.topic,u.nickname,u.head_image_url,u.self_medals")
             ->order("fp.id desc")
             ->limit(($pageNum-1)*$pageSize, $pageSize)
             ->select();
@@ -625,8 +630,137 @@ class ForumService extends Base
                         "reply_num" => $item["direct_reply_num"],
                         "upvote_num" => $item["upvote_num"],
                         "is_upvote" => (int) in_array($item["uuid"], $upvoteData),
+                        "topic" => $item["topic"],
                     ],
                 ];
+            }
+        }
+
+        return $returnData;
+    }
+
+    /**
+     * 我发布的帖子
+     * @param $user
+     * @param $pageNum
+     * @param $pageSize
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function myPublishPostList($user, $pageNum, $pageSize)
+    {
+        $returnData = [];
+        $postList = Db::name("forum_post")->alias("fp")
+            ->leftJoin("forum_topic ft", "ft.uuid=fp.t_uuid")
+            ->leftJoin("user_base u", "u.uuid=fp.user_uuid")
+            ->where("fp.user_uuid", $user["uuid"])
+            ->field("fp.*,ft.topic,u.nickname,u.head_image_url,u.self_medals")
+            ->order("fp.id desc")
+            ->limit(($pageNum-1)*$pageSize, $pageSize)
+            ->select();
+
+        if ($postList) {
+            //当前用户点赞情况
+            $postUuids = array_column($postList, "uuid");
+            $upvoteData = Db::name("forum_post_upvote_log")->where("user_uuid", $user["uuid"])
+                ->whereIn("p_uuid", $postUuids)
+                ->column("p_uuid");
+
+            $userService = new UserService();
+            foreach ($postList as $item) {
+                //作者勋章
+                $userSelfMedals = json_decode($item["self_medals"], true);
+                $userCurrentMedal = $userService->getUserCurrentMedal($userSelfMedals);
+
+                //帖子图集
+                $photos = json_decode($item["photos"], true);
+                foreach ($photos as $key=>$photo) {
+                    $photos[$key] = getImageUrl($photo);
+                }
+
+                $returnData[] = [
+                    "user" => [
+                        "nickname" => getNickname($item["nickname"]),
+                        "head_image_url" => getHeadImageUrl($item["head_image_url"]),
+                        "medal" => $userCurrentMedal["medal_url"]??"",
+                    ],
+                    "post" => [
+                        "uuid" => $item["uuid"],
+                        "content" => $item["content"],
+                        "photos" => $photos,
+                        "publish_time" => date("m-d H:i", $item["create_time"]),
+                        "reply_num" => $item["direct_reply_num"],
+                        "upvote_num" => $item["upvote_num"],
+                        "is_upvote" => (int) in_array($item["uuid"], $upvoteData),
+                        "topic" => $item["topic"],
+                    ],
+                ];
+            }
+        }
+
+        return $returnData;
+    }
+
+    public function myRelatedPostList($user, $pageNum, $pageSize)
+    {
+        $returnData = [];
+
+        $postUuids = Db::name("forum_post_reply")
+            ->where("user_uuid", $user["uuid"])
+            ->column("distinct p_uuid");
+        $postUuids = array_reverse($postUuids);
+        $postUuids = array_slice($postUuids, ($pageNum-1)*$pageSize, $pageSize);
+
+        if ($postUuids) {
+            $postList = Db::name("forum_post")->alias("fp")
+                ->leftJoin("forum_topic ft", "ft.uuid=fp.t_uuid")
+                ->leftJoin("user_base u", "u.uuid=fp.user_uuid")
+                ->whereIn("fp.uuid", $postUuids)
+                ->field("fp.*,ft.topic,u.nickname,u.head_image_url,u.self_medals")
+                ->order("fp.id desc")
+                ->limit(($pageNum-1)*$pageSize, $pageSize)
+                ->select();
+            array_multisort($postList, SORT_ASC, $postUuids);
+
+            if ($postList) {
+                //当前用户点赞情况
+                $postUuids = array_column($postList, "uuid");
+                $upvoteData = Db::name("forum_post_upvote_log")->where("user_uuid", $user["uuid"])
+                    ->whereIn("p_uuid", $postUuids)
+                    ->column("p_uuid");
+
+                $userService = new UserService();
+                foreach ($postList as $item) {
+                    //作者勋章
+                    $userSelfMedals = json_decode($item["self_medals"], true);
+                    $userCurrentMedal = $userService->getUserCurrentMedal($userSelfMedals);
+
+                    //帖子图集
+                    $photos = json_decode($item["photos"], true);
+                    foreach ($photos as $key=>$photo) {
+                        $photos[$key] = getImageUrl($photo);
+                    }
+
+                    $returnData[] = [
+                        "user" => [
+                            "nickname" => getNickname($item["nickname"]),
+                            "head_image_url" => getHeadImageUrl($item["head_image_url"]),
+                            "medal" => $userCurrentMedal["medal_url"]??"",
+                        ],
+                        "post" => [
+                            "uuid" => $item["uuid"],
+                            "content" => $item["content"],
+                            "photos" => $photos,
+                            "publish_time" => date("m-d H:i", $item["create_time"]),
+                            "reply_num" => $item["direct_reply_num"],
+                            "upvote_num" => $item["upvote_num"],
+                            "is_upvote" => (int) in_array($item["uuid"], $upvoteData),
+                            "topic" => $item["topic"],
+                        ],
+                    ];
+                }
             }
         }
 

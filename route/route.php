@@ -210,6 +210,10 @@ Route::rule('forum/postListOnTopic', 'api/forum/postListOnTopic');
 Route::rule('forum/recommendPostList', 'api/forum/recommendPostList');
 //帖子列表
 Route::rule('forum/postList', 'api/forum/postList');
+//我发布的帖子列表
+Route::rule('forum/myPublishPostList', 'api/forum/myPublishPostList');
+//我参与的帖子列表
+Route::rule('forum/myRelatedPostList', 'api/forum/myRelatedPostList');
 
 
 
