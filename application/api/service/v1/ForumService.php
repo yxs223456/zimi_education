@@ -40,12 +40,14 @@ class ForumService extends Base
                 $returnData["hot_topic"][] = [
                     "uuid" => $item["uuid"],
                     "topic" => $item["topic"],
+                    "image_url" => $item["image_url"],
                     "post_num" => $item["post_num"],
                 ];
             }
             $returnData["total_topic"][] = [
                 "uuid" => $item["uuid"],
                 "topic" => $item["topic"],
+                "image_url" => $item["image_url"],
                 "post_num" => $item["post_num"],
             ];
         }
