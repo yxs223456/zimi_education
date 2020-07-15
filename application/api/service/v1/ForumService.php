@@ -18,7 +18,6 @@ use app\common\model\ForumPostReplyModel;
 use app\common\model\ForumPostReplyUpvoteModel;
 use app\common\model\ForumPostUpvoteModel;
 use app\common\model\ForumTopicModel;
-use app\common\model\UserBaseModel;
 use think\Db;
 
 class ForumService extends Base
@@ -40,14 +39,14 @@ class ForumService extends Base
                 $returnData["hot_topic"][] = [
                     "uuid" => $item["uuid"],
                     "topic" => $item["topic"],
-                    "image_url" => $item["image_url"],
+                    "image_url" => getImageUrl($item["image_url"]),
                     "post_num" => $item["post_num"],
                 ];
             }
             $returnData["total_topic"][] = [
                 "uuid" => $item["uuid"],
                 "topic" => $item["topic"],
-                "image_url" => $item["image_url"],
+                "image_url" => getImageUrl($item["image_url"]),
                 "post_num" => $item["post_num"],
             ];
         }
