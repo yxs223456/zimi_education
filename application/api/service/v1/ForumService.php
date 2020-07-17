@@ -141,6 +141,10 @@ class ForumService extends Base
 
         return [
             "uuid" => $uuid,
+            "content" => $content,
+            "reply_time" => date("m-d H:i", strtotime($forumPostReplyModel->create_time)),
+            "upvote_num" => 0,
+            "is_upvote" => 0,
         ];
     }
 
@@ -283,6 +287,7 @@ class ForumService extends Base
                 "content" => $forumPost["content"],
                 "photos" => $photos,
                 "topic" => $forumPost["topic"],
+                "t_uuid" => $forumPost["t_uuid"],
                 "publish_time" => date("m-d H:i", $forumPost["create_time"]),
                 "reply_num" => $forumPost["direct_reply_num"],
                 "upvote_num" => $forumPost["upvote_num"],
@@ -505,6 +510,7 @@ class ForumService extends Base
                         "upvote_num" => $item["upvote_num"],
                         "is_upvote" => (int) in_array($item["uuid"], $upvoteData),
                         "topic" => $item["topic"],
+                        "t_uuid" => $item["t_uuid"],
                     ],
                 ];
             }
@@ -569,6 +575,7 @@ class ForumService extends Base
                         "upvote_num" => $item["upvote_num"],
                         "is_upvote" => (int) in_array($item["uuid"], $upvoteData),
                         "topic" => $item["topic"],
+                        "t_uuid" => $item["t_uuid"],
                     ],
                 ];
             }
@@ -632,6 +639,7 @@ class ForumService extends Base
                         "upvote_num" => $item["upvote_num"],
                         "is_upvote" => (int) in_array($item["uuid"], $upvoteData),
                         "topic" => $item["topic"],
+                        "t_uuid" => $item["t_uuid"],
                     ],
                 ];
             }
@@ -696,6 +704,7 @@ class ForumService extends Base
                         "upvote_num" => $item["upvote_num"],
                         "is_upvote" => (int) in_array($item["uuid"], $upvoteData),
                         "topic" => $item["topic"],
+                        "t_uuid" => $item["t_uuid"],
                     ],
                 ];
             }
@@ -759,6 +768,7 @@ class ForumService extends Base
                             "upvote_num" => $item["upvote_num"],
                             "is_upvote" => (int) in_array($item["uuid"], $upvoteData),
                             "topic" => $item["topic"],
+                            "t_uuid" => $item["t_uuid"],
                         ],
                     ];
                 }
