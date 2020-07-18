@@ -116,9 +116,9 @@ class Forum extends Base
     }
 
     /**
-     * 帖子评论列表
+     * 帖子评论列表(按热度排序)
      */
-    public function postReplyList()
+    public function postReplyListByHot()
     {
         $postUuid = input("p_uuid");
         $pageNum = input("page_num");
@@ -133,7 +133,28 @@ class Forum extends Base
 
         $user = $this->query["user"];
         $service = new ForumService();
-        return $this->jsonResponse($service->postReplyList($user, $postUuid, $pageNum, $pageSize));
+        return $this->jsonResponse($service->postReplyListByHot($user, $postUuid, $pageNum, $pageSize));
+    }
+
+    /**
+     * 帖子评论列表(按热度排序)
+     */
+    public function postReplyListByTime()
+    {
+        $postUuid = input("p_uuid");
+        $lastReplyUuid = input("last_r_uuid", "");
+        $pageSize = input("page_size");
+
+        if (!checkInt($pageSize, false)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+        if (empty($postUuid)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $service = new ForumService();
+        return $this->jsonResponse($service->postReplyListByTime($user, $postUuid, $lastReplyUuid, $pageSize));
     }
 
     /**
@@ -255,5 +276,37 @@ class Forum extends Base
         $user = $this->query["user"];
         $service = new ForumService();
         return $this->jsonResponse($service->myRelatedPostList($user, $pageNum, $pageSize));
+    }
+
+    /**
+     * 删除帖子
+     */
+    public function delPost()
+    {
+        $postUuid = input("p_uuid");
+
+        if (empty($postUuid)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $service = new ForumService();
+        return $this->jsonResponse($service->delPost($user, $postUuid));
+    }
+
+    /**
+     * 删除评论
+     */
+    public function delReply()
+    {
+        $replayUuid = input("r_uuid");
+
+        if (empty($replayUuid)) {
+            throw AppException::factory(AppException::COM_PARAMS_ERR);
+        }
+
+        $user = $this->query["user"];
+        $service = new ForumService();
+        return $this->jsonResponse($service->delReply($user, $replayUuid));
     }
 }

@@ -11,6 +11,7 @@ namespace app\api\service\v1;
 use app\api\service\Base;
 use app\api\service\UserService;
 use app\common\AppException;
+use app\common\enum\DbIsDeleteEnum;
 use app\common\enum\ForumTopicIsHotEnum;
 use app\common\enum\PostIsRecommendEnum;
 use app\common\model\ForumPostModel;
@@ -301,7 +302,7 @@ class ForumService extends Base
     }
 
     /**
-     * 帖子评论列表
+     * 帖子评论列表(按热度排序)
      * @param $user
      * @param $postUuid
      * @param $pageNum
@@ -311,12 +312,83 @@ class ForumService extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function postReplyList($user, $postUuid, $pageNum, $pageSize)
+    public function postReplyListByHot($user, $postUuid, $pageNum, $pageSize)
     {
         //评论列表
         $replyList = Db::name("forum_post_reply")
             ->where("p_uuid", $postUuid)
+            ->where("is_delete", DbIsDeleteEnum::NO)
+            ->order("upvote_num", "desc")
             ->limit(($pageNum-1)*$pageSize, $pageSize)
+            ->select();
+        if (empty($replyList)) {
+            return [];
+        }
+
+        //当前用户点赞情况
+        $replyUuids = array_column($replyList, "uuid");
+        $replyUpvote = Db::name("forum_post_reply_upvote_log")
+            ->whereIn("r_uuid", $replyUuids)
+            ->where("user_uuid", $user["uuid"])
+            ->select();
+        $replyUpvoteSign = array_column($replyUpvote, "r_uuid");
+
+        //发表评论的用户信息
+        $userUuids = array_column($replyList, "user_uuid");
+        $users = Db::name("user_base")->whereIn("uuid", $userUuids)->select();
+        $userInfo = [];
+        foreach ($users as $replyUser) {
+            $userSelfMedals = json_decode($replyUser["self_medals"], true);
+            $userCurrentMedal = (new UserService())->getUserCurrentMedal($userSelfMedals);
+            $userInfo[$replyUser["uuid"]] = [
+                "nickname" => getNickname($replyUser["nickname"]),
+                "head_image_url" => getHeadImageUrl($replyUser["head_image_url"]),
+                "medal" => $userCurrentMedal["medal_url"]??"",
+            ];
+        }
+
+        $returnData = [];
+        foreach ($replyList as $item) {
+            $returnData[] = [
+                "user" => $userInfo[$item["user_uuid"]]??[
+                        "nickname" => "",
+                        "head_image_url" => "",
+                        "medal" => "",
+                    ],
+                "reply" => [
+                    "uuid" => $item["uuid"],
+                    "content" => $item["content"],
+                    "reply_time" => date("m-d H:i", $item["create_time"]),
+                    "upvote_num" => $item["upvote_num"],
+                    "is_upvote" => (int) in_array($item["uuid"], $replyUpvoteSign),
+                    "is_my_reply" => (int) ($user["uuid"] == $item["user_uuid"])
+                ],
+            ];
+        }
+
+        return $returnData;
+    }
+
+    public function postReplyListByTime($user, $postUuid, $lastReplyUuid, $pageSize)
+    {
+        $query = Db::name("forum_post_reply")
+            ->where("p_uuid", $postUuid)
+            ->where("is_delete", DbIsDeleteEnum::NO);
+        //上次查询最后一条id值
+        if ($lastReplyUuid) {
+            $lastReply = Db::name("forum_post_reply")
+                ->where("uuid", $lastReplyUuid)
+                ->find();
+            if (empty($lastReply)) {
+                throw AppException::factory(AppException::COM_INVALID);
+            }
+            $query->where("id", "<", $lastReply["id"]);
+        }
+
+        //评论列表
+        $replyList = $query
+            ->order("id", "desc")
+            ->limit(0, $pageSize)
             ->select();
         if (empty($replyList)) {
             return [];
@@ -474,6 +546,7 @@ class ForumService extends Base
             ->leftJoin("forum_topic ft", "ft.uuid=fp.t_uuid")
             ->leftJoin("user_base u", "u.uuid=fp.user_uuid")
             ->where("fp.t_uuid", $topicUuid)
+            ->where("fp.is_delete", DbIsDeleteEnum::NO)
             ->field("fp.*,ft.topic,u.nickname,u.head_image_url,u.self_medals")
             ->order("fp.id desc")
             ->limit(($pageNum-1)*$pageSize, $pageSize)
@@ -540,6 +613,7 @@ class ForumService extends Base
             ->leftJoin("forum_topic ft", "ft.uuid=fp.t_uuid")
             ->leftJoin("user_base u", "u.uuid=fp.user_uuid")
             ->where("fp.is_recommend", PostIsRecommendEnum::YES)
+            ->where("fp.is_delete", DbIsDeleteEnum::NO)
             ->field("fp.*,ft.topic,u.nickname,u.head_image_url,u.self_medals")
             ->order("fp.id desc")
             ->limit(($pageNum-1)*$pageSize, $pageSize)
@@ -605,6 +679,7 @@ class ForumService extends Base
         $postList = Db::name("forum_post")->alias("fp")
             ->leftJoin("forum_topic ft", "ft.uuid=fp.t_uuid")
             ->leftJoin("user_base u", "u.uuid=fp.user_uuid")
+            ->where("fp.is_delete", DbIsDeleteEnum::NO)
             ->field("fp.*,ft.topic,u.nickname,u.head_image_url,u.self_medals")
             ->order("fp.id desc")
             ->limit(($pageNum-1)*$pageSize, $pageSize)
@@ -671,6 +746,7 @@ class ForumService extends Base
             ->leftJoin("forum_topic ft", "ft.uuid=fp.t_uuid")
             ->leftJoin("user_base u", "u.uuid=fp.user_uuid")
             ->where("fp.user_uuid", $user["uuid"])
+            ->where("fp.is_delete", DbIsDeleteEnum::NO)
             ->field("fp.*,ft.topic,u.nickname,u.head_image_url,u.self_medals")
             ->order("fp.id desc")
             ->limit(($pageNum-1)*$pageSize, $pageSize)
@@ -724,8 +800,11 @@ class ForumService extends Base
     {
         $returnData = [];
 
-        $postUuids = Db::name("forum_post_reply")
-            ->where("user_uuid", $user["uuid"])
+        $postUuids = Db::name("forum_post_reply")->alias("fpr")
+            ->leftJoin("forum_post fp", "fp.uuid=fpr.p_uuid")
+            ->where("fpr.user_uuid", $user["uuid"])
+            ->where("fp.is_delete", DbIsDeleteEnum::NO)
+            ->where("fpr.is_delete", DbIsDeleteEnum::NO)
             ->column("distinct p_uuid");
         $postUuids = array_reverse($postUuids);
         $postUuids = array_slice($postUuids, ($pageNum-1)*$pageSize, $pageSize);
@@ -784,5 +863,51 @@ class ForumService extends Base
         }
 
         return $returnData;
+    }
+
+    /**
+     * 删除帖子
+     * @param $user
+     * @param $postUuid
+     * @return \stdClass
+     * @throws AppException
+     */
+    public function delPost($user, $postUuid)
+    {
+        $postModel = new ForumPostModel();
+        $post = $postModel->findByUuid($postUuid);
+
+        if ($post) {
+            if ($post["user_uuid"] != $user["uuid"]) {
+                throw AppException::factory(AppException::COM_INVALID);
+            }
+            $post->is_delete = DbIsDeleteEnum::YES;
+            $post->save();
+        }
+
+        return new \stdClass();
+    }
+
+    /**
+     * 删除回复
+     * @param $user
+     * @param $replyUuid
+     * @return \stdClass
+     * @throws AppException
+     */
+    public function delReply($user, $replyUuid)
+    {
+        $replyModel = new ForumPostReplyModel();
+        $reply = $replyModel->findByUuid($replyUuid);
+
+        if ($reply) {
+            if ($reply["user_uuid"] != $user["uuid"]) {
+                throw AppException::factory(AppException::COM_INVALID);
+            }
+            $reply->is_delete = DbIsDeleteEnum::YES;
+            $reply->save();
+        }
+
+        return new \stdClass();
     }
 }

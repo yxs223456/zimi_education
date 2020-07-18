@@ -198,8 +198,10 @@ Route::rule('forum/replyPost', 'api/forum/replyPost');
 Route::rule('forum/upvotePost', 'api/forum/upvotePost');
 //取消点赞帖子
 Route::rule('forum/cancelUpvotePost', 'api/forum/cancelUpvotePost');
-//帖子评论列表
-Route::rule('forum/postReplyList', 'api/forum/postReplyList');
+//帖子评论列表(按热度排序)
+Route::rule('forum/postReplyListByHot', 'api/forum/postReplyListByHot');
+//帖子评论列表(按时间排序)
+Route::rule('forum/postReplyListByTime', 'api/forum/postReplyListByTime');
 //点赞评论
 Route::rule('forum/upvoteReply', 'api/forum/upvoteReply');
 //取消点赞评论
@@ -214,6 +216,10 @@ Route::rule('forum/postList', 'api/forum/postList');
 Route::rule('forum/myPublishPostList', 'api/forum/myPublishPostList');
 //我参与的帖子列表
 Route::rule('forum/myRelatedPostList', 'api/forum/myRelatedPostList');
+//删除帖子
+Route::rule('forum/delPost', 'api/forum/delPost');
+//删除评论
+Route::rule('forum/delReply', 'api/forum/delReply');
 
 
 
