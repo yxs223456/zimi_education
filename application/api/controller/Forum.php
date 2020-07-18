@@ -133,7 +133,7 @@ class Forum extends Base
 
         $user = $this->query["user"];
         $service = new ForumService();
-        return $this->jsonResponse($service->postReplyList($user["uuid"], $postUuid, $pageNum, $pageSize));
+        return $this->jsonResponse($service->postReplyList($user, $postUuid, $pageNum, $pageSize));
     }
 
     /**

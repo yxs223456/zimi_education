@@ -302,7 +302,7 @@ class ForumService extends Base
 
     /**
      * 帖子评论列表
-     * @param $userUuid
+     * @param $user
      * @param $postUuid
      * @param $pageNum
      * @param $pageSize
@@ -311,7 +311,7 @@ class ForumService extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function postReplyList($userUuid, $postUuid, $pageNum, $pageSize)
+    public function postReplyList($user, $postUuid, $pageNum, $pageSize)
     {
         //评论列表
         $replyList = Db::name("forum_post_reply")
@@ -326,7 +326,7 @@ class ForumService extends Base
         $replyUuids = array_column($replyList, "uuid");
         $replyUpvote = Db::name("forum_post_reply_upvote_log")
             ->whereIn("r_uuid", $replyUuids)
-            ->where("user_uuid", $userUuid)
+            ->where("user_uuid", $user["uuid"])
             ->select();
         $replyUpvoteSign = array_column($replyUpvote, "r_uuid");
 
@@ -334,12 +334,12 @@ class ForumService extends Base
         $userUuids = array_column($replyList, "user_uuid");
         $users = Db::name("user_base")->whereIn("uuid", $userUuids)->select();
         $userInfo = [];
-        foreach ($users as $user) {
-            $userSelfMedals = json_decode($user["self_medals"], true);
+        foreach ($users as $replyUser) {
+            $userSelfMedals = json_decode($replyUser["self_medals"], true);
             $userCurrentMedal = (new UserService())->getUserCurrentMedal($userSelfMedals);
-            $userInfo[$user["uuid"]] = [
-                "nickname" => getNickname($user["nickname"]),
-                "head_image_url" => getHeadImageUrl($user["head_image_url"]),
+            $userInfo[$replyUser["uuid"]] = [
+                "nickname" => getNickname($replyUser["nickname"]),
+                "head_image_url" => getHeadImageUrl($replyUser["head_image_url"]),
                 "medal" => $userCurrentMedal["medal_url"]??"",
             ];
         }
@@ -358,6 +358,7 @@ class ForumService extends Base
                     "reply_time" => date("m-d H:i", $item["create_time"]),
                     "upvote_num" => $item["upvote_num"],
                     "is_upvote" => (int) in_array($item["uuid"], $replyUpvoteSign),
+                    "is_my_reply" => (int) ($user["uuid"] == $item["user_uuid"])
                 ],
             ];
         }
