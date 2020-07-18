@@ -145,6 +145,7 @@ class ForumService extends Base
             "reply_time" => date("m-d H:i", strtotime($forumPostReplyModel->create_time)),
             "upvote_num" => 0,
             "is_upvote" => 0,
+            "is_my_reply" => 1,
         ];
     }
 
@@ -292,6 +293,7 @@ class ForumService extends Base
                 "reply_num" => $forumPost["direct_reply_num"],
                 "upvote_num" => $forumPost["upvote_num"],
                 "is_upvote" => $isUpvote,
+                "is_my_post" => (int) ($user["uuid"] == $forumPost["user_uuid"]),
             ],
         ];
 
@@ -511,6 +513,7 @@ class ForumService extends Base
                         "is_upvote" => (int) in_array($item["uuid"], $upvoteData),
                         "topic" => $item["topic"],
                         "t_uuid" => $item["t_uuid"],
+                        "is_my_post" => (int) ($user["uuid"] == $item["user_uuid"]),
                     ],
                 ];
             }
@@ -576,6 +579,7 @@ class ForumService extends Base
                         "is_upvote" => (int) in_array($item["uuid"], $upvoteData),
                         "topic" => $item["topic"],
                         "t_uuid" => $item["t_uuid"],
+                        "is_my_post" => (int) ($user["uuid"] == $item["user_uuid"]),
                     ],
                 ];
             }
@@ -640,6 +644,7 @@ class ForumService extends Base
                         "is_upvote" => (int) in_array($item["uuid"], $upvoteData),
                         "topic" => $item["topic"],
                         "t_uuid" => $item["t_uuid"],
+                        "is_my_post" => (int) ($user["uuid"] == $item["user_uuid"]),
                     ],
                 ];
             }
@@ -705,6 +710,7 @@ class ForumService extends Base
                         "is_upvote" => (int) in_array($item["uuid"], $upvoteData),
                         "topic" => $item["topic"],
                         "t_uuid" => $item["t_uuid"],
+                        "is_my_post" => (int) ($user["uuid"] == $item["user_uuid"]),
                     ],
                 ];
             }
@@ -769,6 +775,7 @@ class ForumService extends Base
                             "is_upvote" => (int) in_array($item["uuid"], $upvoteData),
                             "topic" => $item["topic"],
                             "t_uuid" => $item["t_uuid"],
+                            "is_my_post" => (int) ($user["uuid"] == $item["user_uuid"]),
                         ],
                     ];
                 }
