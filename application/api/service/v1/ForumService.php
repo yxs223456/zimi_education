@@ -139,14 +139,23 @@ class ForumService extends Base
             throw $e;
         }
 
-
+        //用户勋章
+        $userSelfMedals = json_decode($user["self_medals"], true);
+        $userCurrentMedal = (new UserService())->getUserCurrentMedal($userSelfMedals);
         return [
-            "uuid" => $uuid,
-            "content" => $content,
-            "reply_time" => date("m-d H:i", strtotime($forumPostReplyModel->create_time)),
-            "upvote_num" => 0,
-            "is_upvote" => 0,
-            "is_my_reply" => 1,
+            "user" => [
+                "nickname" => getNickname($user["nickname"]),
+                "head_image_url" => getHeadImageUrl($user["head_image_url"]),
+                "medal" => $userCurrentMedal["medal_url"]??"",
+            ],
+            "reply" => [
+                "uuid" => $uuid,
+                "content" => $content,
+                "reply_time" => date("m-d H:i", strtotime($forumPostReplyModel->create_time)),
+                "upvote_num" => 0,
+                "is_upvote" => 0,
+                "is_my_reply" => 1,
+            ],
         ];
     }
 
@@ -870,19 +879,34 @@ class ForumService extends Base
      * @param $user
      * @param $postUuid
      * @return \stdClass
-     * @throws AppException
+     * @throws \Throwable
      */
     public function delPost($user, $postUuid)
     {
         $postModel = new ForumPostModel();
-        $post = $postModel->findByUuid($postUuid);
 
-        if ($post) {
-            if ($post["user_uuid"] != $user["uuid"]) {
-                throw AppException::factory(AppException::COM_INVALID);
+        Db::startTrans();
+        try {
+            $post = $postModel->where("uuid", $postUuid)->lock(true)->find();
+            if ($post) {
+                if ($post["user_uuid"] != $user["uuid"]) {
+                    throw AppException::factory(AppException::COM_INVALID);
+                }
+                if ($post->is_delete == DbIsDeleteEnum::NO) {
+
+                    $post->is_delete = DbIsDeleteEnum::YES;
+                    $post->save();
+
+                    Db::name("forum_topic")
+                        ->where("uuid", $post["t_uuid"])
+                        ->setDec("post_num", 1);
+                }
             }
-            $post->is_delete = DbIsDeleteEnum::YES;
-            $post->save();
+
+            Db::commit();
+        } catch (\Throwable $e) {
+            Db::rollback();
+            throw $e;
         }
 
         return new \stdClass();
@@ -893,19 +917,37 @@ class ForumService extends Base
      * @param $user
      * @param $replyUuid
      * @return \stdClass
-     * @throws AppException
+     * @throws \Throwable
      */
     public function delReply($user, $replyUuid)
     {
         $replyModel = new ForumPostReplyModel();
-        $reply = $replyModel->findByUuid($replyUuid);
 
-        if ($reply) {
-            if ($reply["user_uuid"] != $user["uuid"]) {
-                throw AppException::factory(AppException::COM_INVALID);
+        Db::startTrans();
+        try {
+
+            $reply = $replyModel->where("uuid", $replyUuid)->lock(true)->find();
+            if ($reply) {
+                if ($reply["user_uuid"] != $user["uuid"]) {
+                    throw AppException::factory(AppException::COM_INVALID);
+                }
+                if ($reply->is_delete == DbIsDeleteEnum::NO) {
+
+                    $reply->is_delete = DbIsDeleteEnum::YES;
+                    $reply->save();
+
+                    Db::name("forum_post")
+                        ->where("uuid", $reply["p_uuid"])
+                        ->dec("direct_reply_num", 1)
+                        ->dec("total_reply_num", 1)
+                        ->update();
+                }
             }
-            $reply->is_delete = DbIsDeleteEnum::YES;
-            $reply->save();
+
+            Db::commit();
+        } catch (\Throwable $e) {
+            Db::rollback();
+            throw $e;
         }
 
         return new \stdClass();
