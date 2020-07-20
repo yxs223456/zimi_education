@@ -94,7 +94,7 @@ class ForumTopic extends Base
             ->where("id", $id)
             ->find();
         $this->assign('info', $info);
-        $this->fetch();
+        return $this->fetch();
     }
 
     public function editPost()
