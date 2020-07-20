@@ -4,6 +4,8 @@ namespace app\admin\controller;
 
 use app\admin\service\ActivityNewsService;
 use app\admin\service\FillTheBlanksService;
+use app\admin\service\ForumPostService;
+use app\admin\service\ForumTopicService;
 use app\admin\service\InternalCompetitionJoinService;
 use app\admin\service\InternalCompetitionService;
 use app\admin\service\PackageChannelService;
@@ -46,6 +48,8 @@ class Base extends Controller {
     protected $systemNewsService;
     protected $packageConfigService;
     protected $packageChannelService;
+    protected $forumTopicService;
+    protected $forumPostService;
 
     /**
      * 依赖注入
@@ -70,6 +74,8 @@ class Base extends Controller {
      * @param SystemNewsService $systemNewsService
      * @param PackageConfigService $packageConfigService
      * @param PackageChannelService $packageChannelService
+     * @param ForumTopicService $forumTopicService
+     * @param ForumPostService $forumPostService
      */
     public function __construct( ActivityNewsService $activityNewsService,
                                  AdminService $adminService,
@@ -90,7 +96,9 @@ class Base extends Controller {
                                  PkService $pkService,
                                  SystemNewsService $systemNewsService,
                                  PackageConfigService $packageConfigService,
-                                 PackageChannelService $packageChannelService){
+                                 PackageChannelService $packageChannelService,
+                                 ForumTopicService $forumTopicService,
+                                 ForumPostService $forumPostService){
 
         parent::__construct();
 
@@ -114,5 +122,7 @@ class Base extends Controller {
         $this->systemNewsService = $systemNewsService;
         $this->packageChannelService = $packageChannelService;
         $this->packageConfigService = $packageConfigService;
+        $this->forumTopicService = $forumTopicService;
+        $this->forumPostService = $forumPostService;
     }
 }

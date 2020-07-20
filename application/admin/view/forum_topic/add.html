@@ -1,0 +1,143 @@
+{include file="public/header" /}
+<link rel="stylesheet" type="text/css" href="/static/admin/webupload/webuploader.css">
+<link rel="stylesheet" type="text/css" href="/static/admin/webupload/style.css">
+<link href="/static/admin/css/select2.min.css" rel="stylesheet">
+<!-- 配置文件 -->
+<script type="text/javascript" src="/static/admin/ueditor/ueditor.config.js"></script>
+<!-- 编辑器源码文件 -->
+<script type="text/javascript" src="/static/admin/ueditor/ueditor.all.js"></script>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>添加活动消息</h5>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal" name="add" id="add" method="post" action="{:url('addPost')}">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">话题<font color='red'>*</font>：</label>
+                            <div class="input-group col-sm-4">
+                                <input id="topic" type="text" class="form-control" name="topic" >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">封面图片<font color='red'>*</font>：</label>
+                            <div class="input-group col-sm-4">
+                                <img id="image_url_src" src="" width="100px">
+                                <input type="hidden" id="image_url" name="image_url" />
+                                <input type="file" name="file" id="file_image_url"
+                                       onchange="uploadImage('image_url_src', 'image_url', 'file_image_url')" class="form-control"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">是否热门：</label>
+                            <div class="col-sm-4">
+                                <div class="radio ">
+                                    <input type="checkbox" class="js-switch"  />&nbsp;&nbsp;默认不热门
+                                    <input name="is_hot" value="0" type="hidden">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-3">
+                                <button id="formSubmit" type="button" class="btn btn-primary"><i class="fa fa-save"></i> 保存</button>&nbsp;&nbsp;&nbsp;
+                                <a class="btn btn-danger" href="javascript:history.go(-1);"><i class="fa fa-close"></i> 返回</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{include file="public/footer" /}
+<script type="text/javascript" src="/static/admin/webupload/webuploader.min.js"></script>
+<script type="text/javascript" src="/static/admin/js/common.js"></script>
+<script src="/static/admin/js/select2.full.min.js"></script>
+<script src="/static/admin/js/ajaxfileupload.js"></script>
+
+<!-- 开发环境版本，包含了有帮助的命令行警告 -->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<!-- 引入样式 -->
+<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<!-- 引入组件库 -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script type="text/javascript">
+
+    $(function(){
+
+        $('#formSubmit').click(function() {
+            if(common.isNullOrEmpty($('#topic').val())){
+                layer.msg('请输入话题',{icon:2,time:1500,shade: 0.1}, function(index){
+                    layer.close(index);
+                });
+                return false;
+            }
+            if(common.isNullOrEmpty($('#image_url').val())){
+                layer.msg('请上传图片',{icon:2,time:1500,shade: 0.1}, function(index){
+                    layer.close(index);
+                });
+                return false;
+            }
+
+
+            $("form#add").submit();
+        });
+    });
+
+    function uploadImage(img, formInput, fileInput) {
+        $.ajaxFileUpload({
+            url: "/admin/upload/uploadFile", //用于文件上传的服务器端请求地址
+            secureuri: false, //是否需要安全协议，一般设置为false
+            fileElementId: fileInput, //文件上传域的ID
+            dataType: 'json', //返回值类型 一般设置为json
+            data: "{}",
+            success: function (data, status)  //服务器成功响应处理函数
+            {
+                console.log(data);
+                if (data['code'] != 200) {
+                    layer.msg(data['msg']);
+                    return false;
+                }
+                $("#" + img).attr("src", "/"+data['data']['url']);
+                $("#" + formInput).val(data['data']['url']);
+                console.log(data['data']['url'])
+            },
+            error: function (data, status, e)//服务器响应失败处理函数
+            {
+                console.log(e);
+            }
+        })
+    }
+
+    //IOS开关样式配置
+    var elem = document.querySelector('.js-switch');
+    var switchery = new Switchery(elem, {
+        color: '#1AB394'
+    });
+
+    elem.onchange = function () {
+        if (elem.checked) {
+            $("input[name='is_hot']").val(0);
+        } else {
+            $("input[name='is_hot']").val(1);
+        }
+    };
+
+    var config = {
+        '.chosen-select': {},
+    };
+    for (var selector in config) {
+        $(selector).chosen(config[selector]);
+    }
+
+</script>
+</body>
+</html>
