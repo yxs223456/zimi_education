@@ -9,18 +9,12 @@
             <!--搜索框开始-->
             <div class="row">
                 <div class="col-sm-12">
-                    <div  class="col-sm-2" style="width: 100px">
-                        <div class="input-group" >
-                            <a href="{:url('add')}"><button class="btn btn-outline btn-primary" type="button">添加话题</button></a>
-                        </div>
-                    </div>
-                    <div class="col-sm-10">
-                        <form method="post" action="{:url('list')}" id="searchForm" class="form-inline">
-                            <label for="">话题</label>
-                            <input type="text" name="topic" value="{$topic|default=''}" class="form-control">
 
-                            <label for="">是否热门</label>
-                            {:getEnumSelectWidget($isHost, 'is_hot', '-全部-', isset($is_hot) ? $is_hot : '-999', 1)}
+                    <div class="col-sm-12">
+                        <form method="post" action="{:url('list')}" id="searchForm" class="form-inline">
+
+                            <label for="">是否推荐</label>
+                            {:getEnumSelectWidget($isRecommend, 'is_recommend', '-全部-', isset($is_recommend) ? $is_recommend : '-999', 1)}
 
                             <button class="btn btn-success btn-sm" type="submit" style="margin-bottom:0;margin-left:4px"><i class="fa fa-filter"></i> 筛选</button>
                             <a class="btn btn-primary btn-sm"  style="margin-bottom:0" href="{:url('list')}"><i class="fa fa-filter"></i> 重置</a>
@@ -38,8 +32,8 @@
                             <thead>
                             <tr class="long-tr">
                                 <th>ID</th>
-                                <th>话题</th>
-                                <th>是否热门</th>
+                                <th>帖子内容</th>
+                                <th>是否推荐</th>
                                 <th>操作</th>
                             </tr>
                             </thead>
@@ -47,22 +41,21 @@
                             {foreach $list as $vo}
                             <tr class="long-td">
                                 <td>{$vo.id}</td>
-                                <td>{$vo.topic}</td>
+                                <td>{$vo.content}</td>
                                 <td>
-                                    {if condition="$vo['is_hot'] eq 1"}
-                                    <a class="red btn btn-info btn-xs" href="{:url('IsHotNo',['id'=>$vo['id'],'topic'=>$topic??'','is_hot'=>$is_hot??'-999','page'=>$page??1])}">
+                                    {if condition="$vo['is_recommend'] eq 1"}
+                                    <a class="red btn btn-info btn-xs" href="{:url('isRecommendNo',['id'=>$vo['id'],'is_recommend'=>$is_recommend??'-999','page'=>$page??1])}">
                                         是
                                     </a>
                                     {else /}
-                                    <a class="red btn btn-danger btn-xs" href="{:url('IsHotYes',['id'=>$vo['id'],'topic'=>$topic??'','is_hot'=>$is_hot??'-999','page'=>$page??1])}">
+                                    <a class="red btn btn-danger btn-xs" href="{:url('isRecommendYes',['id'=>$vo['id'],'is_recommend'=>$is_recommend??'-999','page'=>$page??1])}">
                                         不是
                                     </a>
                                     {/if}
                                 </td>
                                 <td>
-                                    <a href="{:url('edit',['id'=>$vo['id'],'topic'=>$topic??'','is_hot'=>$is_hot??'-999','page'=>$page??1])}" class="btn btn-primary btn-xs">
-                                        <i class="fa fa-paste"></i> 编辑</a>&nbsp;
                                 </td>
+
                             </tr>
                             {/foreach}
                             </tbody>
@@ -101,8 +94,7 @@
                 //首次不执行
                 if(!first){
                     $("#searchForm").attr('action', '{:url("list")}?page='+obj.curr +
-                        "&topic={$topic|default=''}" +
-                        "&is_hot={$is_hot??-999}"
+                        "&is_recommend={$is_recommend??'-999'}"
                     );
                     $("#searchForm").submit();
                 }
