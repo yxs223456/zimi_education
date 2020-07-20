@@ -16,6 +16,8 @@
                 </div>
                 <div class="ibox-content">
                     <form class="form-horizontal" name="add" id="edit" method="post" action="{:url('editPost')}">
+                        <input type="hidden" name="id" value="{$info.id}">
+
                         <div class="form-group">
                             <label class="col-sm-3 control-label">话题<font color='red'>*</font>：</label>
                             <div class="input-group col-sm-4">

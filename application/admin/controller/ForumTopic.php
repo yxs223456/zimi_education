@@ -75,13 +75,12 @@ class ForumTopic extends Base
         $imageUrl = input('image_url', '');
         $isHot = input("is_hot", 0);
 
-        Db::name("forum_topic")
-            ->insert([
-                "uuid" => getRandomString(10),
-                "topic" => $topic,
-                "image_url" => $imageUrl,
-                "is_hot" => $isHot,
-            ]);
+        $this->forumTopicService->saveByData([
+            "uuid" => getRandomString(10),
+            "topic" => $topic,
+            "image_url" => $imageUrl,
+            "is_hot" => $isHot,
+        ]);
 
 
         $this->success("添加成功",url("list"));
@@ -103,12 +102,10 @@ class ForumTopic extends Base
         $topic = input('topic', '');
         $imageUrl= input('image_url', '');
 
-        Db::name("forum_topic")
-            ->where("id", $id)
-            ->update([
-                "topic" => $topic,
-                "image_url" => $imageUrl,
-            ]);
+        $this->forumTopicService->updateByIdAndData($id, [
+            "topic" => $topic,
+            "image_url" => $imageUrl,
+        ]);
 
         $this->success("编辑成功",url("list"));
     }
