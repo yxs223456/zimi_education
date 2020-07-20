@@ -125,9 +125,9 @@
 
     elem.onchange = function () {
         if (elem.checked) {
-            $("input[name='is_hot']").val(0);
-        } else {
             $("input[name='is_hot']").val(1);
+        } else {
+            $("input[name='is_hot']").val(0);
         }
     };
 
