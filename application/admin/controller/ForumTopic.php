@@ -72,13 +72,15 @@ class ForumTopic extends Base
     public function addPost()
     {
         $topic = input('topic', '');
-        $imageUrl= input('image_url', '');
+        $imageUrl = input('image_url', '');
+        $isHot = input("is_hot", 0);
 
         Db::name("forum_topic")
             ->insert([
                 "uuid" => getRandomString(10),
                 "topic" => $topic,
                 "image_url" => $imageUrl,
+                "is_hot" => $isHot,
             ]);
 
 
