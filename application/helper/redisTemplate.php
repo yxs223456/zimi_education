@@ -1005,7 +1005,7 @@ function getPkRankLikeTodayInfo($userUuid, $type, \Redis $redis) {
 }
 
 //创建单推任务
-function createUnicastPushTask($os, $userUuid, $content, $targetPage, array $pageParams, \Redis $redis, $title="消息通知") {
+function createUnicastPushTask($os, $userUuid, $content, $targetPage, array $pageParams, \Redis $redis, $title="消息通知", $targetPageType = 0) {
     $key = "de_education:pushTask";
     $data = [
         "type" => "unicast",
@@ -1013,6 +1013,7 @@ function createUnicastPushTask($os, $userUuid, $content, $targetPage, array $pag
         "userUuid" => $userUuid,
         "title" => $title,
         "content" => $content,
+        "targetPageType" => $targetPageType,
         "targetPage" => $targetPage,
         "pageParams" => $pageParams,
     ];

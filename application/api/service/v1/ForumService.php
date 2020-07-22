@@ -13,12 +13,16 @@ use app\api\service\UserService;
 use app\common\AppException;
 use app\common\enum\DbIsDeleteEnum;
 use app\common\enum\ForumTopicIsHotEnum;
+use app\common\enum\NewsTargetPageTypeEnum;
+use app\common\enum\NewsTypeEnum;
 use app\common\enum\PostIsRecommendEnum;
+use app\common\helper\Redis;
 use app\common\model\ForumPostModel;
 use app\common\model\ForumPostReplyModel;
 use app\common\model\ForumPostReplyUpvoteModel;
 use app\common\model\ForumPostUpvoteModel;
 use app\common\model\ForumTopicModel;
+use app\common\model\NewsModel;
 use think\Db;
 
 class ForumService extends Base
@@ -138,6 +142,26 @@ class ForumService extends Base
             Db::rollback();
             throw $e;
         }
+
+        //纪录、发送消息
+        $post = (new ForumPostModel())->findByUuid($postUuid);
+        $newsModel = new NewsModel();
+        $content = getNickname($user["nickname"]) . "评论了你发布的吐槽";
+        $targetPage = json_encode([
+            "android" => "com.zimi.study.module.complain_detail.ComplainDetailActivity",
+            "ios" => "Roast",
+        ]);
+        $pageParams = [
+            "android" => [
+                "complain_id" => $postUuid,
+            ],
+            "ios" => [
+                "uuid" => $postUuid,
+            ],
+        ];
+        $newsModel->addNews($post["user_uuid"], $content, $targetPage, $pageParams);
+        $title = "有小伙伴评论你发布的吐槽了";
+        createUnicastPushTask($user["os"], $user["uuid"], $content, json_decode($targetPage, true), $pageParams, Redis::factory(), $title);
 
         //用户勋章
         $userSelfMedals = json_decode($user["self_medals"], true);

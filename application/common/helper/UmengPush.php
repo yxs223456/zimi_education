@@ -34,7 +34,7 @@ class UmengPush
         $this->timestamp = strval(time());
     }
 
-    public function sendAndroidUnicast($userUuid, $title, $content)
+    public function sendAndroidUnicast($userUuid, $title, $content, $targetPageType = 0, array $pageConfig = [], $messageType = 'system_message')
     {
         try {
             $umengConfig = config("account.android_umeng_push");
@@ -50,12 +50,24 @@ class UmengPush
             $customizedcast->setPredefinedKeyValue("alias",            $userUuid);
             $customizedcast->setPredefinedKeyValue("alias_type",       "DE_education");
             $customizedcast->setPredefinedKeyValue("production_mode", "true");
+
             $custom = [
                 "is_single_user" => true,
-                "module" => "system_message",
+                "module" => $messageType,
                 "userid" => $userUuid,
-                "target_page_type" => 0,
+                "target_page_type" => $targetPageType,
             ];
+            if ($targetPageType == NewsTargetPageTypeEnum::APP) {
+                $custom["local_android"] = [
+                    "page" => $pageConfig["target_page"]["android"],
+                    "params" => $pageConfig["page_params"]["android"]?$pageConfig["page_params"]["android"]:(new \stdClass()),
+                ];
+                $custom["local_ios"] = [
+                    "page" => $pageConfig["target_page"]["ios"],
+                    "params" => $pageConfig["page_params"]["ios"]?$pageConfig["page_params"]["ios"]:(new \stdClass()),
+                ];
+            }
+
             $customizedcast->setPredefinedKeyValue("custom",       $custom);
             $customizedcast->setPredefinedKeyValue("mipush",       true);
             $customizedcast->setPredefinedKeyValue("mi_activity", "com.zimi.study.module.push.UmengClickActivity");
@@ -70,7 +82,7 @@ class UmengPush
         }
     }
 
-    public function sendIOSUnicast($userUuid, $content) {
+    public function sendIOSUnicast($userUuid, $content, $targetPageType = 0, array $pageConfig = [], $messageType = 'system_message') {
         try {
             $umengConfig = config("account.ios_umeng_push");
             $this->appkey = $umengConfig["app_key"];
@@ -89,10 +101,20 @@ class UmengPush
 
             $custom = [
                 "is_single_user"=>true,
-                "module" => "system_message",
+                "module" => $messageType,
                 "userid"=>$userUuid,
-                "target_page_type" => 0,
+                "target_page_type" => $targetPageType,
             ];
+            if ($targetPageType == NewsTargetPageTypeEnum::APP) {
+                $custom["local_android"] = [
+                    "page" => $pageConfig["target_page"]["android"],
+                    "params" => $pageConfig["page_params"]["android"]?$pageConfig["page_params"]["android"]:(new \stdClass()),
+                ];
+                $custom["local_ios"] = [
+                    "page" => $pageConfig["target_page"]["ios"],
+                    "params" => $pageConfig["page_params"]["ios"]?$pageConfig["page_params"]["ios"]:(new \stdClass()),
+                ];
+            }
             $customizedcast->setPredefinedKeyValue("custom",       $custom);
             $customizedcast->setPredefinedKeyValue("alert", $content);
             $customizedcast->setPredefinedKeyValue("badge", 0);
