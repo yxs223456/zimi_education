@@ -121,7 +121,7 @@ class Constant
     const PK_GOD_JOIN_COIN = 50;
 
     //pk赛题目数量
-    const PK_QUESTION_COUNT = 30;
+    const PK_QUESTION_COUNT = 10;
 
     //pk审核等待最长时间72小时，审核超时自动流局
     const PK_AUDIT_WAIT_TIME = 72 * 3600;
