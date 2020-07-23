@@ -37,7 +37,6 @@ class NewsModel extends Base
             ->where("user_uuid", $userUuid)
             ->where("type", NewsTypeEnum::SYSTEM)
             ->where("is_read", NewsIsReadEnum::NO)
-            ->field("uuid,content,create_time")
             ->order("id", "desc")
             ->select()->toArray();
     }
@@ -51,13 +50,14 @@ class NewsModel extends Base
             ->select()->toArray();
     }
 
-    public function addNews($userUuid, $content, $targetPage = "", array $pageParams = [])
+    public function addNews($userUuid, $content, $targetPage = "", array $pageParams = [], $targetPageType = 0)
     {
         $data = [
             "uuid" => getRandomString(),
             "user_uuid" => $userUuid,
             "content" => $content,
             "target_page" => $targetPage,
+            "target_page_type" => $targetPageType,
             "page_params" => json_encode($pageParams, JSON_UNESCAPED_UNICODE),
             "is_read" => NewsIsReadEnum::NO,
             "create_time" => time(),

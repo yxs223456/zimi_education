@@ -1121,12 +1121,39 @@ class UserService extends Base
         //个人系统消息
         $newsModel = new NewsModel();
         $allUnreadNews = $newsModel->allUnreadNewsByUser($user["uuid"]);
-        foreach ($allUnreadNews as $allUnreadNew) {
+        foreach ($allUnreadNews as $item) {
+            $localAndroid = new \stdClass();
+            $localIos = new \stdClass();
+            $h5PageParams =  new \stdClass();
+            switch ($item["target_page_type"]) {
+                case NewsTargetPageTypeEnum::APP:
+                    $targetPage = json_decode($item["target_page"], true);
+                    $pageParams = json_decode($item["page_params"], true);
+                    $localAndroid = [
+                        "page" => $targetPage["android"],
+                        "params" => $pageParams["android"]?$pageParams["android"]:(new \stdClass()),
+                    ];
+                    $localIos = [
+                        "page" => $targetPage["ios"],
+                        "params" => $pageParams["ios"]?$pageParams["ios"]:(new \stdClass()),
+                    ];
+                    break;
+                case NewsTargetPageTypeEnum::H5:
+                    $targetParams = json_decode($item["page_params"], true);
+                    $h5PageParams = [
+                        "title" => $targetParams["title"],
+                        "url" => $item["target_page"],
+                    ];
+
+            }
             $returnData[] = [
-                "uuid" => $allUnreadNew["uuid"],
-                "content" => $allUnreadNew["content"],
-                "target_page_type" => NewsTargetPageTypeEnum::NONE,
-                "create_time" => strtotime($allUnreadNew["create_time"]),
+                "uuid" => $item["uuid"],
+                "content" => $item["content"],
+                "target_page_type" => $item["target_page_type"],
+                "local_android" => $localAndroid,
+                "local_ios" => $localIos,
+                "h5_page_params" => $h5PageParams,
+                "create_time" => strtotime($item["create_time"]),
             ];
         }
         //全部标记为已读

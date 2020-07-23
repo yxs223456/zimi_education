@@ -146,7 +146,7 @@ class ForumService extends Base
         //纪录、发送消息
         $post = (new ForumPostModel())->findByUuid($postUuid);
         $newsModel = new NewsModel();
-        $content = getNickname($user["nickname"]) . "评论了你发布的吐槽";
+        $newsContent = getNickname($user["nickname"]) . "评论了你发布的吐槽";
         $targetPage = json_encode([
             "android" => "com.zimi.study.module.complain_detail.ComplainDetailActivity",
             "ios" => "Roast",
@@ -159,9 +159,9 @@ class ForumService extends Base
                 "uuid" => $postUuid,
             ],
         ];
-        $newsModel->addNews($post["user_uuid"], $content, $targetPage, $pageParams);
+        $newsModel->addNews($post["user_uuid"], $newsContent, $targetPage, $pageParams);
         $title = "有小伙伴评论你发布的吐槽了";
-        createUnicastPushTask($user["os"], $user["uuid"], $content, json_decode($targetPage, true), $pageParams, Redis::factory(), $title);
+        createUnicastPushTask($user["os"], $user["uuid"], $newsContent, json_decode($targetPage, true), $pageParams, Redis::factory(), $title);
 
         //用户勋章
         $userSelfMedals = json_decode($user["self_medals"], true);
