@@ -89,7 +89,7 @@ class SystemNews extends Base
             }
             $targetPage = json_encode(["android"=>$androidPage,"ios"=>$iosPage]);
             $targetParams = json_encode(["android"=>$androidParams,"ios"=>$iosParams]);
-        } else if (NewsTargetPageTypeEnum::H5) {
+        } else if ($targetPageType == NewsTargetPageTypeEnum::H5) {
             $h5Title = input("h5_title");
             $h5Url = input("h5_url");
             if ($h5Title == "") {
