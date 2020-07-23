@@ -159,7 +159,7 @@ class ForumService extends Base
                 "uuid" => $postUuid,
             ],
         ];
-        $newsModel->addNews($post["user_uuid"], $newsContent, $targetPage, $pageParams);
+        $newsModel->addNews($post["user_uuid"], $newsContent, $targetPage, $pageParams, NewsTargetPageTypeEnum::APP);
         $title = "有小伙伴评论你发布的吐槽了";
         createUnicastPushTask($user["os"], $user["uuid"], $newsContent, json_decode($targetPage, true), $pageParams, Redis::factory(), $title);
 
