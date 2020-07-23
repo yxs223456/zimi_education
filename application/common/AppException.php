@@ -75,6 +75,7 @@ class AppException extends \Exception
     const RANK_DAILY_LIKE_SOMEONE_ONE_TIMES = [7002, "每天只能助力同一人一次"];
 
     const FORUM_UPVOTE_ALREADY = [8000, "已经点过赞啦~"];
+    const FORUM_POST_DELETE = [8001, "该吐槽已被发布者删除"];
 
     public static function factory($errConst)
     {

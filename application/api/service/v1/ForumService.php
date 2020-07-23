@@ -295,6 +295,10 @@ class ForumService extends Base
             throw AppException::factory(AppException::COM_INVALID);
         }
 
+        if ($forumPost["is_delete"] == DbIsDeleteEnum::YES) {
+            throw AppException::factory(AppException::FORUM_POST_DELETE);
+        }
+
         //帖子图片
         $photos = json_decode($forumPost["photos"], true);
         foreach ($photos as $key=>$photo) {
