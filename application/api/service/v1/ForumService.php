@@ -854,11 +854,11 @@ class ForumService extends Base
             ->where("fpr.is_delete", DbIsDeleteEnum::NO)
             ->order("fpr.id", "desc")
             ->column("fpr.p_uuid");
-        $postUuids = array_reverse(array_unique($postUuids));
+        $postUuids = array_unique($postUuids);
         $postUuids = array_slice($postUuids, ($pageNum-1)*$pageSize, $pageSize);
 
         if ($postUuids) {
-            $postList = Db::name("forum_post")->alias("fp")
+            $postList2 = Db::name("forum_post")->alias("fp")
                 ->leftJoin("forum_topic ft", "ft.uuid=fp.t_uuid")
                 ->leftJoin("user_base u", "u.uuid=fp.user_uuid")
                 ->whereIn("fp.uuid", $postUuids)
@@ -866,7 +866,11 @@ class ForumService extends Base
                 ->order("fp.id desc")
                 ->limit(($pageNum-1)*$pageSize, $pageSize)
                 ->select();
-            array_multisort($postList, SORT_ASC, $postUuids);
+            $postList2 = array_column($postList2, null, "uuid");
+            $postList = [];
+            foreach ($postUuids as $postUuid) {
+                $postList[] = $postList2[$postUuid];
+            }
 
             if ($postList) {
                 //当前用户点赞情况
