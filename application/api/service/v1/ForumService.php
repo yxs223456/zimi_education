@@ -852,8 +852,9 @@ class ForumService extends Base
             ->where("fpr.user_uuid", $user["uuid"])
             ->where("fp.is_delete", DbIsDeleteEnum::NO)
             ->where("fpr.is_delete", DbIsDeleteEnum::NO)
-            ->column("distinct p_uuid");
-        $postUuids = array_reverse($postUuids);
+            ->order("fpr.id", "desc")
+            ->column("fpr.p_uuid");
+        $postUuids = array_reverse(array_unique($postUuids));
         $postUuids = array_slice($postUuids, ($pageNum-1)*$pageSize, $pageSize);
 
         if ($postUuids) {
