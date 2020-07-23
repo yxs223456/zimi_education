@@ -66,7 +66,7 @@ class PushMessageToUser extends Command
         $umengPush = new UmengPush();
         $pageConfig = [
             "target_page" => $params["targetPage"]??"",
-            "page_params" => $params["page_params"]??[]
+            "page_params" => $params["pageParams"]??[]
         ];
 
         if (strtolower($params["os"]) == "android") {

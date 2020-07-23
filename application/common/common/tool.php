@@ -227,6 +227,15 @@ function createInviteCode($length = 10)
     return $str;
 }
 
+function getHttpLink($link)
+{
+    if (stripos($link, "http") !== 0) {
+        $link = str_replace("static/", config("web.self_domain") . "/static/", $link);
+    }
+
+    return $link;
+}
+
 function getImageUrl($imageUrl)
 {
     return str_replace("static/", config("web.self_domain") . "/static/", $imageUrl);
