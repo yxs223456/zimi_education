@@ -160,8 +160,9 @@ class ForumService extends Base
             ],
         ];
         $newsModel->addNews($post["user_uuid"], $newsContent, $targetPage, $pageParams, NewsTargetPageTypeEnum::APP);
+        $postUser = Db::name("user_base")->where("uuid", $post["user_uuid"])->find();
         $title = "有小伙伴评论你发布的吐槽了";
-        createUnicastPushTask($user["os"], $user["uuid"], $newsContent, json_decode($targetPage, true), $pageParams, Redis::factory(), $title);
+        createUnicastPushTask($postUser["os"], $postUser["uuid"], $newsContent, json_decode($targetPage, true), $pageParams, Redis::factory(), $title);
 
         //用户勋章
         $userSelfMedals = json_decode($user["self_medals"], true);

@@ -7,20 +7,11 @@
  */
 namespace app\common\helper;
 
-include_once(\Env::get('root_path') . 'extend/aliyun-oss-php-sdk-master/autoload.php');
-
 use OSS\OssClient;
 use OSS\Core\OssException;
-use app\common\helper\Redis;
 
 class AliyunOss
 {
-    protected static $accessKeyId = '';
-    protected static $accessKeySecret = '';
-    protected static $endpoint = '';
-    protected static $host = '';
-    protected static $bucket = '';
-
     /**
      * @param $filename string 文件名称
      * @param string $content The content object
@@ -29,18 +20,21 @@ class AliyunOss
      */
     public static function putObject($filename, $content)
     {
-        $accessKeyId = self::$accessKeyId;
-        $accessKeySecret = self::$accessKeySecret;
-        $endpoint = self::$endpoint;
-        // 存储空间名称
-        $bucket= self::$bucket;
+        $ossConfig = config("account.oss");
+        $accessKeyId = $ossConfig["key_id"];
+        $accessKeySecret = $ossConfig["key_secret"];
+        $endpoint = $ossConfig["endpoint"];
+        $bucket= $ossConfig["bucket"];
 
         $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
         $result = $ossClient->putObject($bucket, $filename, $content);
-        $rs = [
-            'url' => $result['info']['url']
-        ];
-        return $rs;
+
+        if (isset($result['info']['url']) && strpos($result['info']['url'], "https") === false) {
+            $result['info']['url'] = str_replace("http", "https", $result['info']['url']);
+            return $result['info']['url'];
+        } else {
+            return "";
+        }
     }
 
     public static function postObjectUploadInfo()

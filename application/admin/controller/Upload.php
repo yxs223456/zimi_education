@@ -2,6 +2,7 @@
 
 namespace app\admin\controller;
 
+use app\common\helper\AliyunOss;
 use taobao\AliOss;
 use think\facade\Env;
 
@@ -20,19 +21,16 @@ class Upload extends Common {
 
     //文件上传
     public function uploadFile() {
-        $dir = input("dir", "api");
         $tempFile = $_FILES['file']['tmp_name'];
-        $fileName = md5(uniqid(mt_rand(), true)).".".strtolower(pathinfo($_FILES['file']['name'])["extension"]);
-        $fileUrl = "static/$dir/" . $fileName;
-        $filePath = "public/" . $fileUrl;
-        move_uploaded_file($tempFile, Env::get("root_path") . $filePath);
-        $packageLink = $fileUrl;
+        $fileName = config("app.app_name") . "/" . date("ymd") . "/" . md5(uniqid(mt_rand(), true))."."
+            .strtolower(pathinfo($_FILES['file']['name'])["extension"]);
+        $url = AliyunOss::putObject($fileName, file_get_contents($tempFile));
         return json(
             [
                 "code" => 200,
                 "msg" => "",
                 "data" => [
-                    "url" => $packageLink,
+                    "url" => $url,
                 ],
             ]
         );
