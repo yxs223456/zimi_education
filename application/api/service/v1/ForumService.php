@@ -49,13 +49,14 @@ class ForumService extends Base
                     "image_url" => getImageUrl($item["image_url"]),
                     "post_num" => $item["post_num"],
                 ];
+            } else {
+                $returnData["total_topic"][] = [
+                    "uuid" => $item["uuid"],
+                    "topic" => $item["topic"],
+                    "image_url" => getImageUrl($item["image_url"]),
+                    "post_num" => $item["post_num"],
+                ];
             }
-            $returnData["total_topic"][] = [
-                "uuid" => $item["uuid"],
-                "topic" => $item["topic"],
-                "image_url" => getImageUrl($item["image_url"]),
-                "post_num" => $item["post_num"],
-            ];
         }
 
         return $returnData;
