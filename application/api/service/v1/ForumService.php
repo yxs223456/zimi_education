@@ -33,7 +33,9 @@ class ForumService extends Base
     public function topic()
     {
         $forumTopicModel = new ForumTopicModel();
-        $topic = $forumTopicModel->select();
+        $topic = $forumTopicModel
+            ->where("is_delete", DbIsDeleteEnum::NO)
+            ->select();
 
         $returnData = [
             "hot_topic" => [],

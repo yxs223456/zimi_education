@@ -9,6 +9,7 @@
 namespace app\admin\controller;
 
 
+use app\common\enum\DbIsDeleteEnum;
 use app\common\enum\ForumTopicIsHotEnum;
 use think\Db;
 
@@ -17,7 +18,7 @@ class ForumTopic extends Base
     public function convertRequestToWhereSql()
     {
 
-        $whereSql = " 1=1 ";
+        $whereSql = " is_delete = 0 ";
         $pageMap = [];
 
         $params = input("param.");
@@ -143,6 +144,24 @@ class ForumTopic extends Base
                 "is_hot" => ForumTopicIsHotEnum::YES,
                 "update_time" => time(),
             ]);
+        $this->redirect("list?page=$page&topic=$topic&is_hot=$isHot");
+    }
+
+    public function delete()
+    {
+        $id = input("id");
+        Db::name("forum_topic")
+            ->where("id", $id)
+            ->update([
+                "is_delete" => DbIsDeleteEnum::YES,
+                "update_time" => time()
+            ]);
+
+        //跳转参数
+        $page = input("page",1);
+        $topic = input('topic', '');
+        $isHot= input('is_hot', '');
+
         $this->redirect("list?page=$page&topic=$topic&is_hot=$isHot");
     }
 }
