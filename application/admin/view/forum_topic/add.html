@@ -106,7 +106,7 @@
                     layer.msg(data['msg']);
                     return false;
                 }
-                $("#" + img).attr("src", "/"+data['data']['url']);
+                $("#" + img).attr("src", data['data']['url']);
                 $("#" + formInput).val(data['data']['url']);
                 console.log(data['data']['url'])
             },
